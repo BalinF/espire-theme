@@ -1,0 +1,509 @@
+/*
+Theme Name: Espire Clothing
+Theme URI: https://espireclothing.com.au
+Author: Espire Clothing
+Description: Custom hand-coded theme for Espire Clothing — replaces the Elementor page-builder build with real WordPress template files, using WooCommerce for the store itself. Built to match the brand style guide and the Design canvas mockups.
+Version: 0.1.0
+Requires PHP: 7.4
+Text Domain: espire
+*/
+
+/* ============================================================
+   HOW THIS FILE WORKS (for learning):
+   WordPress requires every theme to have a style.css file with
+   the comment block above — that's how WordPress recognises it
+   as an installed theme and shows its name in Appearance > Themes.
+   Everything below the comment block is just normal CSS that
+   applies site-wide.
+   ============================================================ */
+
+:root{
+  /* Real brand tokens, from Espire_Clothing_Brand_Guide.pdf */
+  --paper:#FDFAF4;
+  --paper-alt:#F1E8D6;
+  --ink:#1E1E1E;       /* near-black — brand guide says never pure #000 */
+  --ink-soft:#565E4F;
+  --olive:#565E4F;
+  --olive-deep:#3A4038;
+  --rust:#C37602;
+  --redrock:#A92626;
+  --silver:#C0C0C0;
+  --line:#E0D7C7;
+  --card:#F6F0E5;
+  --white:#FFFDF7;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family:"Heebo","Segoe UI",Arial,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+a{ color:inherit; text-decoration:none; }
+img{ max-width:100%; display:block; }
+
+h1,h2,h3{
+  font-family:"League Spartan","Arial Black",sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.01em;
+  margin:0;
+}
+h1{ font-weight:700; letter-spacing:.08em; }
+
+.wordmark-top{ font-family:"Cambria",Georgia,serif; }
+
+/* ---------- Header ---------- */
+header.site-header{
+  position:absolute;
+  top:0; left:0; right:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:20px; padding:22px 5%;
+  background:transparent; color:#fff;
+  border-bottom:1px solid rgba(255,255,255,.16);
+}
+/* On every page except the homepage, the header is solid black, not
+   transparent over a hero. The "is-solid" class is added by header.php
+   when we're NOT on the front page — see the PHP conditional there. */
+header.site-header.is-solid{
+  position:relative;
+  left:0; right:0; width:100%; box-sizing:border-box;
+  background:var(--ink);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+/* FIX: when logged in to wp-admin, WordPress shows a black admin toolbar
+   fixed at the very top of every page (32px tall on desktop, 46px on
+   phones/tablets — it adds a "admin-bar" class to <body> and pushes
+   <html> down to make room). Our HOMEPAGE header is position:absolute
+   with top:0, so without this rule the admin toolbar sits ON TOP of it
+   and visually crops the logo/nav — that's the "header getting cut off"
+   bug. This nudges the header down to sit below the toolbar instead.
+   Logged-out visitors never see the admin bar, so this never affects them.
+
+   IMPORTANT: this must only apply to the absolute-positioned homepage
+   header (:not(.is-solid)). The ":is-solid" header used on every other
+   page is position:relative, and top:32px on a position:relative
+   element doesn't push it down in the page flow the way it does on an
+   absolute one — it just visually SHIFTS it 32px down while leaving its
+   original space empty, which showed up as a "thick cream band" at the
+   top of every category/shop page for logged-in admins (WordPress's own
+   admin-bar CSS already makes room for the toolbar on relative/static
+   headers, so is-solid needs no extra rule here at all). */
+body.admin-bar header.site-header:not(.is-solid){ top:32px; }
+@media screen and (max-width:782px){
+  body.admin-bar header.site-header:not(.is-solid){ top:46px; }
+}
+.logo-block{ display:flex; flex-direction:column; align-items:flex-start; line-height:1; }
+.logo-block .top{ font-family:"Cambria",Georgia,serif; font-size:1.05rem; font-weight:700; letter-spacing:.24em; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.4); }
+.logo-block .bottom{ font-family:"Cambria",Georgia,serif; font-size:.56rem; font-weight:500; letter-spacing:.32em; color:#E7E3D2; margin-top:3px; text-shadow:0 1px 6px rgba(0,0,0,.4); }
+
+nav.primary-nav{ display:flex; gap:26px; flex-wrap:wrap; font-size:.72rem; font-weight:700; letter-spacing:.04em; }
+nav.primary-nav ul{ list-style:none; display:flex; gap:26px; flex-wrap:wrap; margin:0; padding:0; }
+nav.primary-nav a{ color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.4); white-space:nowrap; display:flex; align-items:center; gap:6px; }
+nav.primary-nav a:hover{ color:var(--rust); }
+/* Per-item nav icon — plain inline SVG using stroke="currentColor", so
+   it automatically picks up the link's own colour (white normally,
+   rust on hover) with no extra CSS needed per icon. */
+nav.primary-nav a svg{ width:15px; height:15px; flex:none; stroke:currentColor; }
+
+.head-actions{ font-size:.8rem; font-weight:700; display:flex; gap:14px; align-items:center; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.4); }
+
+/* ---------- Mobile menu toggle + slide-in sidebar ---------- */
+.menu-toggle{
+  display:none; background:none; border:none; padding:6px; cursor:pointer;
+  color:#fff; flex:none;
+}
+.menu-toggle svg{ width:24px; height:24px; stroke:currentColor; display:block; }
+.mobile-sidebar-overlay{
+  display:none; position:fixed; inset:0; background:rgba(10,10,8,.55); z-index:98;
+}
+.mobile-sidebar{
+  position:fixed; top:0; right:0; bottom:0; width:min(320px,84vw); z-index:99;
+  background:var(--ink); color:#fff; padding:22px 24px; overflow-y:auto;
+  transform:translateX(100%); transition:transform .28s ease;
+}
+body.mobile-nav-open .mobile-sidebar{ transform:translateX(0); }
+body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
+.mobile-sidebar-close{ background:none; border:none; color:#fff; padding:6px; margin:0 0 18px -6px; cursor:pointer; }
+.mobile-sidebar-close svg{ width:22px; height:22px; stroke:currentColor; display:block; }
+.mobile-sidebar nav ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.mobile-sidebar nav a{ display:flex; align-items:center; gap:12px; padding:13px 4px; font-size:.9rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#fff; border-bottom:1px solid rgba(255,255,255,.12); }
+.mobile-sidebar nav a:hover{ color:var(--rust); }
+.mobile-sidebar nav a svg{ width:17px; height:17px; flex:none; stroke:currentColor; }
+
+@media (max-width:860px){
+  nav.primary-nav{ display:none; }
+  .menu-toggle{ display:block; }
+}
+
+/* ---------- Hero (homepage only) ---------- */
+.hero{ position:relative; width:100%; height:clamp(520px,72vh,720px); overflow:hidden; color:var(--white); }
+.hero video, .hero .video-fallback{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.hero .video-fallback{ background:linear-gradient(120deg,#2c2b26,#4a4a41); }
+.hero .overlay{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,10,8,.15) 0%, rgba(10,10,8,.1) 40%, rgba(10,10,8,.55) 100%); }
+.hero-content{ position:absolute; left:0; right:0; bottom:64px; z-index:2; display:flex; flex-direction:column; align-items:center; gap:22px; text-align:center; padding:0 6%; }
+.hero-content .hero-mark{ width:64px; height:auto; }
+.hero-content .tagline{ font-size:clamp(1.8rem,3.6vw,2.9rem); max-width:820px; line-height:1.28; text-shadow:0 3px 14px rgba(0,0,0,.55); font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; }
+.hero-content .cta-row{ display:flex; gap:14px; }
+.btn{ display:inline-block; padding:13px 26px; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; border:none; }
+.btn.solid{ background:#fff; color:var(--ink); }
+.btn.outline{ border:1.5px solid #fff; color:#fff; background:transparent; }
+.btn.olive{ background:var(--olive); color:#fff; }
+.btn.olive:hover{ background:var(--rust); }
+
+/* ---------- Quicklinks bar (homepage) ---------- */
+.espire-quicklinks{ position:relative; background:var(--ink); overflow-x:auto; }
+.espire-quicklinks-row{ display:flex; gap:0; max-width:1400px; margin:0 auto; }
+.espire-quicklinks-row a{
+  display:flex; flex-direction:row-reverse; align-items:center; justify-content:center; gap:8px;
+  flex:1 1 0; padding:16px 14px; font-size:.66rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.03em; color:#fff; white-space:nowrap; border-right:1px solid rgba(255,255,255,.12);
+}
+.espire-quicklinks-row a:last-child{ border-right:none; }
+.espire-quicklinks-row a:hover{ color:var(--rust); }
+.espire-quicklinks-row a svg{ width:18px; height:18px; stroke:currentColor; flex:none; }
+
+/* Same idea as the collection slider's arrows — on mobile the row is
+   wider than the screen and just scrolls, which isn't obviously
+   "swipeable" on sight. These small arrow buttons (desktop-hidden)
+   nudge that same scroll and signal there's more to the row. */
+.ql-arrow{
+  display:none; position:absolute; top:50%; transform:translateY(-50%);
+  width:28px; height:28px; border-radius:50%; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.4); z-index:2; cursor:pointer;
+  color:#fff;
+}
+.ql-arrow .espire-arrow-mark{ width:6px; height:20px; }
+.ql-prev{ left:6px; }
+.ql-next{ right:6px; }
+
+@media (max-width:700px){
+  .espire-quicklinks-row{ width:max-content; min-width:100%; }
+  .espire-quicklinks-row a{ flex:none; }
+  .ql-arrow{ display:flex; }
+}
+
+/* ---------- Section layout ---------- */
+.section-wrap{ padding:46px 5%; max-width:1400px; margin:0 auto; }
+.section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:16px; flex-wrap:wrap; }
+.section-head h2{ font-size:1.05rem; }
+.head-title{ display:flex; align-items:center; gap:10px; }
+.section-head .head-mark{ width:auto; height:34px; color:var(--ink); flex:none; }
+.section-head .view-all{
+  font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+  text-decoration:none; color:#fff; background:var(--olive); padding:9px 16px; border-radius:3px;
+  transition:background .15s ease;
+}
+.section-head .view-all:hover{ background:var(--rust); }
+
+/* ---------- Shop By Collection slider ---------- */
+/* A horizontally-scrolling, scroll-snap carousel rather than a fixed
+   3-item grid, so every top-level collection can be featured (not just
+   3) without the homepage growing forever — see site-inventory.md's
+   confirmed category list. Plain CSS scroll-snap + a little vanilla JS
+   for the arrow buttons (see assets/js/main.js); native touch swipe
+   already works on mobile with no JS at all. */
+.collection-slider{ position:relative; }
+.collection-track{
+  display:flex; gap:20px; overflow-x:auto; scroll-snap-type:x mandatory;
+  scroll-behavior:smooth; padding-bottom:4px; scrollbar-width:none;
+}
+.collection-track::-webkit-scrollbar{ display:none; }
+.collection-slide{
+  flex:0 0 calc(33.333% - 14px); scroll-snap-align:start;
+  border:1.5px solid var(--ink); background:var(--white); overflow:hidden; display:block;
+}
+@media (max-width:1000px){ .collection-slide{ flex-basis:calc(50% - 10px); } }
+@media (max-width:640px){ .collection-slide{ flex-basis:88%; } }
+.collection-slide .cs-shot{ aspect-ratio:16/10; overflow:hidden; }
+.collection-slide .cs-shot img{ width:100%; height:100%; object-fit:cover; }
+.collection-slide .cs-shot.placeholder{
+  display:flex; align-items:center; justify-content:center; background:var(--olive-deep); color:var(--white);
+}
+.collection-slide .cs-shot.placeholder svg{ width:34px; height:34px; stroke:currentColor; opacity:.85; }
+.collection-slide .cs-body{ padding:16px 18px 18px; }
+.collection-slide h3{ font-size:.92rem; margin:0 0 6px; }
+.collection-slide p{ margin:0 0 13px; font-size:.78rem; color:var(--ink-soft); line-height:1.5; }
+.collection-slide .cs-link{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; display:inline-flex; align-items:center; background:var(--olive); color:#fff; padding:7px 12px; border-radius:3px; transition:background .15s ease; }
+.collection-slide:hover .cs-link{ background:var(--rust); }
+
+/* Flush against the slider's own edges, no button/circle chrome — matches
+   how the arrow mark is already used on the live product pages ("Also
+   From The Bar"): just the bold mark itself, sitting on top of the
+   content. The drop-shadow keeps it readable over whichever image happens
+   to be behind it, light or dark. */
+.cs-arrow{
+  display:flex; align-items:center; justify-content:center; position:absolute;
+  /* Centred on the PHOTO, not the whole card (image + title + price +
+     button) — --cs-photo-center is set in px by main.js from the actual
+     rendered photo height, since our cards carry a lot more text under
+     the image than the live product-page carousel this is modelled on,
+     and 50%-of-the-whole-card would land the arrow down over the CTA
+     button instead of the picture. 50% is just the fallback before JS runs. */
+  top:var(--cs-photo-center, 50%);
+  transform:translateY(-50%); background:none; border:none; padding:10px;
+  cursor:pointer; z-index:2; color:var(--ink);
+}
+.cs-arrow:hover{ color:var(--rust); }
+.cs-prev{ left:0; }
+.cs-next{ right:0; }
+.cs-arrow .espire-arrow-mark{ width:16px; height:58px; filter:drop-shadow(0 1px 3px rgba(0,0,0,.35)); }
+
+/* Espire's own arrow mark (see espire_arrow_icon() in functions.php) —
+   shared sizing/rotation for every prev/next control on the site, so
+   .cs-arrow, .ql-arrow and anything added later all use it the same way. */
+.espire-arrow-mark{ width:9px; height:32px; transform:rotate(-90deg); flex:none; }
+.espire-arrow-mark.is-next{ transform:rotate(-90deg) scaleX(-1); }
+/* Kept visible (not hidden) on mobile, just scaled down a little —
+   touch swipe alone isn't an obvious affordance, the arrows are what
+   tells people there's more to see. */
+@media (max-width:900px){
+  .cs-arrow .espire-arrow-mark{ width:12px; height:44px; }
+}
+
+/* ---------- Full-bleed banners (DIY / Mission) ---------- */
+.banner-strip{ position:relative; width:100%; overflow:hidden; min-height:420px; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--white); }
+.banner-strip img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.banner-strip .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.46); }
+.banner-strip .content{ position:relative; z-index:2; padding:0 6%; display:flex; flex-direction:column; align-items:center; gap:16px; max-width:680px; }
+.banner-strip h2{ font-size:clamp(2.2rem,5vw,3.6rem); text-shadow:0 3px 14px rgba(0,0,0,.5); }
+.banner-strip p{ margin:0; font-size:1rem; line-height:1.55; color:#F1EEE4; text-shadow:0 1px 6px rgba(0,0,0,.4); }
+
+/* ---------- Shop The Set ---------- */
+.look{ display:grid; grid-template-columns:1.1fr 1fr; gap:0; border:1.5px solid var(--ink); background:var(--white); }
+@media (max-width:900px){ .look{ grid-template-columns:1fr; } }
+.look-shot{ position:relative; aspect-ratio:4/5; overflow:hidden; }
+.look-shot img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.look-info{ display:flex; flex-direction:column; }
+.look-head{ padding:26px 28px 16px; border-bottom:1px solid var(--line); }
+.look-head .kicker{ font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; margin-bottom:6px; }
+.look-head p{ margin:8px 0 0; font-size:.82rem; color:var(--ink-soft); line-height:1.55; }
+.look-item{ display:flex; align-items:center; gap:14px; padding:14px 28px; border-bottom:1px solid var(--line); }
+.look-item .num{ flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; }
+.look-item .li-name{ flex:1; font-weight:700; font-size:.86rem; }
+.look-item .li-meta{ font-size:.74rem; color:var(--ink-soft); margin-top:2px; font-weight:400; }
+.look-item .li-price{ font-weight:700; font-size:.84rem; color:var(--rust); }
+.look-cta{ padding:18px 28px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+.look-cta .total{ font-size:.78rem; color:var(--ink-soft); }
+
+/* ---------- From Seed To Store ---------- */
+.d-row{ display:flex; align-items:center; gap:0; overflow-x:auto; padding:6px 0; }
+.d-step{ display:flex; flex-direction:column; align-items:center; gap:8px; min-width:130px; }
+.d-step .ic{ width:56px; height:56px; border-radius:50%; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:.5rem; font-weight:700; text-align:center; line-height:1.15; padding:4px; background:var(--white); color:var(--ink); transition:background .15s ease, color .15s ease, border-color .15s ease; }
+.d-step .ic img{ display:block; }
+.d-step a.ic{ text-decoration:none; cursor:pointer; }
+.d-step a.ic:hover{ background:var(--olive); border-color:var(--olive); color:#fff; }
+.d-step .lb{ font-size:.66rem; text-transform:uppercase; letter-spacing:.03em; text-align:center; font-weight:700; }
+.d-connector{ flex:1; height:1.5px; background:var(--line); min-width:24px; margin:0 -4px 22px; }
+
+/* ---------- Footer ---------- */
+/* Near-black per the brand guide (--ink, #1E1E1E — never pure #000).
+   Text colours below are flipped to light-on-dark to stay readable. */
+footer.site-footer{ background:var(--ink); border-top:1px solid rgba(255,255,255,.1); padding:42px 5% 22px; color:#fff; }
+.footer-cols{ display:grid; grid-template-columns:repeat(4,1fr); gap:28px; max-width:1400px; margin:0 auto 26px; }
+@media (max-width:900px){ .footer-cols{ grid-template-columns:1fr 1fr; } }
+.footer-col h4{ font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; margin:0 0 12px; color:#fff; }
+.footer-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.footer-col a{ font-size:.8rem; color:#C7C2B4; }
+.footer-col a:hover{ color:var(--rust); }
+.footer-col li{ font-size:.8rem; color:#C7C2B4; }
+/* Condensed bottom half: social + newsletter share one row (newsletter
+   pushed over to fill the space that used to sit empty to the right of
+   the social icons), and the acknowledgement + copyright share a second
+   row instead of each stacking as a full-width block. Same information,
+   two rows tall instead of four. */
+.footer-bottom-row{
+  display:flex; flex-wrap:wrap; gap:16px 28px; align-items:center; justify-content:space-between;
+  max-width:1400px; margin:0 auto 16px;
+}
+.footer-social{ display:flex; gap:12px; flex:none; }
+.footer-social a{ width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.7rem; }
+.footer-social a:hover{ border-color:var(--rust); color:var(--rust); }
+.footer-newsletter{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:.8rem; color:#C7C2B4; }
+.footer-newsletter input[type="email"]{ padding:9px 13px; border:1px solid rgba(255,255,255,.25); border-radius:3px; font-size:.8rem; min-width:200px; background:transparent; color:#fff; }
+.footer-newsletter input[type="email"]::placeholder{ color:#8C8779; }
+
+.footer-ack-row{
+  display:flex; flex-wrap:wrap; gap:12px 28px; align-items:baseline; justify-content:space-between;
+  max-width:1400px; margin:0 auto; border-top:1px solid rgba(255,255,255,.12); padding-top:14px;
+}
+.footer-ack{ margin:0; font-size:.7rem; color:#9C9788; line-height:1.5; max-width:900px; }
+.footer-bottom{ margin:0; font-size:.72rem; color:#9C9788; white-space:nowrap; }
+
+/* ============================================================
+   GENERIC PAGE BANNER (used by page.php, 404.php)
+   A simple on-brand header for any page that isn't the homepage
+   or a WooCommerce page — a placeholder until pages get their
+   own bespoke designs (Australian Made, Contact, etc.) per the
+   project plan.
+   ============================================================ */
+.page-banner{ background:var(--olive-deep); color:var(--white); padding:70px 5% 46px; text-align:center; }
+.page-banner h1{ font-size:clamp(1.6rem,3.4vw,2.4rem); margin-bottom:10px; }
+.page-banner .sub{ font-family:"Heebo",sans-serif; text-transform:none; font-size:.9rem; color:var(--silver); max-width:640px; margin:0 auto; }
+.page-content{ padding:44px 5% 70px; max-width:900px; margin:0 auto; line-height:1.7; font-size:.95rem; }
+.page-content h2{ font-size:1.15rem; margin:34px 0 14px; }
+.page-content h2:first-child{ margin-top:0; }
+.page-content p{ margin:0 0 16px; }
+.page-content ul, .page-content ol{ margin:0 0 16px; padding-left:22px; }
+.page-content a{ color:var(--rust); text-decoration:underline; text-underline-offset:2px; }
+
+/* ---------- 404 ---------- */
+.notfound-wrap{ text-align:center; padding:90px 5%; max-width:640px; margin:0 auto; }
+.notfound-wrap .code{ font-family:"League Spartan","Arial Black",sans-serif; font-size:clamp(3rem,10vw,6rem); font-weight:700; color:var(--rust); line-height:1; }
+.notfound-wrap p{ font-size:.95rem; color:var(--ink-soft); margin:14px 0 26px; }
+.notfound-search{ display:flex; gap:8px; max-width:380px; margin:0 auto 30px; }
+.notfound-search input{ flex:1; padding:11px 14px; border:1px solid var(--line); border-radius:3px; font-size:.85rem; }
+.notfound-links{ display:flex; gap:10px 18px; flex-wrap:wrap; justify-content:center; font-size:.78rem; }
+.notfound-links a{ text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+
+/* ============================================================
+   WOOCOMMERCE — baseline theming pass
+   WooCommerce ships its own default templates for the shop,
+   category archives, single product, cart, checkout and my
+   account pages — this theme doesn't override those template
+   files, it just re-styles WooCommerce's own default markup/
+   classes so every one of those pages looks on-brand without
+   needing a bespoke rebuild of each one individually. This is
+   the "working now, refine later" pass — the fuller bespoke
+   designs (category sidebars, symbol badges, etc.) come later.
+   ============================================================ */
+/* div.woocommerce (not bare .woocommerce) — WooCommerce also stamps the
+   class "woocommerce" onto <body> itself on every shop/category page, so
+   a bare .woocommerce selector here was matching BOTH the real content
+   wrapper div AND <body>, capping the entire page (including the header)
+   at 1400px instead of just this wrapper. That was the "header/page not
+   full width" bug — this scopes it to the div only. */
+div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
+.woocommerce-breadcrumb{ font-size:.74rem; color:var(--ink-soft); margin-bottom:20px; }
+.woocommerce-breadcrumb a{ color:var(--ink-soft); }
+.woocommerce ul.products{ display:grid; grid-template-columns:repeat(4,1fr); gap:26px; list-style:none; margin:0; padding:0; }
+@media (max-width:1000px){ .woocommerce ul.products{ grid-template-columns:repeat(2,1fr); } }
+.woocommerce ul.products li.product{ background:var(--white); border:1px solid var(--line); }
+.woocommerce ul.products li.product img{ aspect-ratio:3/4; object-fit:cover; width:100%; }
+.woocommerce ul.products li.product .woocommerce-loop-product__title{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; font-size:.82rem; padding:14px 14px 4px; margin:0; }
+.woocommerce ul.products li.product .price{ padding:0 14px 16px; font-weight:700; color:var(--rust); font-size:.86rem; }
+.woocommerce ul.products li.product .price del{ color:var(--ink-soft); font-weight:400; opacity:.7; margin-right:6px; }
+.woocommerce ul.products li.product .button{ margin:0 14px 16px; }
+
+/* Buttons — WooCommerce's default .button class, matched to our .btn.olive look */
+.woocommerce a.button, .woocommerce button.button, .woocommerce input.button,
+.woocommerce #respond input#submit, .woocommerce-page a.button{
+  background:var(--olive); color:#fff; border:none; padding:12px 22px; font-size:.76rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:.05em; border-radius:0; cursor:pointer;
+}
+.woocommerce a.button:hover, .woocommerce button.button:hover, .woocommerce input.button:hover{ background:var(--rust); color:#fff; }
+.woocommerce a.button.alt, .woocommerce #respond input#submit.alt{ background:var(--ink); }
+
+/* Single product */
+.woocommerce div.product .product_title{ font-size:1.5rem; margin-bottom:10px; }
+.woocommerce div.product p.price, .woocommerce div.product span.price{ color:var(--rust); font-size:1.2rem; font-weight:700; }
+.woocommerce div.product .woocommerce-product-details__short-description{ font-size:.9rem; line-height:1.7; color:var(--ink-soft); margin:16px 0; }
+.woocommerce div.product form.cart{ margin:22px 0; }
+.woocommerce div.product .quantity input.qty{ padding:11px; border:1px solid var(--line); width:60px; text-align:center; }
+
+/* Cart & checkout tables */
+.woocommerce table.shop_table{ width:100%; border-collapse:collapse; margin:20px 0; }
+.woocommerce table.shop_table th{ text-align:left; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; padding:12px 10px; border-bottom:2px solid var(--ink); }
+.woocommerce table.shop_table td{ padding:14px 10px; border-bottom:1px solid var(--line); font-size:.86rem; }
+.woocommerce-cart-form img{ width:64px; }
+.woocommerce .cart-collaterals .cart_totals{ background:var(--card); border:1px solid var(--line); padding:22px; max-width:400px; margin-left:auto; }
+.woocommerce .cart_totals table{ width:100%; }
+.woocommerce .cart_totals .order-total .amount{ color:var(--rust); font-weight:700; font-size:1.1rem; }
+
+/* Forms — checkout, my account, login */
+.woocommerce form .form-row label{ font-size:.76rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; margin-bottom:5px; display:block; }
+.woocommerce form .form-row input.input-text, .woocommerce form .form-row select,
+.woocommerce-account .woocommerce-MyAccount-content input.input-text{
+  width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:3px; font-size:.88rem; font-family:inherit;
+}
+.woocommerce-account .woocommerce-MyAccount-navigation ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.woocommerce-account .woocommerce-MyAccount-navigation a{ display:block; padding:10px 14px; font-size:.82rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; border:1px solid var(--line); }
+.woocommerce-account .woocommerce-MyAccount-navigation li.is-active a{ background:var(--ink); color:#fff; border-color:var(--ink); }
+
+/* Notices (added to cart, errors, etc.) */
+.woocommerce-message, .woocommerce-info, .woocommerce-error, .woocommerce-noreviews{
+  background:var(--card); border-left:4px solid var(--olive); padding:14px 18px; font-size:.85rem; list-style:none; margin:0 0 20px;
+}
+.woocommerce-error{ border-left-color:var(--redrock); }
+
+/* Category/shop archive title */
+.woocommerce-products-header{ margin-bottom:26px; }
+.woocommerce-products-header__title{ font-size:1.6rem; }
+.term-description{ font-size:.85rem; color:var(--ink-soft); margin-top:10px; max-width:700px; }
+
+/* ============================================================
+   CATEGORY ARCHIVE — banner, fit-filter row, info panels
+   Used on every /product-category/.../ page via archive-product.php.
+   Banner image/title/text come from ACF fields on the category
+   (Products > Categories > edit) — falls back to a plain dark banner
+   with just the category name if nothing's been filled in yet.
+   ============================================================ */
+.category-banner{
+  background:var(--ink) center/cover no-repeat;
+  min-height:220px;
+  display:flex; align-items:flex-end;
+  position:relative;
+}
+.category-banner::before{
+  /* Darkens a photo banner so white text stays readable; harmless
+     no-op look on the plain-color fallback since there's no image
+     under it to darken. */
+  content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);
+}
+.category-banner-inner{
+  position:relative; z-index:1; padding:40px 5% 28px; color:#fff; max-width:700px;
+}
+.category-banner-inner h1{
+  font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase;
+  font-size:clamp(1.8rem,4vw,2.6rem); margin:0 0 8px;
+}
+.category-banner-inner p{ font-size:.9rem; opacity:.92; margin:0; }
+
+.fit-filter-row{ background:var(--card); border-bottom:1px solid var(--line); }
+.fit-filter-row-inner{
+  max-width:1400px; margin:0 auto; padding:14px 5%;
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+}
+.fit-filter-pills{ display:flex; gap:8px; flex-wrap:wrap; }
+.fit-pill{
+  padding:8px 16px; font-size:.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.04em; border:1.5px solid var(--line); border-radius:20px;
+  color:var(--ink-soft); background:var(--paper); white-space:nowrap;
+}
+.fit-pill:hover{ border-color:var(--ink); color:var(--ink); }
+.fit-pill.is-active{ background:var(--ink); border-color:var(--ink); color:#fff; }
+.btn-sm{ padding:8px 16px; font-size:.72rem; }
+.btn-block{ display:block; text-align:center; width:100%; margin-top:14px; }
+
+/* Info panels (About This Category / Fit Guide) — same right-anchored
+   slide-in shell as the mobile nav sidebar, just a second/third
+   instance driven by data-panel-open/data-panel-close instead of the
+   mobile menu's own toggle button (see main.js). */
+.panel-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.4);
+  opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:60;
+}
+.info-panel{
+  position:fixed; top:0; right:0; height:100%; width:min(380px,88vw);
+  background:var(--paper); z-index:61; padding:26px 24px;
+  transform:translateX(100%); transition:transform .3s ease;
+  overflow-y:auto;
+}
+body.panel-open-category-sidebar .panel-overlay[data-panel-close="category-sidebar"],
+body.panel-open-fit-guide-sidebar .panel-overlay[data-panel-close="fit-guide-sidebar"]{
+  opacity:1; pointer-events:auto;
+}
+body.panel-open-category-sidebar #category-sidebar-panel,
+body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
+  transform:translateX(0);
+}
+.info-panel .panel-close{ background:none; border:none; cursor:pointer; margin-bottom:14px; color:var(--ink); }
+.info-panel h3{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; font-size:1.3rem; margin:0 0 12px; }
+.info-panel h4{ font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; margin:22px 0 10px; }
+.info-panel .panel-intro{ font-size:.88rem; line-height:1.6; color:var(--ink-soft); }
+.fits-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.fits-list li{ display:flex; flex-direction:column; font-size:.85rem; border-bottom:1px solid var(--line); padding-bottom:8px; }
+.fits-list li span{ color:var(--ink-soft); font-size:.78rem; }
