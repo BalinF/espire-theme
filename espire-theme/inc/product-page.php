@@ -106,9 +106,35 @@ function espire_parse_measurements( $text ) {
  */
 function espire_fit_guide_panel( $product_id ) {
 	list( $fits, $term ) = espire_product_category_field( $product_id, 'category_sidebar_fits' );
-	$fits = is_array( $fits ) ? array_values( array_filter( $fits, function ( $fit ) {
+	return espire_render_fit_guide( $fits, $term );
+}
+
+/**
+ * Fit Guide for a category page: the category's own fits, else the
+ * nearest parent category's (so "Fitted Tees" uses the Tees guide).
+ * Returns false when there's no guide content to show.
+ */
+function espire_category_fit_guide_panel( $term ) {
+	while ( $term && ! is_wp_error( $term ) ) {
+		$fits = function_exists( 'get_field' ) ? get_field( 'category_sidebar_fits', 'product_cat_' . $term->term_id ) : null;
+		if ( espire_fits_with_guide( $fits ) ) {
+			return espire_render_fit_guide( $fits, $term );
+		}
+		$term = $term->parent ? get_term( $term->parent, 'product_cat' ) : null;
+	}
+	return false;
+}
+
+/** Just the fits that have Fit Guide content (not only a name). */
+function espire_fits_with_guide( $fits ) {
+	return is_array( $fits ) ? array_values( array_filter( $fits, function ( $fit ) {
 		return ! empty( $fit['fit_name'] ) && ( ! empty( $fit['fit_measurements'] ) || ! empty( $fit['fit_size_notes'] ) || ! empty( $fit['fit_intro'] ) );
 	} ) ) : array();
+}
+
+/** Prints the Fit Guide slide-in panel (id "fit-guide"); false if nothing to show. */
+function espire_render_fit_guide( $fits, $term ) {
+	$fits = espire_fits_with_guide( $fits );
 	if ( ! $fits ) {
 		return false;
 	}
@@ -259,7 +285,7 @@ function espire_goes_well_with_ids( $product, $limit = 4 ) {
  * option dropdowns use.
  */
 function espire_product_swatches( $product ) {
-	if ( ! function_exists( 'get_field' ) || ! $product->is_type( 'variable' ) ) {
+	if ( ! $product->is_type( 'variable' ) ) {
 		return array();
 	}
 	$swatches = array();
@@ -269,8 +295,9 @@ function espire_product_swatches( $product ) {
 		}
 		$taxonomy = $attribute->get_name();
 		foreach ( $attribute->get_terms() as $term ) {
-			$colour = get_field( 'swatch_colour', $taxonomy . '_' . $term->term_id );
-			$image  = get_field( 'swatch_image', $taxonomy . '_' . $term->term_id );
+			$swatch = espire_term_swatch( $taxonomy, $term );
+			$colour = $swatch['colour'];
+			$image  = $swatch['image'];
 			if ( $colour || $image ) {
 				$swatches[ 'attribute_' . $taxonomy ][ $term->slug ] = array(
 					'colour' => (string) $colour,

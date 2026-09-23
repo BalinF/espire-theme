@@ -7,7 +7,8 @@
  * FOR LEARNING: the filters use WooCommerce's own built-in attribute
  * filtering — a link like /product-category/hoodies/?filter_colour=navy
  * already shows only the navy hoodies, with no plugin. This file just
- * builds the dropdowns that make those links: Fit, Colour and Size, from
+ * builds the clickable options that make those links — Fit and Size
+ * buttons, Colour swatches — from
  * the product attributes set up under Products → Attributes (any
  * attribute whose name contains "fit", "colour"/"color" or "size").
  */
@@ -17,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The attributes the filter bar offers, in bar order: Fit, Colour, Size.
+ * The attributes the filter bar offers, in bar order: Fit, Size, Colour.
  * Each: array( label, taxonomy e.g. "pa_colour", query key e.g. "filter_colour" ).
  */
 function espire_filter_attributes() {
@@ -26,8 +27,8 @@ function espire_filter_attributes() {
 	}
 	$wanted = array(
 		'Fit'    => '/fit/i',
-		'Colour' => '/colou?r/i',
 		'Size'   => '/size/i',
+		'Colour' => '/colou?r/i',
 	);
 	$found = array();
 	foreach ( $wanted as $label => $pattern ) {
@@ -142,7 +143,7 @@ function espire_filter_bar( $args = array() ) {
 	$active = espire_filters_active();
 	?>
 	<div class="filter-bar">
-		<form class="filter-bar-inner" method="get" action="<?php echo esc_url( $action ); ?>" data-auto-submit>
+		<div class="filter-bar-inner">
 			<?php if ( $fit_terms ) : ?>
 				<div class="filter-group">
 					<span class="filter-label">Fit</span>
@@ -156,20 +157,35 @@ function espire_filter_bar( $args = array() ) {
 			<?php foreach ( $selects as $select ) : ?>
 				<?php
 				list( $attr, $terms ) = $select;
-				$current = isset( $_GET[ $attr[2] ] ) ? sanitize_title( wp_unslash( $_GET[ $attr[2] ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+				list( $label, $taxonomy, $key ) = $attr;
+				$chosen = espire_filter_chosen( $key );
 				?>
-				<label class="filter-group filter-select">
-					<span class="filter-label"><?php echo esc_html( $attr[0] ); ?></span>
-					<select name="<?php echo esc_attr( $attr[2] ); ?>">
-						<option value="">All</option>
-						<?php foreach ( $terms as $term ) : ?>
-							<option value="<?php echo esc_attr( $term->slug ); ?>" <?php selected( $current, $term->slug ); ?>><?php echo esc_html( $term->name ); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</label>
+				<div class="filter-group filter-<?php echo esc_attr( strtolower( $label ) ); ?>" role="group" aria-label="<?php echo esc_attr( $label ); ?>">
+					<span class="filter-label"><?php echo esc_html( $label ); ?></span>
+					<?php foreach ( $terms as $term ) : ?>
+						<?php
+						$on   = in_array( $term->slug, $chosen, true );
+						$href = espire_filter_toggle_url( $action, $key, $term->slug );
+						?>
+						<?php if ( 'Colour' === $label ) : ?>
+							<?php
+							$swatch = espire_term_swatch( $taxonomy, $term );
+							$style  = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : ( $swatch['colour'] ? 'background-color:' . $swatch['colour'] : '' );
+							?>
+							<?php if ( $style ) : ?>
+								<a href="<?php echo esc_url( $href ); ?>" class="filter-swatch<?php echo $on ? ' is-active' : ''; ?>" style="<?php echo esc_attr( $style ); ?>" title="<?php echo esc_attr( $term->name ); ?>" aria-label="<?php echo esc_attr( $term->name ); ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>></a>
+							<?php else : ?>
+								<a href="<?php echo esc_url( $href ); ?>" class="fit-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a>
+							<?php endif; ?>
+						<?php elseif ( 'Size' === $label ) : ?>
+							<a href="<?php echo esc_url( $href ); ?>" class="size-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a>
+						<?php else : ?>
+							<a href="<?php echo esc_url( $href ); ?>" class="fit-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
 			<?php endforeach; ?>
 
-			<noscript><button type="submit" class="btn olive btn-sm">Filter</button></noscript>
 			<?php if ( $active ) : ?>
 				<a class="filter-clear" href="<?php echo esc_url( $action ); ?>">Clear filters</a>
 			<?php endif; ?>
@@ -177,23 +193,142 @@ function espire_filter_bar( $args = array() ) {
 			<?php if ( $args['panel'] ) : ?>
 				<button type="button" class="btn olive btn-sm filter-panel-btn" data-panel-open="<?php echo esc_attr( $args['panel'] ); ?>"><?php echo esc_html( $args['panel_label'] ); ?></button>
 			<?php endif; ?>
-		</form>
+		</div>
 	</div>
 	<?php
 }
 
+/** Values picked for one filter in the current URL (WooCommerce allows several, comma-separated). */
+function espire_filter_chosen( $key ) {
+	if ( empty( $_GET[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- read-only filter
+		return array();
+	}
+	return array_filter( array_map( 'sanitize_title', explode( ',', wp_unslash( $_GET[ $key ] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
+}
+
 /**
- * Banner photo for a collection page: the category's Banner Image (ACF),
- * else its WooCommerce category image (Products → Categories → Thumbnail).
+ * Link for one filter option: switches that value on (or off, if it's
+ * already on) while keeping every other filter picked so far.
+ */
+function espire_filter_toggle_url( $base, $key, $slug ) {
+	$params = array();
+	foreach ( espire_filter_attributes() as $attr ) {
+		$values = espire_filter_chosen( $attr[2] );
+		if ( $attr[2] === $key ) {
+			$values = in_array( $slug, $values, true ) ? array_diff( $values, array( $slug ) ) : array_merge( $values, array( $slug ) );
+		}
+		if ( $values ) {
+			$params[ $attr[2] ] = implode( ',', $values );
+		}
+	}
+	return $params ? add_query_arg( $params, $base ) : $base;
+}
+
+/**
+ * Banner photo for a collection page, first one found:
+ *   1. the category's Banner Image (Products → Categories → edit)
+ *   2. its WooCommerce category Thumbnail
+ *   3. the same for its parent category (so "Fitted Tees" uses Tees')
+ *   4. the photo the homepage uses for that collection
+ *   5. the store workroom photo
+ * so a banner is never just black.
  */
 function espire_category_banner_image( $term ) {
-	if ( ! $term ) {
-		return '';
+	$defaults = array();
+	foreach ( espire_collection_defaults() as $tile ) {
+		if ( ! empty( $tile['image'] ) ) {
+			$defaults[ espire_collection_slug( $tile ) ] = $tile['image'];
+		}
 	}
-	$image = function_exists( 'get_field' ) ? get_field( 'category_banner_image', 'product_cat_' . $term->term_id ) : '';
+	while ( $term && ! is_wp_error( $term ) ) {
+		$image = function_exists( 'get_field' ) ? espire_image_url( get_field( 'category_banner_image', 'product_cat_' . $term->term_id ) ) : '';
+		if ( ! $image ) {
+			$thumb = get_term_meta( $term->term_id, 'thumbnail_id', true );
+			$image = $thumb ? (string) wp_get_attachment_image_url( $thumb, 'full' ) : '';
+		}
+		if ( ! $image && isset( $defaults[ $term->slug ] ) ) {
+			$image = get_template_directory_uri() . '/assets/' . $defaults[ $term->slug ];
+		}
+		if ( $image ) {
+			return $image;
+		}
+		$term = $term->parent ? get_term( $term->parent, 'product_cat' ) : null;
+	}
+	return get_template_directory_uri() . '/assets/store-banner.jpg';
+}
+
+/**
+ * The banner across the top of collection pages (categories, shop, Store
+ * hub, DIY) — Site Map "Category Archive": photo, darkened; crumb, title
+ * and intro on the left; the collection's emblem in the middle.
+ */
+function espire_collection_banner( $args ) {
+	$args = wp_parse_args( $args, array(
+		'image'  => '',
+		'title'  => '',
+		'text'   => '',
+		'crumb'  => '',
+		'emblem' => '',
+	) );
+	?>
+	<section class="category-banner">
+		<img class="category-banner-img" src="<?php echo esc_url( $args['image'] ?: get_template_directory_uri() . '/assets/store-banner.jpg' ); ?>" alt="">
+		<?php if ( $args['emblem'] ) : ?>
+			<img class="category-banner-emblem" src="<?php echo esc_url( $args['emblem'] ); ?>" alt="">
+		<?php endif; ?>
+		<div class="category-banner-inner">
+			<?php if ( $args['crumb'] ) : ?>
+				<span class="story-label"><?php echo esc_html( $args['crumb'] ); ?></span>
+			<?php endif; ?>
+			<h1><?php echo esc_html( $args['title'] ); ?></h1>
+			<?php if ( $args['text'] ) : ?>
+				<p><?php echo esc_html( $args['text'] ); ?></p>
+			<?php endif; ?>
+		</div>
+	</section>
+	<?php
+}
+
+/**
+ * Any image value → URL. ACF image fields can hand back a URL, an
+ * attachment ID or an array depending on how the field is set up (and a
+ * field made by hand in wp-admin with the same name can differ from the
+ * theme's), so accept all three.
+ */
+function espire_image_url( $value, $size = 'full' ) {
+	if ( is_array( $value ) ) {
+		return isset( $value['url'] ) ? $value['url'] : ( isset( $value['ID'] ) ? (string) wp_get_attachment_image_url( $value['ID'], $size ) : '' );
+	}
+	if ( is_numeric( $value ) ) {
+		return (string) wp_get_attachment_image_url( (int) $value, $size );
+	}
+	return is_string( $value ) ? $value : '';
+}
+
+/**
+ * A colour/fabric swatch for an attribute term (e.g. Colour → Navy):
+ * array( 'colour' => '#1f2a44', 'image' => url ), either may be empty.
+ *
+ * Reads the theme's Swatch fields first, then falls back to the colours
+ * and images saved by the GetWooPlugins "Variation Swatches" plugin
+ * (term meta product_attribute_color / product_attribute_image), so
+ * swatches set up there keep working with that plugin switched off.
+ */
+function espire_term_swatch( $taxonomy, $term ) {
+	$colour = '';
+	$image  = '';
+	if ( function_exists( 'get_field' ) ) {
+		$colour = (string) get_field( 'swatch_colour', $taxonomy . '_' . $term->term_id );
+		$image  = espire_image_url( get_field( 'swatch_image', $taxonomy . '_' . $term->term_id ), 'thumbnail' );
+	}
+	if ( ! $colour ) {
+		$colour = (string) get_term_meta( $term->term_id, 'product_attribute_color', true );
+	}
 	if ( ! $image ) {
-		$thumb = get_term_meta( $term->term_id, 'thumbnail_id', true );
-		$image = $thumb ? wp_get_attachment_image_url( $thumb, 'full' ) : '';
+		$image = espire_image_url( get_term_meta( $term->term_id, 'product_attribute_image', true ), 'thumbnail' );
 	}
-	return $image;
+	return array(
+		'colour' => sanitize_hex_color( $colour ) ?: '',
+		'image'  => $image,
+	);
 }

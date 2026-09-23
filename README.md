@@ -85,14 +85,23 @@ The templates fall back gracefully when these are empty, so fill them in as you 
 
 **Banner photos** — every collection banner uses an image you pick:
 - Category pages: Products → Categories → edit → *Banner Image* (or the
-  category's normal WooCommerce *Thumbnail*).
+  category's normal WooCommerce *Thumbnail*; sub-categories use their parent's).
+  With neither set, the homepage photo for that collection is used. Add a
+  *Category Emblem* on the same screen to show it centred on the banner.
 - Store / DIY / Shop page: that page's **Featured image** (right-hand sidebar
   when editing the page). The line under the title is the page's *Excerpt*.
 
-**Filter bar** — Fit / Colour / Size across the top of every category page, the
-Store hub and the shop, built from Products → Attributes (any attribute named
-like "fit", "colour"/"color" or "size"). If there's no Fit attribute, a
-category's sub-categories are used as the Fit buttons. No plugin needed.
+**Filter bar** — Fit / Size / Colour options across the top of every category
+page, the Store hub and the shop, built from Products → Attributes (any attribute
+named like "fit", "size" or "colour"/"color"): Fit buttons, round Size buttons and
+Colour swatches. Click to switch an option on, click again to switch it off;
+several can be combined. If there's no Fit attribute, a category's sub-categories
+are the Fit buttons. The green **Fit Guide** button opens the category's Fit Guide
+(or its parent category's). No plugin needed.
+
+**Swatch colours** come from Products → Attributes → Colour → edit a colour →
+*Swatch* — or, if left blank there, from what the old GetWooPlugins swatches
+plugin saved, so that plugin can stay switched off.
 
 **Product cards** — show colour swatches (or "4 Colours") and the size range
 from the same attributes, so a variation-swatches plugin isn't needed.

@@ -48,10 +48,13 @@ function espire_diy_card_buttons( $on ) {
 		return sprintf( '<a href="%s" class="button diy-start">Start Designing &rarr;</a>', esc_url( $product->get_permalink() ) );
 	};
 	if ( $on ) {
+		// Cards normally have no button (inc/product-cards.php); DIY cards do.
+		add_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
 		add_filter( 'woocommerce_product_add_to_cart_text', $text, 99 );
 		add_filter( 'woocommerce_loop_add_to_cart_link', $link, 99, 2 );
 		$GLOBALS['espire_diy_filters'] = array( $text, $link );
 	} elseif ( ! empty( $GLOBALS['espire_diy_filters'] ) ) {
+		remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
 		remove_filter( 'woocommerce_product_add_to_cart_text', $GLOBALS['espire_diy_filters'][0], 99 );
 		remove_filter( 'woocommerce_loop_add_to_cart_link', $GLOBALS['espire_diy_filters'][1], 99 );
 	}

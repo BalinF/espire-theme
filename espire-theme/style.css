@@ -432,7 +432,6 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
 .shop-grid .woocommerce-info{ margin:0; }
 .woocommerce nav.woocommerce-pagination{ margin-top:30px; text-align:center; }
 @media (max-width:1000px){ .woocommerce ul.products{ grid-template-columns:repeat(2,1fr); } }
-.woocommerce ul.products li.product{ background:var(--white); border:1px solid var(--line); }
 .woocommerce ul.products li.product img{ aspect-ratio:3/4; object-fit:cover; width:100%; }
 .woocommerce ul.products li.product .woocommerce-loop-product__title{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; font-size:.82rem; padding:14px 14px 4px; margin:0; }
 .woocommerce ul.products li.product .price{ padding:0 14px 16px; font-weight:700; color:var(--rust); font-size:.86rem; }
@@ -493,25 +492,32 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
    with just the category name if nothing's been filled in yet.
    ============================================================ */
 .category-banner{
-  background:var(--ink) center/cover no-repeat;
-  min-height:220px;
-  display:flex; align-items:flex-end;
-  position:relative;
+  position:relative; min-height:300px; overflow:hidden; background:var(--ink);
+  display:flex; align-items:center;
 }
-.category-banner::before{
-  /* Darkens a photo banner so white text stays readable; harmless
-     no-op look on the plain-color fallback since there's no image
-     under it to darken. */
-  content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);
+.category-banner-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.category-banner::after{
+  /* darkens the photo so the white text stays readable */
+  content:''; position:absolute; inset:0; background:rgba(10,10,8,.36);
+}
+.category-banner-emblem{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2;
+  width:150px; height:160px; object-fit:contain; filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));
 }
 .category-banner-inner{
-  position:relative; z-index:1; padding:40px 5% 28px; color:#fff; max-width:700px;
+  position:relative; z-index:3; padding:40px 5%; color:#fff; max-width:min(520px,40%);
+  display:flex; flex-direction:column; gap:8px;
 }
 .category-banner-inner h1{
   font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase;
-  font-size:clamp(1.8rem,4vw,2.6rem); margin:0 0 8px;
+  font-size:clamp(1.8rem,4vw,2.6rem); margin:0; text-shadow:0 2px 8px rgba(0,0,0,.5);
 }
-.category-banner-inner p{ font-size:.9rem; opacity:.92; margin:0; }
+.category-banner-inner p{ font-size:.9rem; line-height:1.5; margin:0; color:#F1EEE4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+@media (max-width:760px){
+  .category-banner{ min-height:240px; align-items:flex-end; }
+  .category-banner-inner{ max-width:none; padding:30px 5% 24px; }
+  .category-banner-emblem{ width:84px; height:90px; top:34%; }
+}
 
 .fit-filter-row{ background:transparent; border-bottom:1px solid var(--line); }
 .fit-filter-row-inner{
@@ -1090,23 +1096,37 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-bar-inner{ max-width:1400px; margin:0 auto; padding:14px 5%; display:flex; align-items:center; gap:12px 26px; flex-wrap:wrap; }
 .filter-group{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
-.filter-select select{
-  appearance:none; -webkit-appearance:none; border:1.5px solid var(--line); border-radius:20px; background:var(--white)
-  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%23565E4F'/></svg>") no-repeat right 12px center;
-  padding:7px 32px 7px 14px; font:inherit; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); cursor:pointer;
-}
-.filter-select select:hover, .filter-select select:focus{ border-color:var(--ink); outline:none; }
+.size-pill{ min-width:34px; height:34px; padding:0 6px; border-radius:999px; border:1px solid var(--ink); display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--ink); background:var(--white); transition:border-color .15s ease, background .15s ease, color .15s ease; }
+.size-pill:hover{ border-color:var(--rust); color:var(--rust); }
+.size-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.filter-swatch{ width:24px; height:24px; border-radius:50%; border:1px solid var(--line); background-size:cover; background-position:center; transition:box-shadow .15s ease; }
+.filter-swatch:hover{ box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--rust); }
+.filter-swatch.is-active{ box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--redrock); }
+.filter-bar .fit-pill{ border:1px solid var(--ink); color:var(--ink); background:var(--white); }
+.filter-bar .fit-pill:hover{ border-color:var(--rust); color:var(--rust); }
+.filter-bar .fit-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
 .filter-clear{ font-size:.72rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
 .filter-clear:hover{ color:var(--rust); }
 .filter-panel-btn{ margin-left:auto; border:none; }
 @media (max-width:640px){ .filter-panel-btn{ margin-left:0; width:100%; text-align:center; } }
 
-/* Product card extras (inc/product-cards.php): colours + size range */
-.card-attrs{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 14px 8px; font-size:.72rem; color:var(--ink-soft); }
-.card-swatches{ display:flex; align-items:center; gap:4px; }
-.card-swatch{ width:12px; height:12px; border-radius:50%; border:1px solid var(--line); background-size:cover; background-position:center; }
-.card-more{ font-size:.66rem; margin-left:2px; }
-.card-sizes{ font-weight:700; letter-spacing:.03em; }
+/* Product cards (Site Map "Category Archive"): bordered card — photo,
+   name, colour dots, "Sizes S–XL · Slim fit", price. Extras come from
+   inc/product-cards.php. */
+.woocommerce ul.products li.product{ border:1.5px solid var(--ink); background:var(--white); transition:box-shadow .15s ease; }
+.woocommerce ul.products li.product:hover{ box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.woocommerce ul.products li.product img{ aspect-ratio:4/5; margin:0 !important; }
+.woocommerce ul.products li.product .woocommerce-loop-product__title{ font-family:"Heebo",sans-serif; text-transform:none; letter-spacing:0; font-weight:700; font-size:.92rem; padding:14px 16px 4px; }
+.woocommerce ul.products li.product:hover .woocommerce-loop-product__title{ color:var(--rust); }
+.card-swatches{ display:flex; align-items:center; gap:5px; padding:4px 16px 2px; }
+.card-swatch{ width:14px; height:14px; border-radius:50%; border:1px solid var(--line); background-size:cover; background-position:center; }
+.card-more{ font-size:.7rem; color:var(--ink-soft); margin-left:2px; }
+.card-meta{ display:block; padding:4px 16px 0; font-size:.8rem; color:var(--ink-soft); }
+.woocommerce ul.products li.product .price{ display:block; padding:6px 16px 18px; font-size:.9rem; font-variant-numeric:tabular-nums; }
+/* Category pages: three to a row, as in the design */
+.shop-grid ul.products{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+@media (max-width:900px){ .shop-grid ul.products{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
+@media (max-width:480px){ .shop-grid ul.products{ grid-template-columns:1fr; } }
 .trust-item a{ text-decoration:underline; text-underline-offset:2px; }
 .trust-item a:hover{ color:var(--rust); }
 

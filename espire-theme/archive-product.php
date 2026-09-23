@@ -62,24 +62,33 @@ $espire_has_sidebar_content = $espire_sidebar_intro || ! empty( $espire_sidebar_
 
 ?>
 
-<div class="category-banner" <?php if ( $espire_banner_image ) : ?>style="background-image:url('<?php echo esc_url( $espire_banner_image ); ?>');"<?php endif; ?>>
-	<div class="category-banner-inner">
-		<h1><?php echo esc_html( $espire_banner_title ); ?></h1>
-		<?php if ( $espire_banner_text ) : ?>
-			<p><?php echo esc_html( $espire_banner_text ); ?></p>
-		<?php endif; ?>
-	</div>
-</div>
+<?php
+$espire_emblem = ( $espire_term && function_exists( 'get_field' ) ) ? espire_image_url( get_field( 'category_emblem', 'product_cat_' . $espire_term->term_id ) ) : '';
+espire_collection_banner( array(
+	'image'  => $espire_banner_image,
+	'title'  => $espire_banner_title,
+	'text'   => $espire_banner_text,
+	'crumb'  => $espire_term ? 'Store / ' . $espire_term->name : '',
+	'emblem' => $espire_emblem,
+) );
+?>
 
 <?php espire_quicklinks_bar(); ?>
 
 <?php
-// Fit / Colour / Size filters (inc/shop-filters.php), with the green
-// "About This Category" button on the right when there's sidebar content.
+// Fit / Size / Colour filters (inc/shop-filters.php), with the green
+// "Fit Guide" button on the right.
+// The Fit Guide panel is printed now (hidden) so we know whether there is
+// one; categories without fit details fall back to the sidebar content.
+ob_start();
+$espire_has_fit_guide  = $espire_term ? espire_category_fit_guide_panel( $espire_term ) : false;
+$espire_fit_guide_html = ob_get_clean();
+$espire_panel          = $espire_has_fit_guide ? 'fit-guide' : ( $espire_has_sidebar_content ? 'category-sidebar' : '' );
+
 espire_filter_bar( array(
 	'category'    => $espire_term,
-	'panel'       => $espire_has_sidebar_content ? 'category-sidebar' : '',
-	'panel_label' => 'About This Category',
+	'panel'       => $espire_panel,
+	'panel_label' => 'Fit Guide',
 ) );
 ?>
 
@@ -111,8 +120,11 @@ if ( $espire_show_tiles ) {
 echo '</div>';
 ?>
 
-<?php if ( $espire_has_sidebar_content ) : ?>
-<!-- "About This Category" slide-in — same right-anchored panel pattern
+<?php echo $espire_fit_guide_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built ?>
+
+<?php if ( ! $espire_has_fit_guide && $espire_has_sidebar_content ) : ?>
+<!-- Fallback "Fit Guide" slide-in for categories without full fit guide
+     details yet (no measurements/size notes) — same right-anchored panel pattern
      as the mobile nav sidebar (see .mobile-sidebar in style.css and the
      open/close JS in main.js), populated entirely from the ACF fields
      above. Empty repeater rows are just skipped, so a category with no
@@ -122,7 +134,7 @@ echo '</div>';
 	<button type="button" class="panel-close" aria-label="Close" data-panel-close="category-sidebar">
 		<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 	</button>
-	<h3>About <?php echo esc_html( $espire_term ? $espire_term->name : '' ); ?></h3>
+	<h3>Fit Guide &mdash; <?php echo esc_html( $espire_term ? $espire_term->name : '' ); ?></h3>
 	<?php if ( $espire_sidebar_intro ) : ?>
 		<p class="panel-intro"><?php echo esc_html( $espire_sidebar_intro ); ?></p>
 	<?php endif; ?>
@@ -144,12 +156,7 @@ echo '</div>';
 		<p><?php echo esc_html( $espire_sidebar_sourcing ); ?></p>
 	<?php endif; ?>
 
-	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn outline btn-block">Need Help? Contact Us Here &rarr;</a>
+	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
 </div>
 <?php endif; ?>
-<!-- Fit Guide is deliberately NOT on category pages (Balin's call) — it
-     lives on product pages instead, where "which size do I need" is a
-     more immediate question. The panel markup/CSS (.info-panel etc.)
-     stays generic in style.css so it's ready to reuse there. -->
-
 <?php get_footer(); ?>

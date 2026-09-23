@@ -41,12 +41,14 @@ $espire_ids = $espire_show ? wc_get_products( array(
 ) ) : array();
 ?>
 
-<div class="category-banner diy-banner"<?php if ( has_post_thumbnail() ) : ?> style="background-image:url('<?php echo esc_url( get_the_post_thumbnail_url( null, 'full' ) ); ?>');"<?php endif; ?>>
-	<div class="category-banner-inner">
-		<h1><?php the_title(); ?></h1>
-		<p><?php echo esc_html( has_excerpt() ? get_the_excerpt() : 'Pick a base garment, then customise fabric, colour and print in the live designer — cut and sewn here in Bright once you\'re happy with it.' ); ?></p>
-	</div>
-</div>
+<?php
+espire_collection_banner( array(
+	'image' => has_post_thumbnail() ? get_the_post_thumbnail_url( null, 'full' ) : '',
+	'title' => get_the_title(),
+	'text'  => has_excerpt() ? get_the_excerpt() : 'Pick a base garment, then customise fabric, colour and print in the live designer — cut and sewn here in Bright once you\'re happy with it.',
+	'crumb' => 'Store / ' . get_the_title(),
+) );
+?>
 
 <?php espire_quicklinks_bar(); ?>
 

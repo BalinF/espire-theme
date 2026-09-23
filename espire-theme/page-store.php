@@ -16,14 +16,14 @@
 get_header();
 ?>
 
-<div class="category-banner"<?php if ( has_post_thumbnail() ) : ?> style="background-image:url('<?php echo esc_url( get_the_post_thumbnail_url( null, 'full' ) ); ?>');"<?php endif; ?>>
-	<div class="category-banner-inner">
-		<h1><?php the_title(); ?></h1>
-		<?php if ( has_excerpt() ) : ?>
-			<p><?php echo esc_html( get_the_excerpt() ); ?></p>
-		<?php endif; ?>
-	</div>
-</div>
+<?php
+espire_collection_banner( array(
+	'image' => has_post_thumbnail() ? get_the_post_thumbnail_url( null, 'full' ) : '',
+	'title' => get_the_title(),
+	'text'  => has_excerpt() ? get_the_excerpt() : '',
+	'crumb' => '',
+) );
+?>
 
 <?php espire_quicklinks_bar(); ?>
 

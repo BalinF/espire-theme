@@ -457,28 +457,3 @@
 		window.jQuery( document.body ).on( 'updated_wc_div updated_cart_totals', enhanceAll );
 	}
 } )();
-
-/**
- * Filter bar (inc/shop-filters.php) — picking a Fit/Colour/Size applies it
- * straight away (no "Filter" button needed), leaving unset ones out of
- * the address so it stays tidy, e.g. /product-category/hoodies/?filter_colour=navy
- */
-( function () {
-	'use strict';
-
-	document.querySelectorAll( 'form[data-auto-submit]' ).forEach( function ( form ) {
-		form.addEventListener( 'change', function ( e ) {
-			if ( e.target.tagName !== 'SELECT' ) {
-				return;
-			}
-			var params = new URLSearchParams();
-			form.querySelectorAll( 'select' ).forEach( function ( select ) {
-				if ( select.value ) {
-					params.set( select.name, select.value );
-				}
-			} );
-			var query = params.toString();
-			window.location.href = form.getAttribute( 'action' ) + ( query ? '?' + query : '' );
-		} );
-	} );
-} )();
