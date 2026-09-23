@@ -90,3 +90,29 @@ photo. Tile text: the category *Description*, else the homepage copy. The intro
 line under the banner is the Store page's *Excerpt*; anything typed into the
 page body shows above the tiles. The Design Your Own tile uses the DIY page's
 featured image.
+
+**Australian Made / F\*ck Fast Fashion (Pages → edit → Brand Story box)** — hero,
+pillar cards (each linking to its longer post), stat strip, shop feature,
+definition line and closing banner, in tabs. Blank fields use the starting copy.
+Any other page can use this layout via *Page Attributes → Template → Brand Story*.
+
+**Symbol pages (`/product-tag/<symbol>/`)** — built from the same tag *Symbol* box:
+add a *Symbol Page Banner*, optional *Journey Diagram* and *Certification Line*.
+Products carrying the tag are listed automatically.
+
+**Pages → DIY → Design Your Own** — pick the *Base Garment Category* (its
+sub-categories become the Base Fit buttons) and write the *Design Guide*. Banner
+photo = the page's featured image; banner line = its excerpt.
+
+**Pages → Contact** — the page body holds your contact form (e.g. its shortcode);
+the *Contact Details* box sets the heading, intro, hours, phone, email and
+address. Hours and phone also feed the footer.
+
+## Pages to check on staging
+
+- **Cart / Checkout** page bodies should be the classic `[woocommerce_cart]` and
+  `[woocommerce_checkout]` shortcodes (not the Cart/Checkout blocks or old
+  Elementor content) for the theme's design to apply.
+- Pages the theme styles by slug: `store`, `diy`, `contact`, `australian-made`,
+  `sustainability`, `faq`. A different slug means that page falls back to the
+  plain page layout.

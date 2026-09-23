@@ -110,6 +110,31 @@ function espire_symbol_defaults() {
 }
 
 /**
+ * Starting banner photo and certification line for each built-in
+ * symbol's own page (Site Map "SymbolPage" — Belgian Linen worked
+ * example). Banners are stand-ins from the Site Map until real symbol
+ * photography is uploaded on the tag.
+ */
+function espire_symbol_page_default( $slug, $key ) {
+	$defaults = array(
+		'australian-made'   => array( 'banner' => 'story-bright-aerial.jpg' ),
+		'respired'          => array( 'banner' => 'store-banner.jpg' ),
+		'made-in-store'     => array( 'banner' => 'story-sewing-repair.jpg' ),
+		'good-earth-cotton' => array( 'banner' => 'story-lifestyle-ivy.jpg', 'cert_icon' => 'icon-certified.png' ),
+		'belgian-linen'     => array(
+			'banner'    => 'shirts-banner.jpg',
+			'cert_icon' => 'icon-euroflax.png',
+			'cert_text' => 'European Flax® certified. A guarantee of traceability from field to fabric — no irrigation, no GMOs, no waste. Every fibre can be traced back to its country of origin.',
+		),
+	);
+	if ( ! isset( $defaults[ $slug ][ $key ] ) ) {
+		return '';
+	}
+	$value = $defaults[ $slug ][ $key ];
+	return in_array( $key, array( 'banner', 'cert_icon' ), true ) ? get_template_directory_uri() . '/assets/' . $value : $value;
+}
+
+/**
  * Everything needed to draw one symbol, merged from the tag's ACF fields
  * over the built-in defaults. Returns null when the tag isn't a symbol.
  */
@@ -153,6 +178,12 @@ function espire_symbol_from_tag( $tag ) {
 		'heading' => $field( 'symbol_heading' ) ?: $base['heading'],
 		'intro'   => $field( 'symbol_intro' ) ?: $base['intro'],
 		'points'  => $points ? array_filter( array_map( 'trim', preg_split( '/\r\n|\r|\n/', $points ) ) ) : $base['points'],
+		// Symbol page (taxonomy-product_tag.php) extras.
+		'banner'        => $field( 'symbol_banner' ) ?: espire_symbol_page_default( $tag->slug, 'banner' ),
+		'diagram'       => $field( 'symbol_diagram' ),
+		'diagram_label' => $field( 'symbol_diagram_label' ) ?: 'The Journey',
+		'cert_text'     => $field( 'symbol_cert_text' ) ?: espire_symbol_page_default( $tag->slug, 'cert_text' ),
+		'cert_icon'     => $field( 'symbol_cert_icon' ) ?: espire_symbol_page_default( $tag->slug, 'cert_icon' ),
 		'story'   => $story_url
 			? array( $field( 'symbol_story_label' ) ?: 'Read The Full Story', $story_url )
 			: ( $base['story'][1] ? array( $base['story'][0], home_url( $base['story'][1] ) ) : null ),
