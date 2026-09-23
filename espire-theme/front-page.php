@@ -165,12 +165,12 @@ $espire_set = espire_shop_the_set();
 	</div>
 </div>
 
-<div class="section-wrap">
+<div class="section-wrap seed-section">
+	<?php // The tee drawing sits to the left of the heading and the journey row (a transparent copy of seed-to-store-tee.png, whose teal background is baked in). ?>
+	<img class="seed-tee" src="<?php echo esc_url( get_template_directory_uri() . '/assets/seed-to-store-tee-line.png' ); ?>" alt="">
+	<div class="seed-body">
 	<div class="section-head">
-		<div class="head-title">
-			<img class="head-mark" src="<?php echo esc_url( get_template_directory_uri() . '/assets/seed-to-store-tee.png' ); ?>" alt="">
-			<h2>Our Tees: From Seed To Store</h2>
-		</div>
+		<h2>Our Tees: From Seed To Store</h2>
 	</div>
 	<?php
 	/**
@@ -225,6 +225,7 @@ $espire_set = espire_shop_the_set();
 	<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="seed-to-store" data-slide-amount="container">
 		<?php espire_arrow_icon( 'next' ); ?>
 	</button>
+	</div>
 	</div>
 </div>
 
