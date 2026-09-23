@@ -116,3 +116,19 @@ address. Hours and phone also feed the footer.
 - Pages the theme styles by slug: `store`, `diy`, `contact`, `australian-made`,
   `sustainability`, `faq`. A different slug means that page falls back to the
   plain page layout.
+
+## Installing the theme by hand (no FTP needed)
+
+Every push builds an installable zip:
+
+1. GitHub → this repo → **Actions** tab → click the latest **"Check & deploy
+   theme to staging"** run (green tick) for the branch you want.
+2. Scroll to **Artifacts** → click **espire-theme** to download `espire-theme.zip`.
+3. WordPress (staging) → **Appearance → Themes → Add New → Upload Theme** → choose
+   the zip → **Install Now**. If the theme is already installed, WordPress asks to
+   **Replace current with uploaded** — choose that.
+4. **Activate** it (first time only).
+
+Why not GitHub's green *Code → Download ZIP* button? That zips the whole repo
+(README, workflow and all) with the theme one folder down, so WordPress can't
+find `style.css` and rejects it. The Actions artifact is just the theme folder.
