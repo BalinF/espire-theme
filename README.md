@@ -82,3 +82,11 @@ The templates fall back gracefully when these are empty, so fill them in as you 
 
 **Pages → FAQ → Quick Answers**
 - The questions in the product page's "Shipping & Returns" panel.
+
+**Store hub (`/store/`)** — one tile per top-level product category, in the
+order you drag them into under Products → Categories. Tile photo: the
+category's *Banner Image*, else its WooCommerce thumbnail, else the homepage
+photo. Tile text: the category *Description*, else the homepage copy. The intro
+line under the banner is the Store page's *Excerpt*; anything typed into the
+page body shows above the tiles. The Design Your Own tile uses the DIY page's
+featured image.

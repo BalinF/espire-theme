@@ -55,22 +55,10 @@ espire_quicklinks_bar();
  * feature all of them without endless vertical scrolling. Real photos
  * are used where we have them; everything else gets a plain on-brand
  * placeholder panel (no stock-photo clutter) until real shots exist —
- * swap a category's 'image' key to a filename in /assets/ once one's
- * supplied, same pattern as the Seed to Store icons above.
+ * swap a category's 'image' key (inc/collections.php) to a filename in
+ * /assets/ once one's supplied, same pattern as the Seed to Store icons above.
  */
-$espire_collections = array(
-	array( 'label' => 'The Hoodie Bar', 'url' => '/product-category/hoodies/', 'image' => 'homepage-hoodies.jpg', 'alt' => 'Couple wearing matching Espire hoodies', 'copy' => 'Off the rack, or built your way — same base garment, your call.', 'cta' => 'Shop Hoodies' ),
-	array( 'label' => 'The Tee Bar', 'url' => '/product-category/tees/', 'image' => 'homepage-tees.jpg', 'alt' => 'Couple wearing Espire tees', 'copy' => '200GSM Merino as standard, or design a print run of your own.', 'cta' => 'Shop Tees' ),
-	array( 'label' => 'Leg Hoodies', 'url' => '/product-category/leg-hoodies/', 'image' => 'leg-hoods-popup-05-mu4smsn5-205h.webp', 'alt' => 'Couple wearing Espire tees and joggers', 'copy' => 'Ready-made joggers and leg hoodies, cut and sewn in Bright.', 'cta' => 'Shop Leg Hoodies' ),
-	array( 'label' => 'Shirts', 'url' => '/product-category/shirts/', 'copy' => 'Fitted and slim cuts, made to order.', 'cta' => 'Shop Shirts' ),
-	array( 'label' => 'Kids', 'url' => '/product-category/kids/', 'copy' => 'Hoodies, tees and tresses sized down for the little ones.', 'cta' => 'Shop Kids' ),
-	array( 'label' => 'The Bad Batch', 'url' => '/product-category/the-bad-batch/', 'copy' => 'Made from fabric off-cuts — small runs, once they\'re gone they\'re gone.', 'cta' => 'Shop The Bad Batch' ),
-	array( 'label' => "Nanna's Threads", 'url' => '/product-category/nannas-threads/', 'copy' => 'Hand-knitted pieces, beanies included.', 'cta' => 'Shop Nanna\'s Threads' ),
-	array( 'label' => 'Gloves', 'url' => '/product-category/gloves/', 'copy' => 'Australian made, built for the cold.', 'cta' => 'Shop Gloves' ),
-	array( 'label' => 'Shorts', 'url' => '/product-category/shorts/', 'copy' => 'Cut and sewn in Bright, same fabric as the joggers.', 'cta' => 'Shop Shorts' ),
-	array( 'label' => 'Socks', 'url' => '/product-category/socks/', 'copy' => 'The small stuff, made properly.', 'cta' => 'Shop Socks' ),
-	array( 'label' => 'UGG Boots', 'url' => '/product-category/ugg-boots/', 'copy' => 'Australian made and owned, through and through.', 'cta' => 'Shop UGG Boots' ),
-);
+$espire_collections = espire_collection_defaults(); // list lives in inc/collections.php
 ?>
 <div class="section-wrap">
 	<div class="section-head">
