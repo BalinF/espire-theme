@@ -23,6 +23,9 @@ require_once get_template_directory() . '/inc/cart-checkout.php';
 require_once get_template_directory() . '/inc/collections.php';
 require_once get_template_directory() . '/inc/story.php';
 require_once get_template_directory() . '/inc/pages.php';
+require_once get_template_directory() . '/inc/home.php';
+require_once get_template_directory() . '/inc/shop-filters.php';
+require_once get_template_directory() . '/inc/product-cards.php';
 
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.
@@ -120,9 +123,9 @@ add_action( 'woocommerce_before_shop_loop', function () {
  * generic chevron. One shared function so every arrow on the site is
  * the exact same mark, not slightly different hand-copies of it.
  *
- * It's drawn tall/thin in its native orientation, so this rotates it
- * -90deg to point left by default; pass 'next' to mirror it so it
- * points right instead. fill="currentColor" (not stroke) because the
+ * It's shown upright — tall and thin, as drawn — with its point facing
+ * left by default; pass 'next' for the right-facing version (the CSS in
+ * style.css, .espire-arrow-mark, does the mirroring). fill="currentColor" (not stroke) because the
  * source mark is a solid shape, so it picks up whatever text colour is
  * already set on its container/button, light or dark, automatically.
  *

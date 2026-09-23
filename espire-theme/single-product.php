@@ -117,7 +117,7 @@ while ( have_posts() ) :
 					<div class="trust-lines">
 						<div class="trust-item">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-							<span>Unsure on size? Pick up the phone and give us a call.</span>
+							<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Unsure on size? Pick up the phone and give us a call.</a>
 						</div>
 						<div class="trust-item">
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
@@ -160,7 +160,7 @@ while ( have_posts() ) :
 		<?php $espire_pairs = espire_goes_well_with_ids( $product ); ?>
 		<?php if ( $espire_pairs ) : ?>
 			<section class="product-section related-products">
-				<h2>Goes Well With</h2>
+				<h2 class="screen-reader-text">More from the store</h2>
 				<?php
 				// Same product cards as the category pages.
 				wc_set_loop_prop( 'name', 'goes-well-with' );

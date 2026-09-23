@@ -105,34 +105,47 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 	</div>
 </div>
 
+<?php
+/**
+ * Shop The Set — a hand-picked outfit (Site Map: curated per season, not a
+ * live "popular" query). Picked on the homepage in wp-admin (Pages → the
+ * homepage → "Shop The Set" box, see inc/home.php): a lifestyle photo, a
+ * title, and 2–4 products. Each product shows its own photo, name and
+ * price; the set total is added up underneath. Until products are picked,
+ * the placeholder set below shows.
+ */
+$espire_set = espire_shop_the_set();
+?>
 <div class="section-wrap">
 	<div class="section-head">
 		<h2>Shop The Set</h2>
 		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="view-all">Shop All &rarr;</a>
 	</div>
-	<!-- TODO: this whole "Shop The Set" block is hand-curated per the
-	     site-inventory doc (an ACF field picking 3–4 real products each
-	     season), not a live query. For now it's static placeholder
-	     content matching the mockup — swap for real ACF-selected
-	     products once that field is set up. -->
 	<div class="look">
 		<div class="look-shot">
-			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/story-couple-hoodies.jpg' ); ?>" alt="Couple wearing matching rust and black Espire hoodies">
+			<img src="<?php echo esc_url( $espire_set['image'] ); ?>" alt="">
 		</div>
 		<div class="look-info">
 			<div class="look-head">
-				<div class="kicker">This Week's Set</div>
-				<h2>The Weekend Layer</h2>
-				<p>One outfit, styled head to toe — swap any piece for your size and colour before adding the set to cart.</p>
+				<div class="kicker"><?php echo esc_html( $espire_set['kicker'] ); ?></div>
+				<h2><?php echo esc_html( $espire_set['title'] ); ?></h2>
+				<p><?php echo esc_html( $espire_set['text'] ); ?></p>
 			</div>
-			<div class="look-list">
-				<div class="look-item"><span class="num">1</span><div><div class="li-name">200GSM Merino Tee</div><div class="li-meta">Tees &middot; Ocean Blue</div></div><span class="li-price">$89.00</span></div>
-				<div class="look-item"><span class="num">2</span><div><div class="li-name">Classic Hoodie</div><div class="li-meta">Hoodies &middot; Stone</div></div><span class="li-price">$109.00</span></div>
-				<div class="look-item"><span class="num">3</span><div><div class="li-name">Merino Joggers</div><div class="li-meta">Leg Hoodies &middot; Stone</div></div><span class="li-price">$99.00</span></div>
+			<div class="look-items">
+				<?php foreach ( $espire_set['items'] as $espire_item ) : ?>
+					<a class="look-item" href="<?php echo esc_url( $espire_item['url'] ); ?>">
+						<span class="li-shot"><img src="<?php echo esc_url( $espire_item['image'] ); ?>" alt="" loading="lazy"></span>
+						<span class="li-name"><?php echo esc_html( $espire_item['name'] ); ?></span>
+						<?php if ( $espire_item['meta'] ) : ?>
+							<span class="li-meta"><?php echo esc_html( $espire_item['meta'] ); ?></span>
+						<?php endif; ?>
+						<span class="li-price"><?php echo wp_kses_post( $espire_item['price_html'] ); ?></span>
+					</a>
+				<?php endforeach; ?>
 			</div>
 			<div class="look-cta">
-				<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="btn olive">Shop This Set</a>
-				<span class="total">3 pieces &middot; $297.00 together</span>
+				<span class="total"><?php echo esc_html( count( $espire_set['items'] ) ); ?> pieces &middot; <?php echo wp_kses_post( $espire_set['total_html'] ); ?> together</span>
+				<a href="<?php echo esc_url( $espire_set['cta_url'] ); ?>" class="btn olive">Shop This Set</a>
 			</div>
 		</div>
 	</div>
@@ -186,7 +199,12 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 	);
 	$espire_step_count = count( $espire_journey_steps );
 	?>
-	<div class="d-row">
+	<div class="d-slider">
+	<?php // Arrows show on mobile only, where the row is wider than the screen. ?>
+	<button type="button" class="d-arrow d-prev" aria-label="Scroll left" data-slide-prev="seed-to-store" data-slide-amount="container">
+		<?php espire_arrow_icon( 'prev' ); ?>
+	</button>
+	<div class="d-row" id="seed-to-store">
 		<?php foreach ( $espire_journey_steps as $espire_i => $espire_step ) : ?>
 			<div class="d-step">
 				<a class="ic" href="<?php echo esc_url( $espire_step['url'] ); ?>">
@@ -203,6 +221,10 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 				<div class="d-connector"></div>
 			<?php endif; ?>
 		<?php endforeach; ?>
+	</div>
+	<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="seed-to-store" data-slide-amount="container">
+		<?php espire_arrow_icon( 'next' ); ?>
+	</button>
 	</div>
 </div>
 

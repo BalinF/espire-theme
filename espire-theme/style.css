@@ -155,7 +155,8 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .hero-content .cta-row{ display:flex; gap:14px; }
 .btn{ display:inline-block; padding:13px 26px; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; border:none; }
 .btn.solid{ background:#fff; color:var(--ink); }
-.btn.outline{ border:1.5px solid #fff; color:#fff; background:transparent; }
+.btn.outline{ border:1.5px solid #fff; color:#fff; background:transparent; transition:background .15s ease, border-color .15s ease; }
+.btn.outline:hover{ background:var(--rust); border-color:var(--rust); color:#fff; }
 .btn.olive{ background:var(--olive); color:#fff; }
 .btn.olive:hover{ background:var(--rust); }
 
@@ -177,11 +178,11 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
    nudge that same scroll and signal there's more to the row. */
 .ql-arrow{
   display:none; position:absolute; top:50%; transform:translateY(-50%);
-  width:28px; height:28px; border-radius:50%; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:50%; align-items:center; justify-content:center;
   background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.4); z-index:2; cursor:pointer;
   color:#fff;
 }
-.ql-arrow .espire-arrow-mark{ width:6px; height:20px; }
+.ql-arrow .espire-arrow-mark{ width:8px; height:26px; }
 .ql-prev{ left:6px; }
 .ql-next{ right:6px; }
 
@@ -249,24 +250,26 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
      and 50%-of-the-whole-card would land the arrow down over the CTA
      button instead of the picture. 50% is just the fallback before JS runs. */
   top:var(--cs-photo-center, 50%);
-  transform:translateY(-50%); background:none; border:none; padding:10px;
-  cursor:pointer; z-index:2; color:var(--ink);
+  transform:translateY(-50%); background:rgba(253,250,244,.88); border:none; padding:12px 10px;
+  cursor:pointer; z-index:2; color:var(--ink); box-shadow:0 2px 10px rgba(0,0,0,.18);
 }
 .cs-arrow:hover{ color:var(--rust); }
 .cs-prev{ left:0; }
 .cs-next{ right:0; }
-.cs-arrow .espire-arrow-mark{ width:16px; height:58px; filter:drop-shadow(0 1px 3px rgba(0,0,0,.35)); }
+.cs-arrow .espire-arrow-mark{ width:22px; height:80px; }
 
 /* Espire's own arrow mark (see espire_arrow_icon() in functions.php) —
-   shared sizing/rotation for every prev/next control on the site, so
-   .cs-arrow, .ql-arrow and anything added later all use it the same way. */
-.espire-arrow-mark{ width:9px; height:32px; transform:rotate(-90deg); flex:none; }
-.espire-arrow-mark.is-next{ transform:rotate(-90deg) scaleX(-1); }
+   shared sizing for every prev/next control on the site, so .cs-arrow,
+   .ql-arrow and anything added later all use it the same way. Shown
+   upright (tall and thin, as drawn): as drawn its point faces right, so
+   "next" uses it as-is and "prev" is mirrored. */
+.espire-arrow-mark{ width:9px; height:32px; flex:none; transform:scaleX(-1); }
+.espire-arrow-mark.is-next{ transform:none; }
 /* Kept visible (not hidden) on mobile, just scaled down a little —
    touch swipe alone isn't an obvious affordance, the arrows are what
    tells people there's more to see. */
 @media (max-width:900px){
-  .cs-arrow .espire-arrow-mark{ width:12px; height:44px; }
+  .cs-arrow .espire-arrow-mark{ width:16px; height:58px; }
 }
 
 /* ---------- Full-bleed banners (DIY / Mission) ---------- */
@@ -278,24 +281,43 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .banner-strip p{ margin:0; font-size:1rem; line-height:1.55; color:#F1EEE4; text-shadow:0 1px 6px rgba(0,0,0,.4); }
 
 /* ---------- Shop The Set ---------- */
-.look{ display:grid; grid-template-columns:1.1fr 1fr; gap:0; border:1.5px solid var(--ink); background:var(--white); }
+.look{ display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:0; border:1.5px solid var(--ink); background:var(--white); }
 @media (max-width:900px){ .look{ grid-template-columns:1fr; } }
-.look-shot{ position:relative; aspect-ratio:4/5; overflow:hidden; }
+/* The photo fills whatever height the info column needs (no fixed tall
+   ratio), so the section is only as tall as its content. */
+.look-shot{ position:relative; min-height:260px; overflow:hidden; }
 .look-shot img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .look-info{ display:flex; flex-direction:column; }
-.look-head{ padding:26px 28px 16px; border-bottom:1px solid var(--line); }
+.look-head{ padding:22px 26px 14px; border-bottom:1px solid var(--line); }
 .look-head .kicker{ font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; margin-bottom:6px; }
-.look-head p{ margin:8px 0 0; font-size:.82rem; color:var(--ink-soft); line-height:1.55; }
-.look-item{ display:flex; align-items:center; gap:14px; padding:14px 28px; border-bottom:1px solid var(--line); }
-.look-item .num{ flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; }
-.look-item .li-name{ flex:1; font-weight:700; font-size:.86rem; }
-.look-item .li-meta{ font-size:.74rem; color:var(--ink-soft); margin-top:2px; font-weight:400; }
-.look-item .li-price{ font-weight:700; font-size:.84rem; color:var(--rust); }
-.look-cta{ padding:18px 28px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
-.look-cta .total{ font-size:.78rem; color:var(--ink-soft); }
+.look-head p{ margin:6px 0 0; font-size:.82rem; color:var(--ink-soft); line-height:1.55; }
+/* The pieces side by side: photo, name, price */
+.look-items{ display:grid; grid-template-columns:repeat(auto-fit,minmax(0,1fr)); gap:16px; padding:18px 26px; border-bottom:1px solid var(--line); }
+.look-item{ display:flex; flex-direction:column; gap:4px; color:var(--ink); }
+.look-item .li-shot{ display:block; aspect-ratio:4/5; overflow:hidden; background:var(--card); margin-bottom:6px; }
+.look-item .li-shot img{ width:100%; height:100%; object-fit:cover; transition:transform .3s ease; }
+.look-item:hover .li-shot img{ transform:scale(1.03); }
+.look-item .li-name{ font-weight:700; font-size:.82rem; line-height:1.3; }
+.look-item:hover .li-name{ color:var(--rust); }
+.look-item .li-meta{ font-size:.72rem; color:var(--ink-soft); }
+.look-item .li-price{ font-weight:700; font-size:.82rem; color:var(--rust); }
+.look-item .li-price del{ color:var(--ink-soft); font-weight:400; margin-right:4px; }
+@media (max-width:520px){ .look-items{ gap:10px; padding:16px; } .look-item .li-name{ font-size:.74rem; } }
+.look-cta{ padding:16px 26px; display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.look-cta .total{ font-size:.86rem; font-weight:700; }
 
 /* ---------- From Seed To Store ---------- */
-.d-row{ display:flex; align-items:center; gap:0; overflow-x:auto; padding:6px 0; }
+.d-slider{ position:relative; }
+.d-row{ display:flex; align-items:center; gap:0; overflow-x:auto; padding:6px 0; scroll-behavior:smooth; scrollbar-width:none; }
+.d-row::-webkit-scrollbar{ display:none; }
+/* Swipe arrows for the Seed to Store row — mobile only, where the row is
+   wider than the screen (same arrow mark as the sliders). */
+.d-arrow{ display:none; position:absolute; top:28px; transform:translateY(-50%); z-index:2; background:rgba(253,250,244,.92); border:none; padding:8px 6px; cursor:pointer; color:var(--ink); }
+.d-arrow:hover{ color:var(--rust); }
+.d-arrow .espire-arrow-mark{ width:12px; height:42px; }
+.d-prev{ left:0; }
+.d-next{ right:0; }
+@media (max-width:900px){ .d-arrow{ display:block; } .d-row{ padding:6px 26px; } }
 .d-step{ display:flex; flex-direction:column; align-items:center; gap:8px; min-width:130px; }
 .d-step .ic{ width:56px; height:56px; border-radius:50%; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:.5rem; font-weight:700; text-align:center; line-height:1.15; padding:4px; background:var(--white); color:var(--ink); transition:background .15s ease, color .15s ease, border-color .15s ease; }
 .d-step .ic img{ display:block; }
@@ -384,7 +406,18 @@ footer.site-footer{ background:var(--ink); border-top:1px solid rgba(255,255,255
 div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
 .woocommerce-breadcrumb{ font-size:.74rem; color:var(--ink-soft); margin-bottom:20px; }
 .woocommerce-breadcrumb a{ color:var(--ink-soft); }
-.woocommerce ul.products{ display:grid; grid-template-columns:repeat(4,1fr); gap:26px; list-style:none; margin:0; padding:0; }
+.woocommerce ul.products{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:26px; list-style:none; margin:0; padding:0; }
+/* WooCommerce's own stylesheet lays cards out with floats: fixed widths,
+   margins and clearfix ::before/::after. Inside a grid those spacers
+   become empty grid cells (pushing the first product along) and the
+   widths shrink every card — switch all of that off. */
+.woocommerce ul.products::before, .woocommerce ul.products::after{ display:none !important; content:none !important; }
+.woocommerce ul.products li.product{ width:auto !important; margin:0 !important; float:none !important; display:flex; flex-direction:column; }
+.woocommerce ul.products li.product > a.woocommerce-LoopProduct-link{ display:block; }
+/* Collection pages: breathing room around the product grid */
+.shop-grid{ max-width:1400px; margin:0 auto; padding:30px 5% 60px; }
+.shop-grid .woocommerce-info{ margin:0; }
+.woocommerce nav.woocommerce-pagination{ margin-top:30px; text-align:center; }
 @media (max-width:1000px){ .woocommerce ul.products{ grid-template-columns:repeat(2,1fr); } }
 .woocommerce ul.products li.product{ background:var(--white); border:1px solid var(--line); }
 .woocommerce ul.products li.product img{ aspect-ratio:3/4; object-fit:cover; width:100%; }
@@ -467,7 +500,7 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
 }
 .category-banner-inner p{ font-size:.9rem; opacity:.92; margin:0; }
 
-.fit-filter-row{ background:var(--card); border-bottom:1px solid var(--line); }
+.fit-filter-row{ background:transparent; border-bottom:1px solid var(--line); }
 .fit-filter-row-inner{
   max-width:1400px; margin:0 auto; padding:14px 5%;
   display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;
@@ -1035,3 +1068,31 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .notfound-wrap h1{ font-size:clamp(1.4rem,3vw,1.9rem); letter-spacing:.04em; }
 .notfound-home{ display:inline-block; margin-bottom:34px; }
 .notfound-links-label{ font-size:.68rem !important; text-transform:uppercase; letter-spacing:.1em; font-weight:700; margin:0 0 10px !important; }
+
+/* ============================================================
+   FILTER BAR — inc/shop-filters.php: Fit / Colour / Size across the
+   top of every collection page, green panel button on the right
+   ============================================================ */
+.filter-bar{ border-bottom:1px solid var(--line); }
+.filter-bar-inner{ max-width:1400px; margin:0 auto; padding:14px 5%; display:flex; align-items:center; gap:12px 26px; flex-wrap:wrap; }
+.filter-group{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
+.filter-select select{
+  appearance:none; -webkit-appearance:none; border:1.5px solid var(--line); border-radius:20px; background:var(--white)
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%23565E4F'/></svg>") no-repeat right 12px center;
+  padding:7px 32px 7px 14px; font:inherit; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); cursor:pointer;
+}
+.filter-select select:hover, .filter-select select:focus{ border-color:var(--ink); outline:none; }
+.filter-clear{ font-size:.72rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+.filter-clear:hover{ color:var(--rust); }
+.filter-panel-btn{ margin-left:auto; border:none; }
+@media (max-width:640px){ .filter-panel-btn{ margin-left:0; width:100%; text-align:center; } }
+
+/* Product card extras (inc/product-cards.php): colours + size range */
+.card-attrs{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 14px 8px; font-size:.72rem; color:var(--ink-soft); }
+.card-swatches{ display:flex; align-items:center; gap:4px; }
+.card-swatch{ width:12px; height:12px; border-radius:50%; border:1px solid var(--line); background-size:cover; background-position:center; }
+.card-more{ font-size:.66rem; margin-left:2px; }
+.card-sizes{ font-weight:700; letter-spacing:.03em; }
+.trust-item a{ text-decoration:underline; text-underline-offset:2px; }
+.trust-item a:hover{ color:var(--rust); }

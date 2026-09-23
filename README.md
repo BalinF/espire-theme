@@ -83,6 +83,23 @@ The templates fall back gracefully when these are empty, so fill them in as you 
 **Pages → FAQ → Quick Answers**
 - The questions in the product page's "Shipping & Returns" panel.
 
+**Banner photos** — every collection banner uses an image you pick:
+- Category pages: Products → Categories → edit → *Banner Image* (or the
+  category's normal WooCommerce *Thumbnail*).
+- Store / DIY / Shop page: that page's **Featured image** (right-hand sidebar
+  when editing the page). The line under the title is the page's *Excerpt*.
+
+**Filter bar** — Fit / Colour / Size across the top of every category page, the
+Store hub and the shop, built from Products → Attributes (any attribute named
+like "fit", "colour"/"color" or "size"). If there's no Fit attribute, a
+category's sub-categories are used as the Fit buttons. No plugin needed.
+
+**Product cards** — show colour swatches (or "4 Colours") and the size range
+from the same attributes, so a variation-swatches plugin isn't needed.
+
+**Homepage → Shop The Set** (Pages → the homepage → *Shop The Set* box) — pick
+2–4 products, a photo and a title; photos, prices and the total fill in.
+
 **Store hub (`/store/`)** — one tile per top-level product category, in the
 order you drag them into under Products → Categories. Tile photo: the
 category's *Banner Image*, else its WooCommerce thumbnail, else the homepage

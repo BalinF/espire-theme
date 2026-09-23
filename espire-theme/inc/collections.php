@@ -79,3 +79,43 @@ function espire_store_tiles() {
 	}
 	return $tiles;
 }
+
+/**
+ * The tile grid itself — every collection, then a Design Your Own tile
+ * (its photo is the DIY page's featured image, when it has one). Used by
+ * the Store hub page and by WooCommerce's shop page when no filter is set.
+ */
+function espire_store_tiles_grid() {
+	$tiles = espire_store_tiles();
+	$diy   = get_page_by_path( 'diy' );
+	$tiles[] = array(
+		'label' => 'Design Your Own',
+		'url'   => home_url( '/diy/' ),
+		'image' => $diy ? get_the_post_thumbnail_url( $diy, 'large' ) : '',
+		'copy'  => 'Pick the base garment, then make it yours in our designer.',
+		'cta'   => 'Start Designing',
+		'count' => 0,
+	);
+	?>
+	<div class="collection-grid">
+		<?php foreach ( $tiles as $tile ) : ?>
+			<a class="collection-slide" href="<?php echo esc_url( $tile['url'] ); ?>">
+				<?php if ( $tile['image'] ) : ?>
+					<div class="cs-shot"><img src="<?php echo esc_url( $tile['image'] ); ?>" alt="" loading="lazy"></div>
+				<?php else : ?>
+					<div class="cs-shot placeholder">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21h16"/><path d="M6 21V9l6-5 6 5v12"/><path d="M10 21v-6h4v6"/></svg>
+					</div>
+				<?php endif; ?>
+				<div class="cs-body">
+					<h3><?php echo esc_html( $tile['label'] ); ?></h3>
+					<?php if ( $tile['copy'] ) : ?>
+						<p><?php echo esc_html( $tile['copy'] ); ?></p>
+					<?php endif; ?>
+					<span class="cs-link"><?php echo esc_html( $tile['cta'] ); ?> &rarr;</span>
+				</div>
+			</a>
+		<?php endforeach; ?>
+	</div>
+	<?php
+}
