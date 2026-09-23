@@ -16,6 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Bigger features live in their own files under /inc to keep this one short.
+require_once get_template_directory() . '/inc/symbols.php';
+require_once get_template_directory() . '/inc/product-page.php';
+
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.
  * Hooked to 'after_setup_theme', which is the standard place to do this.
@@ -33,6 +37,12 @@ function espire_theme_setup() {
 	// without this, WooCommerce falls back to wrapping everything in
 	// extra markup that's harder to style.
 	add_theme_support( 'woocommerce' );
+
+	// WooCommerce's own product gallery features: hover zoom, click-to-
+	// open lightbox, and the thumbnail slider (used on single-product.php).
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
 
 	// Register a menu "location" called "primary". This is what makes
 	// Appearance > Menus show a place to assign a menu to the header —
@@ -159,6 +169,15 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'instructions' => 'Short line under the banner title, e.g. "Heavyweight, made to last."',
 				),
 				array(
+					'key'           => 'field_espire_cat_emblem',
+					'label'         => 'Category Emblem',
+					'name'          => 'category_emblem',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'thumbnail',
+					'instructions'  => 'The collection\'s badge (e.g. the Shirts emblem). Shown next to the product name and description on every product in this category — sub-categories use their parent\'s if left blank.',
+				),
+				array(
 					'key'          => 'field_espire_cat_sidebar_intro',
 					'label'        => 'Sidebar Intro Copy',
 					'name'         => 'category_sidebar_intro',
@@ -185,6 +204,62 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'name'  => 'fit_description',
 							'type'  => 'text',
 						),
+						// Everything below feeds the Fit Guide panel on product
+						// pages (see espire_fit_guide_panel() in inc/product-page.php).
+						// A fit with none of these filled in just doesn't show there.
+						array(
+							'key'           => 'field_espire_fit_image',
+							'label'         => 'Fit Guide Photo',
+							'name'          => 'fit_image',
+							'type'          => 'image',
+							'return_format' => 'url',
+							'preview_size'  => 'thumbnail',
+						),
+						array(
+							'key'          => 'field_espire_fit_intro',
+							'label'        => 'Fit Guide Intro',
+							'name'         => 'fit_intro',
+							'type'         => 'textarea',
+							'rows'         => 3,
+							'instructions' => 'e.g. "Our slim cut is fairly generous, with a tapered shape and higher shoulders…"',
+						),
+						array(
+							'key'          => 'field_espire_fit_model_note',
+							'label'        => 'Model Note',
+							'name'         => 'fit_model_note',
+							'type'         => 'text',
+							'instructions' => 'e.g. "Model is wearing size M, 180cm tall."',
+						),
+						array(
+							'key'          => 'field_espire_fit_size_notes',
+							'label'        => 'Size Notes',
+							'name'         => 'fit_size_notes',
+							'type'         => 'repeater',
+							'layout'       => 'table',
+							'button_label' => 'Add Size',
+							'sub_fields'   => array(
+								array(
+									'key'   => 'field_espire_fit_size_notes_size',
+									'label' => 'Size',
+									'name'  => 'size',
+									'type'  => 'text',
+								),
+								array(
+									'key'   => 'field_espire_fit_size_notes_note',
+									'label' => 'Note',
+									'name'  => 'note',
+									'type'  => 'text',
+								),
+							),
+						),
+						array(
+							'key'          => 'field_espire_fit_measurements',
+							'label'        => 'Measurements (cm)',
+							'name'         => 'fit_measurements',
+							'type'         => 'textarea',
+							'rows'         => 7,
+							'instructions' => "One row per line, cells separated by | — first line is the sizes. Example:\n| XS | S | M | L | XL\nChest (B) | 109 | 114 | 119 | 124 | 129",
+						),
 					),
 				),
 				array(
@@ -204,6 +279,71 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					),
 				),
 			),
+		) );
+
+		/**
+		 * Product page extras (Products > edit a product): which symbol
+		 * badges it shows, and the short "facts" lines under its
+		 * description. Symbol choices come from espire_symbols() in
+		 * inc/symbols.php, so adding a symbol there adds a tick box here.
+		 */
+		$espire_symbol_choices = array();
+		foreach ( espire_symbols() as $espire_slug => $espire_symbol ) {
+			$espire_symbol_choices[ $espire_slug ] = $espire_symbol['label'];
+		}
+		acf_add_local_field_group( array(
+			'key'      => 'group_espire_product_page',
+			'title'    => 'Product Page Extras',
+			'fields'   => array(
+				array(
+					'key'           => 'field_espire_product_symbols',
+					'label'         => 'Product Symbols',
+					'name'          => 'product_symbols',
+					'type'          => 'checkbox',
+					'choices'       => $espire_symbol_choices,
+					'default_value' => espire_core_symbols(),
+					'return_format' => 'value',
+					'instructions'  => 'Badges shown in "The Symbols" row. Each opens its story in a slide-in panel.',
+				),
+				array(
+					'key'          => 'field_espire_product_raw_materials',
+					'label'        => 'Raw Materials',
+					'name'         => 'product_raw_materials',
+					'type'         => 'text',
+					'instructions' => 'e.g. "100% Australian Merino". Leave any of these blank to hide that line.',
+				),
+				array(
+					'key'          => 'field_espire_product_fabric',
+					'label'        => 'Fabric',
+					'name'         => 'product_fabric',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Woven and dyed into 200gsm fabric in Melbourne, Victoria"',
+				),
+				array(
+					'key'          => 'field_espire_product_stitched',
+					'label'        => 'Stitched',
+					'name'         => 'product_stitched',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Our store, Bright Victoria"',
+				),
+				array(
+					'key'          => 'field_espire_product_care',
+					'label'        => 'Care',
+					'name'         => 'product_care',
+					'type'         => 'text',
+					'instructions' => 'e.g. "5% shrinkage in length, cold machine wash only"',
+				),
+			),
+			'location' => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'product',
+					),
+				),
+			),
+			'position' => 'normal',
 		) );
 	} );
 }

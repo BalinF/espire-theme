@@ -45,3 +45,24 @@ Until the FTP secrets below exist, the deploy step is skipped with a warning.
 
 WooCommerce, Advanced Custom Fields (category banner/sidebar fields are defined
 in `functions.php`, so their structure is version-controlled here).
+
+## Filling in content (wp-admin)
+
+The templates fall back gracefully when these are empty, so fill them in as you go.
+
+**Products → Categories → edit a category** (sub-categories inherit from their parent)
+- *Category Emblem* — the collection badge shown beside the product name.
+- *Available Fits* — each fit's name and one-liner, plus the **Fit Guide** details
+  (photo, intro, model note, size notes, measurements). The product page's
+  "Fit Guide" button only appears once a fit has guide content.
+  Measurements are typed one row per line with `|` between cells:
+  ```
+  | XS | S | M | L | XL
+  Chest (B) | 109 | 114 | 119 | 124 | 129
+  ```
+
+**Products → edit a product → Product Page Extras**
+- *Product Symbols* — which badges show (the core four are ticked by default).
+- *Raw Materials / Fabric / Stitched / Care* — the fact lines under the description.
+- **Linked Products → Cross-sells** (in WooCommerce's Product data box) — the
+  "Goes Well With" row. Falls back to related products if left empty.

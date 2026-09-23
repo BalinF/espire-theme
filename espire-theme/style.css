@@ -507,3 +507,173 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .fits-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
 .fits-list li{ display:flex; flex-direction:column; font-size:.85rem; border-bottom:1px solid var(--line); padding-bottom:8px; }
 .fits-list li span{ color:var(--ink-soft); font-size:.78rem; }
+
+/* Any panel opened through main.js gets "is-open" on itself and its
+   overlay — so new panels (Fit Guide, symbols, shipping…) need no
+   per-panel rules like the two above. */
+.panel-overlay.is-open{ opacity:1; pointer-events:auto; }
+.info-panel.is-open{ transform:translateX(0); }
+.info-panel{ width:min(440px,92vw); }
+.panel-textlink{ display:block; text-align:center; margin-top:14px; font-size:.78rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+button.btn-block{ border:none; }
+
+/* ============================================================
+   SINGLE PRODUCT — single-product.php
+   Follows the Site Map's SingleProduct artboard: gallery with
+   thumbnails down the left, buy box on the right, then white
+   black-bordered cards for the description and symbols.
+   ============================================================ */
+.product-page{ max-width:1400px; margin:0 auto; }
+.product-page .woocommerce-notices-wrapper{ padding:14px 5% 0; }
+.product-crumb{ padding:14px 5% 0; font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); }
+.product-crumb a:hover{ color:var(--rust); }
+
+.product-main{ display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:28px; padding:18px 5% 8px; align-items:start; }
+@media (max-width:900px){ .product-main{ grid-template-columns:1fr; } }
+
+/* WooCommerce gallery: main image on the right, thumbnails in a column
+   on the left (the slider puts them underneath by default). */
+.product-gallery .woocommerce-product-gallery{ position:relative; display:grid; grid-template-columns:64px minmax(0,1fr); gap:12px; margin:0; opacity:1 !important; }
+.product-gallery .woocommerce-product-gallery .flex-viewport,
+.product-gallery .woocommerce-product-gallery > .woocommerce-product-gallery__wrapper{ grid-column:2; grid-row:1; border:1px solid var(--line); background:var(--card); }
+.product-gallery .woocommerce-product-gallery__wrapper{ margin:0; }
+.product-gallery .woocommerce-product-gallery__image img{ width:100%; height:auto; }
+.product-gallery .flex-control-thumbs{ grid-column:1; grid-row:1; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.product-gallery .flex-control-thumbs img{ aspect-ratio:1; object-fit:cover; width:100%; border:1px solid var(--line); border-radius:3px; cursor:pointer; opacity:1; transition:border-color .15s ease; }
+.product-gallery .flex-control-thumbs img:hover{ border-color:var(--rust); }
+.product-gallery .flex-control-thumbs img.flex-active{ border-color:var(--redrock); }
+.product-gallery .woocommerce-product-gallery__trigger{ position:absolute; top:10px; right:10px; z-index:3; width:34px; height:34px; border-radius:50%; background:var(--white); border:1px solid var(--line); font-size:0; }
+.product-gallery .woocommerce-product-gallery__trigger::after{ content:"⤢"; font-size:1rem; display:flex; align-items:center; justify-content:center; height:100%; color:var(--ink); }
+@media (max-width:640px){
+  .product-gallery .woocommerce-product-gallery{ grid-template-columns:1fr; }
+  .product-gallery .flex-control-thumbs{ grid-row:2; grid-column:1; flex-direction:row; overflow-x:auto; }
+  .product-gallery .flex-control-thumbs li{ flex:0 0 56px; }
+  .product-gallery .woocommerce-product-gallery .flex-viewport,
+  .product-gallery .woocommerce-product-gallery > .woocommerce-product-gallery__wrapper{ grid-column:1; }
+}
+
+.product-info{ display:flex; flex-direction:column; gap:16px; }
+.info-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+.info-top h1{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.01em; font-size:1.5rem; line-height:1.15; margin:0; }
+.product-emblem{ flex:none; width:64px; height:68px; object-fit:contain; }
+.product-price{ font-size:1.15rem; font-weight:700; font-variant-numeric:tabular-nums; color:var(--rust); }
+.product-price del{ color:var(--ink-soft); font-weight:400; opacity:.7; margin-right:6px; }
+
+.avail-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--ink); color:#fff; padding:11px 16px; font-size:.74rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; }
+.avail-link{ background:none; border:none; color:inherit; font:inherit; text-transform:inherit; letter-spacing:.05em; cursor:pointer; display:flex; align-items:center; gap:7px; padding:0; }
+.avail-link:hover{ color:var(--rust); }
+.arrow-circle{ width:16px; height:16px; border-radius:50%; border:1px solid currentColor; display:flex; align-items:center; justify-content:center; flex:none; }
+.arrow-circle svg{ width:8px; height:8px; }
+
+/* WooCommerce's add-to-cart form, laid out as stacked option fields */
+.product-info form.cart{ margin:0; display:flex; flex-direction:column; gap:16px; }
+.product-info table.variations{ width:100%; border-collapse:collapse; }
+.product-info table.variations tr{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.product-info table.variations th, .product-info table.variations td{ padding:0; text-align:left; }
+.product-info table.variations th label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
+.product-info table.variations select{ width:100%; padding:10px 12px; border:1px solid var(--ink); background:var(--white); font:inherit; font-size:.85rem; }
+.product-info .reset_variations{ display:inline-block; margin-top:8px; font-size:.72rem; text-decoration:underline; color:var(--ink-soft); }
+.product-info .woocommerce-variation-price{ font-weight:700; color:var(--rust); }
+.product-info .woocommerce-variation-availability .stock{ font-size:.8rem; color:var(--ink-soft); margin:4px 0 0; }
+.product-info .woocommerce-variation-add-to-cart,
+.product-info form.cart:not(.variations_form){ display:flex; gap:10px; align-items:stretch; flex-direction:row; }
+.product-info .quantity input.qty{ height:100%; min-height:48px; width:64px; padding:0 8px; border:1px solid var(--ink); text-align:center; font:inherit; }
+.woocommerce .product-info button.single_add_to_cart_button{ flex:1; background:var(--olive); color:var(--white); border:none; border-radius:3px; padding:14px; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; transition:background .15s ease; }
+.woocommerce .product-info button.single_add_to_cart_button:hover{ background:var(--rust); }
+.woocommerce .product-info button.single_add_to_cart_button.disabled{ opacity:.55; cursor:not-allowed; }
+
+/* Pills that replace the option dropdowns (built by main.js) */
+select.is-pill-source{ position:absolute !important; width:1px !important; height:1px !important; opacity:0; pointer-events:none; }
+.option-pills{ display:flex; gap:8px; flex-wrap:wrap; }
+.option-pill{ padding:8px 16px; border-radius:2px; border:1px solid var(--ink); font:inherit; font-size:.76rem; font-weight:600; letter-spacing:.01em; cursor:pointer; background:var(--white); color:var(--ink); transition:border-color .15s ease; }
+.option-pill:hover{ border-color:var(--rust); }
+.option-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.option-pill.is-unavailable{ opacity:.35; text-decoration:line-through; }
+.option-pills.is-size .option-pill{ width:38px; height:38px; padding:0; border-radius:50%; background:var(--ink); color:var(--white); font-size:.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.option-pills.is-size .option-pill.is-active{ outline:1.5px solid var(--redrock); outline-offset:2px; background:var(--redrock); }
+.option-pill:focus-visible{ outline:2px solid var(--rust); outline-offset:2px; }
+
+.ship-note{ display:flex; align-items:center; gap:8px; font-size:.74rem; color:var(--ink-soft); margin:0; }
+
+/* Description + symbols cards */
+.product-section{ padding:20px 5% 6px; }
+.desc-box, .symbols-box{ border:1.5px solid var(--ink); border-radius:4px; background:var(--white); padding:28px 32px; }
+.desc-box{ display:flex; gap:30px; align-items:flex-start; }
+.desc-text{ flex:1; min-width:0; }
+.desc-box h2{ font-size:1rem; margin-bottom:10px; }
+.desc-body{ font-size:.86rem; line-height:1.7; color:var(--ink-soft); }
+.desc-body p{ margin:0 0 12px; }
+.desc-emblem{ flex:none; width:96px; height:102px; object-fit:contain; }
+.facts{ margin:0; font-size:.82rem; line-height:1.9; color:var(--ink-soft); }
+.facts dt{ display:inline; color:var(--ink); font-weight:700; }
+.facts dt::after{ content:" —"; }
+.facts dd{ display:inline; margin:0; }
+.trust-lines{ display:flex; gap:24px; flex-wrap:wrap; margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }
+.trust-item{ flex:1; min-width:200px; display:flex; gap:10px; align-items:flex-start; font-size:.78rem; color:var(--ink-soft); text-align:left; }
+.trust-item svg{ flex:none; width:18px; height:18px; margin-top:1px; color:var(--ink); }
+button.trust-link{ background:none; border:none; padding:0; font:inherit; font-size:.78rem; cursor:pointer; }
+button.trust-link span{ text-decoration:underline; text-underline-offset:2px; }
+button.trust-link:hover{ color:var(--rust); }
+@media (max-width:640px){
+  .desc-box{ flex-direction:column-reverse; padding:22px 18px; }
+  .symbols-box{ padding:22px 14px; }
+}
+
+.symbols-title{ text-align:center; font-size:1rem; padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); }
+.badge-row{ display:flex; align-items:flex-start; justify-content:center; gap:30px; flex-wrap:wrap; }
+.symbol-badge{ width:98px; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; background:none; border:none; padding:0; font:inherit; color:var(--ink); }
+.symbol-badge .ring-wrap{ position:relative; width:98px; height:98px; display:block; }
+.symbol-badge .ring-wrap > svg{ width:100%; height:100%; color:var(--ink); transition:color .15s ease; }
+.symbol-badge .center-ic{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
+/* Symbol marks are single-ink artwork (some supplied white, for dark
+   backgrounds) — brightness(0) prints them in solid ink on light badges. */
+.symbol-badge .center-ic img{ width:100%; height:auto; filter:brightness(0); }
+.symbol-badge .center-ic svg{ width:100%; height:100%; transition:color .15s ease; }
+.symbol-badge .lb{ font-size:.6rem; text-transform:uppercase; letter-spacing:.03em; text-align:center; font-weight:700; color:var(--ink-soft); transition:color .15s ease; }
+.symbol-badge:hover .ring-wrap > svg, .symbol-badge:hover .center-ic svg, .symbol-badge:hover .lb{ color:var(--rust); }
+.symbol-badge:focus-visible{ outline:2px solid var(--rust); outline-offset:4px; border-radius:50%; }
+
+.lifestyle-banner{ position:relative; height:260px; overflow:hidden; margin-top:20px; }
+.lifestyle-banner img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.lifestyle-banner .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.28); }
+.lifestyle-banner .banner-text{ position:absolute; inset:0; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; }
+.lifestyle-banner h2{ color:#fff; font-size:1.6rem; text-shadow:0 3px 10px rgba(0,0,0,.6); }
+.lifestyle-banner a{ font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#fff; border:1px solid #fff; padding:8px 18px; }
+.lifestyle-banner a:hover{ background:#fff; color:var(--ink); }
+
+.related-products{ padding-bottom:50px; }
+.related-products h2{ font-size:1.1rem; margin-bottom:16px; }
+
+/* Slide-in panel contents: symbol title bar, Fit Guide, FAQ */
+.symbol-panel{ padding-top:0; }
+.panel-titlebar{ display:flex; align-items:center; gap:12px; background:var(--ink); color:#fff; margin:0 -24px 18px; padding:18px 24px; }
+.panel-titlebar h3{ color:#fff; margin:0; font-size:1.1rem; }
+.panel-titlebar p{ margin:2px 0 0; font-size:.78rem; color:#E7E3D2; }
+.panel-titlebar .panel-close{ margin:0 0 0 auto; color:#fff; }
+.panel-mark{ flex:none; width:40px; height:40px; border-radius:50%; background:var(--white); color:var(--ink); display:flex; align-items:center; justify-content:center; padding:9px; }
+.panel-mark img, .panel-mark svg{ width:100%; height:100%; object-fit:contain; }
+.panel-mark img{ filter:brightness(0); }
+.info-panel .panel-close svg{ width:22px; height:22px; display:block; }
+.panel-points{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.panel-points li{ position:relative; padding-left:18px; font-size:.84rem; line-height:1.55; }
+.panel-points li::before{ content:""; position:absolute; left:0; top:.55em; width:7px; height:7px; background:var(--rust); border-radius:50%; }
+.panel-links{ display:flex; flex-direction:column; gap:8px; margin-top:22px; }
+.panel-links .btn{ text-align:center; }
+
+.fit-tabs{ display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:8px; margin:6px 0 18px; }
+.fit-tab{ border:1.5px solid var(--ink); background:var(--white); padding:10px 6px; font:inherit; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; cursor:pointer; color:var(--ink); }
+.fit-tab.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.fit-photo{ width:100%; aspect-ratio:4/3; object-fit:cover; margin-bottom:12px; }
+.fit-model-note{ font-size:.74rem; color:var(--ink-soft); margin:6px 0 0; }
+.size-notes{ margin:16px 0 0; display:grid; grid-template-columns:auto 1fr; gap:8px 12px; font-size:.8rem; }
+.size-notes dt{ font-weight:700; }
+.size-notes dd{ margin:0; color:var(--ink-soft); line-height:1.5; }
+.measure-table-wrap{ overflow-x:auto; margin-top:18px; }
+.measure-table{ width:100%; border-collapse:collapse; font-size:.78rem; font-variant-numeric:tabular-nums; }
+.measure-table th, .measure-table td{ padding:7px 6px; border-bottom:1px solid var(--line); text-align:center; }
+.measure-table thead th{ border-bottom:2px solid var(--ink); font-size:.7rem; }
+.measure-table tbody th{ text-align:left; font-weight:700; white-space:nowrap; }
+
+.faq-item{ border-bottom:1px solid var(--line); padding:12px 0; }
+.faq-item summary{ cursor:pointer; font-weight:700; font-size:.86rem; }
+.faq-item p{ font-size:.84rem; line-height:1.6; color:var(--ink-soft); margin:10px 0 0; }
