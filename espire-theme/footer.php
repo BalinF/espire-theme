@@ -46,8 +46,9 @@
 				<h4>Get In Touch</h4>
 				<ul>
 					<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact Us</a></li>
-					<li>Store open daily 9am&ndash;5pm</li>
-					<li>0490 124 074</li>
+					<?php $espire_details = espire_store_details(); // edited on the Contact page ?>
+					<li><?php echo esc_html( $espire_details['hours'] ); ?></li>
+					<li><a href="tel:<?php echo esc_attr( preg_replace( '/[^0-9+]/', '', $espire_details['phone'] ) ); ?>"><?php echo esc_html( $espire_details['phone'] ); ?></a></li>
 				</ul>
 			</div>
 		</div>

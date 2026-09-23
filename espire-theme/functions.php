@@ -22,6 +22,7 @@ require_once get_template_directory() . '/inc/product-page.php';
 require_once get_template_directory() . '/inc/cart-checkout.php';
 require_once get_template_directory() . '/inc/collections.php';
 require_once get_template_directory() . '/inc/story.php';
+require_once get_template_directory() . '/inc/pages.php';
 
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.
