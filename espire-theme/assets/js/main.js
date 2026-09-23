@@ -376,3 +376,84 @@
 		}
 	} );
 } )();
+
+/**
+ * Quantity steppers — "–  1  +" buttons around WooCommerce's quantity
+ * boxes (cart and product page). The real number box stays underneath,
+ * so WooCommerce reads it exactly as before. On the cart, changing a
+ * quantity updates the cart by itself a moment later (it presses
+ * WooCommerce's own "Update cart" button), so nobody has to hunt for it.
+ */
+( function () {
+	'use strict';
+
+	var updateTimer = null;
+
+	function autoUpdateCart( input ) {
+		var form = input.closest( 'form.woocommerce-cart-form' );
+		var btn = form && form.querySelector( '[name="update_cart"]' );
+		if ( ! btn ) {
+			return;
+		}
+		window.clearTimeout( updateTimer );
+		updateTimer = window.setTimeout( function () {
+			btn.disabled = false;
+			btn.removeAttribute( 'aria-disabled' );
+			btn.click();
+		}, 700 );
+	}
+
+	function enhance( wrap ) {
+		var input = wrap.querySelector( 'input.qty' );
+		if ( ! input || input.type === 'hidden' || wrap.classList.contains( 'has-stepper' ) ) {
+			return;
+		}
+		wrap.classList.add( 'has-stepper' );
+
+		function step( dir ) {
+			var min = parseFloat( input.min ) || 0;
+			var max = parseFloat( input.max );
+			var stepBy = parseFloat( input.step ) || 1;
+			var value = ( parseFloat( input.value ) || 0 ) + dir * stepBy;
+			if ( value < min ) {
+				value = min;
+			}
+			if ( ! isNaN( max ) && max > 0 && value > max ) {
+				value = max;
+			}
+			input.value = value;
+			input.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+			input.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+		}
+
+		[ [ -1, '–', 'Decrease quantity' ], [ 1, '+', 'Increase quantity' ] ].forEach( function ( cfg ) {
+			var btn = document.createElement( 'button' );
+			btn.type = 'button';
+			btn.className = 'qty-step ' + ( cfg[ 0 ] < 0 ? 'qty-minus' : 'qty-plus' );
+			btn.textContent = cfg[ 1 ];
+			btn.setAttribute( 'aria-label', cfg[ 2 ] );
+			btn.addEventListener( 'click', function () {
+				step( cfg[ 0 ] );
+			} );
+			if ( cfg[ 0 ] < 0 ) {
+				wrap.insertBefore( btn, input );
+			} else {
+				wrap.appendChild( btn );
+			}
+		} );
+
+		input.addEventListener( 'change', function () {
+			autoUpdateCart( input );
+		} );
+	}
+
+	function enhanceAll() {
+		document.querySelectorAll( '.quantity' ).forEach( enhance );
+	}
+
+	enhanceAll();
+	// WooCommerce redraws the cart table after an update; re-add steppers.
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'updated_wc_div updated_cart_totals', enhanceAll );
+	}
+} )();

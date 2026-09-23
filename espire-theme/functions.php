@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Bigger features live in their own files under /inc to keep this one short.
 require_once get_template_directory() . '/inc/symbols.php';
 require_once get_template_directory() . '/inc/product-page.php';
+require_once get_template_directory() . '/inc/cart-checkout.php';
 
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.

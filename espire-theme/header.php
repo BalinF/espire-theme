@@ -30,6 +30,26 @@
  * as "homepage" under Settings > Reading.
  */
 $espire_header_class = is_front_page() ? 'site-header' : 'site-header is-solid';
+
+/**
+ * Checkout gets a trimmed header — logo + "Secure Checkout", no menu —
+ * so nothing pulls people away mid-purchase (Site Map: Checkout).
+ */
+if ( function_exists( 'espire_is_checkout_form' ) && espire_is_checkout_form() ) :
+	?>
+	<header class="site-header is-solid is-checkout">
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo-block">
+			<span class="top">ESPIRE</span>
+			<span class="bottom">CLOTHING</span>
+		</a>
+		<div class="head-actions">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+			<span>Secure Checkout</span>
+		</div>
+	</header>
+	<?php
+	return;
+endif;
 ?>
 <header class="<?php echo esc_attr( $espire_header_class ); ?>">
 
