@@ -305,6 +305,11 @@
 		return /size/i.test( select.getAttribute( 'data-attribute_name' ) || select.name || '' );
 	}
 
+	function swatchesFor( select ) {
+		var all = window.espireSwatches || {};
+		return all[ select.getAttribute( 'data-attribute_name' ) ] || {};
+	}
+
 	function build( select ) {
 		var row = select._espirePills;
 		if ( ! row ) {
@@ -329,6 +334,15 @@
 			btn.type = 'button';
 			btn.className = 'option-pill';
 			btn.textContent = option.textContent;
+			// Colour/fabric swatch set on the attribute term in wp-admin
+			// (passed in as window.espireSwatches by inc/product-page.php).
+			var swatch = swatchesFor( select )[ option.value ];
+			if ( swatch ) {
+				btn.classList.add( 'is-swatch' );
+				btn.title = option.textContent;
+				btn.setAttribute( 'aria-label', option.textContent );
+				btn.style.background = swatch.image ? 'center / cover url("' + swatch.image.replace( /"/g, '%22' ) + '")' : swatch.colour;
+			}
 			btn.setAttribute( 'aria-pressed', option.value === select.value ? 'true' : 'false' );
 			if ( option.value === select.value ) {
 				btn.classList.add( 'is-active' );

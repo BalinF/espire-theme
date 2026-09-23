@@ -282,29 +282,14 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 		) );
 
 		/**
-		 * Product page extras (Products > edit a product): which symbol
-		 * badges it shows, and the short "facts" lines under its
-		 * description. Symbol choices come from espire_symbols() in
-		 * inc/symbols.php, so adding a symbol there adds a tick box here.
+		 * Product page extras (Products > edit a product): the short
+		 * "facts" lines under its description. (Symbols come from the
+		 * product's tags — see the "Symbol" box on tags below.)
 		 */
-		$espire_symbol_choices = array();
-		foreach ( espire_symbols() as $espire_slug => $espire_symbol ) {
-			$espire_symbol_choices[ $espire_slug ] = $espire_symbol['label'];
-		}
 		acf_add_local_field_group( array(
 			'key'      => 'group_espire_product_page',
 			'title'    => 'Product Page Extras',
 			'fields'   => array(
-				array(
-					'key'           => 'field_espire_product_symbols',
-					'label'         => 'Product Symbols',
-					'name'          => 'product_symbols',
-					'type'          => 'checkbox',
-					'choices'       => $espire_symbol_choices,
-					'default_value' => espire_core_symbols(),
-					'return_format' => 'value',
-					'instructions'  => 'Badges shown in "The Symbols" row. Each opens its story in a slide-in panel.',
-				),
 				array(
 					'key'          => 'field_espire_product_raw_materials',
 					'label'        => 'Raw Materials',
@@ -345,6 +330,202 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 			),
 			'position' => 'normal',
 		) );
+
+		/**
+		 * Symbols (Products > Tags > edit a tag). A tag with "Show as
+		 * symbol" on shows as a badge on every product carrying it; these
+		 * fields fill in its badge and slide-in panel. Blank fields fall
+		 * back to the built-in copy in inc/symbols.php.
+		 */
+		acf_add_local_field_group( array(
+			'key'      => 'group_espire_symbol_tag',
+			'title'    => 'Symbol',
+			'fields'   => array(
+				array(
+					'key'           => 'field_espire_symbol_enabled',
+					'label'         => 'Show as symbol',
+					'name'          => 'symbol_enabled',
+					'type'          => 'select',
+					'choices'       => array(
+						'auto' => 'Automatic (on for the built-in symbols: Australian Made, Respired, Made In Store, Good Earth Cotton, Belgian Linen)',
+						'yes'  => 'Yes — show this tag as a symbol badge',
+						'no'   => 'No',
+					),
+					'default_value' => 'auto',
+				),
+				array(
+					'key'           => 'field_espire_symbol_icon',
+					'label'         => 'Icon',
+					'name'          => 'symbol_icon',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'thumbnail',
+					'instructions'  => 'The mark in the middle of the badge. Single-colour artwork on a transparent background (PNG or SVG) works best — it\'s printed in ink colour automatically.',
+				),
+				array(
+					'key'          => 'field_espire_symbol_ring_text',
+					'label'        => 'Badge Ring Text',
+					'name'         => 'symbol_ring_text',
+					'type'         => 'text',
+					'instructions' => 'Printed around the circle, e.g. "AUSTRALIAN MADE AND OWNED". Longer text is shrunk to fit.',
+				),
+				array(
+					'key'   => 'field_espire_symbol_order',
+					'label' => 'Badge Order',
+					'name'  => 'symbol_order',
+					'type'  => 'number',
+					'instructions' => 'Lower numbers show first. Leave blank to use the default order.',
+				),
+				array(
+					'key'          => 'field_espire_symbol_tagline',
+					'label'        => 'Panel Tagline',
+					'name'         => 'symbol_tagline',
+					'type'         => 'text',
+					'instructions' => 'Under the name in the panel\'s black title bar, e.g. "Made In Bright, Victoria."',
+				),
+				array(
+					'key'          => 'field_espire_symbol_heading',
+					'label'        => 'Panel Heading',
+					'name'         => 'symbol_heading',
+					'type'         => 'text',
+					'instructions' => 'e.g. "The Symbol", "The Fabric", "The Program".',
+				),
+				array(
+					'key'   => 'field_espire_symbol_intro',
+					'label' => 'Panel Intro',
+					'name'  => 'symbol_intro',
+					'type'  => 'textarea',
+					'rows'  => 3,
+				),
+				array(
+					'key'          => 'field_espire_symbol_points',
+					'label'        => 'Panel Points',
+					'name'         => 'symbol_points',
+					'type'         => 'textarea',
+					'rows'         => 5,
+					'instructions' => 'One point per line.',
+				),
+				array(
+					'key'          => 'field_espire_symbol_story_label',
+					'label'        => 'Story Button Text',
+					'name'         => 'symbol_story_label',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Read The Full Story".',
+				),
+				array(
+					'key'   => 'field_espire_symbol_story_url',
+					'label' => 'Story Button Link',
+					'name'  => 'symbol_story_url',
+					'type'  => 'url',
+				),
+				array(
+					'key'          => 'field_espire_symbol_shop_label',
+					'label'        => 'Shop Button Text',
+					'name'         => 'symbol_shop_label',
+					'type'         => 'text',
+					'instructions' => 'Links to this tag\'s own page (all products with this symbol). e.g. "Shop Belgian Linen Pieces".',
+				),
+			),
+			'location' => array(
+				array(
+					array(
+						'param'    => 'taxonomy',
+						'operator' => '==',
+						'value'    => 'product_tag',
+					),
+				),
+			),
+		) );
+
+		/**
+		 * Colour swatches (Products > Attributes > Configure terms > edit
+		 * a term, e.g. Colour > Navy). When a term has a swatch, product
+		 * pages show it as a coloured square instead of a text button.
+		 */
+		$espire_attribute_locations = array();
+		if ( function_exists( 'wc_get_attribute_taxonomy_names' ) ) {
+			foreach ( wc_get_attribute_taxonomy_names() as $espire_attr ) {
+				$espire_attribute_locations[] = array(
+					array(
+						'param'    => 'taxonomy',
+						'operator' => '==',
+						'value'    => $espire_attr,
+					),
+				);
+			}
+		}
+		if ( $espire_attribute_locations ) {
+			acf_add_local_field_group( array(
+				'key'      => 'group_espire_attribute_swatch',
+				'title'    => 'Swatch',
+				'fields'   => array(
+					array(
+						'key'          => 'field_espire_swatch_colour',
+						'label'        => 'Swatch Colour',
+						'name'         => 'swatch_colour',
+						'type'         => 'color_picker',
+						'instructions' => 'Leave blank to keep this option as a text button.',
+					),
+					array(
+						'key'           => 'field_espire_swatch_image',
+						'label'         => 'Swatch Image',
+						'name'          => 'swatch_image',
+						'type'          => 'image',
+						'return_format' => 'url',
+						'preview_size'  => 'thumbnail',
+						'instructions'  => 'Optional — a fabric photo for marles/prints/trims. Used instead of the colour when set.',
+					),
+				),
+				'location' => $espire_attribute_locations,
+			) );
+		}
+
+		/**
+		 * Shipping & Returns quick answers — edited on the FAQ page itself
+		 * (Pages > FAQ), shown in the slide-in panel on every product page.
+		 */
+		$espire_faq_page = get_page_by_path( 'faq' );
+		if ( $espire_faq_page ) {
+			acf_add_local_field_group( array(
+				'key'      => 'group_espire_faq_quick',
+				'title'    => 'Product Page Quick Answers',
+				'fields'   => array(
+					array(
+						'key'          => 'field_espire_faq_quick',
+						'label'        => 'Quick Answers',
+						'name'         => 'faq_quick_answers',
+						'type'         => 'repeater',
+						'layout'       => 'block',
+						'button_label' => 'Add Question',
+						'instructions' => 'Shown in the "Shipping & Returns" panel on product pages — keep it to the 3–4 questions people ask before buying.',
+						'sub_fields'   => array(
+							array(
+								'key'   => 'field_espire_faq_quick_q',
+								'label' => 'Question',
+								'name'  => 'question',
+								'type'  => 'text',
+							),
+							array(
+								'key'   => 'field_espire_faq_quick_a',
+								'label' => 'Answer',
+								'name'  => 'answer',
+								'type'  => 'textarea',
+								'rows'  => 3,
+							),
+						),
+					),
+				),
+				'location' => array(
+					array(
+						array(
+							'param'    => 'page',
+							'operator' => '==',
+							'value'    => (string) $espire_faq_page->ID,
+						),
+					),
+				),
+			) );
+		}
 	} );
 }
 

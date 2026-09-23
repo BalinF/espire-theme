@@ -192,16 +192,26 @@ function espire_fit_guide_panel( $product_id ) {
  * Shipping & Returns quick panel — the most purchase-relevant FAQ
  * answers, with the full /faq/ page linked for everything else.
  *
- * Only the returns answer is in so far (copied from the live /faq/ page
- * via the Site Map). Add the rest to $faqs as array( question, answer ).
+ * The questions are edited on the FAQ page itself (Pages > FAQ >
+ * "Quick Answers" box). Until that's filled in, the returns answer copied
+ * from the live /faq/ page is shown.
  */
 function espire_shipping_panel() {
-	$faqs = array(
-		array(
+	$faqs     = array();
+	$faq_page = get_page_by_path( 'faq' );
+	if ( $faq_page && function_exists( 'get_field' ) ) {
+		foreach ( get_field( 'faq_quick_answers', $faq_page->ID ) ?: array() as $row ) {
+			if ( ! empty( $row['question'] ) && ! empty( $row['answer'] ) ) {
+				$faqs[] = array( $row['question'], $row['answer'] );
+			}
+		}
+	}
+	if ( ! $faqs ) {
+		$faqs[] = array(
 			'Can I return an item if I change my mind?',
 			"If the item hasn't been worn yet and you want to return it, this can be done with a full refund but the shipping will be paid by the customer. Please address it to our Bright store and return with the tag and wrapping within 90 days.",
-		),
-	);
+		);
+	}
 	?>
 	<div class="panel-overlay" data-panel-close="shipping"></div>
 	<aside class="info-panel" id="shipping-panel" aria-label="Shipping and Returns">
@@ -213,7 +223,7 @@ function espire_shipping_panel() {
 		<?php foreach ( $faqs as $i => $faq ) : ?>
 			<details class="faq-item"<?php echo 0 === $i ? ' open' : ''; ?>>
 				<summary><?php echo esc_html( $faq[0] ); ?></summary>
-				<p><?php echo esc_html( $faq[1] ); ?></p>
+				<?php echo wp_kses_post( wpautop( $faq[1] ) ); ?>
 			</details>
 		<?php endforeach; ?>
 		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
@@ -238,3 +248,47 @@ function espire_goes_well_with_ids( $product, $limit = 4 ) {
 	} );
 	return array_slice( array_values( $ids ), 0, $limit );
 }
+
+/**
+ * Swatch colours/images for this product's options, handed to main.js so
+ * it can draw coloured squares instead of text buttons. Filled in per
+ * attribute term in wp-admin (Products > Attributes > Configure terms).
+ *
+ * Output shape: { "attribute_pa_colour": { "navy": { "colour": "#1f2a44",
+ * "image": "" } } } — keyed by the same names/values WooCommerce's
+ * option dropdowns use.
+ */
+function espire_product_swatches( $product ) {
+	if ( ! function_exists( 'get_field' ) || ! $product->is_type( 'variable' ) ) {
+		return array();
+	}
+	$swatches = array();
+	foreach ( $product->get_attributes() as $attribute ) {
+		if ( ! $attribute->is_taxonomy() ) {
+			continue;
+		}
+		$taxonomy = $attribute->get_name();
+		foreach ( $attribute->get_terms() as $term ) {
+			$colour = get_field( 'swatch_colour', $taxonomy . '_' . $term->term_id );
+			$image  = get_field( 'swatch_image', $taxonomy . '_' . $term->term_id );
+			if ( $colour || $image ) {
+				$swatches[ 'attribute_' . $taxonomy ][ $term->slug ] = array(
+					'colour' => (string) $colour,
+					'image'  => (string) $image,
+				);
+			}
+		}
+	}
+	return $swatches;
+}
+
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
+		return;
+	}
+	$product = wc_get_product( get_queried_object_id() );
+	$swatches = $product ? espire_product_swatches( $product ) : array();
+	if ( $swatches ) {
+		wp_add_inline_script( 'espire-theme-main', 'window.espireSwatches = ' . wp_json_encode( $swatches ) . ';', 'before' );
+	}
+}, 20 );

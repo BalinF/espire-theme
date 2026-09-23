@@ -61,8 +61,24 @@ The templates fall back gracefully when these are empty, so fill them in as you 
   Chest (B) | 109 | 114 | 119 | 124 | 129
   ```
 
+**Products → Tags → edit a tag → Symbol** — symbols *are* product tags
+- A product shows a badge for every symbol tag it carries; each badge opens
+  that symbol's own slide-in panel. Tag products as you already do.
+- *Show as symbol*: **Automatic** (the default) turns it on for the built-in
+  symbols (`australian-made`, `respired`, `made-in-store`, `good-earth-cotton`,
+  `belgian-linen` slugs); set **Yes** for any other tag, **No** to hide one.
+- *Icon, Badge Ring Text, Badge Order, Panel Tagline / Heading / Intro /
+  Points, Story button, Shop button* — anything left blank uses the built-in
+  copy. The Shop button links to the tag's own page (all products with it).
+
 **Products → edit a product → Product Page Extras**
-- *Product Symbols* — which badges show (the core four are ticked by default).
 - *Raw Materials / Fabric / Stitched / Care* — the fact lines under the description.
 - **Linked Products → Cross-sells** (in WooCommerce's Product data box) — the
   "Goes Well With" row. Falls back to related products if left empty.
+
+**Products → Attributes → (e.g. Colour) → Configure terms → edit a term → Swatch**
+- *Swatch Colour* or *Swatch Image* — that option then shows as a coloured
+  square instead of a text button.
+
+**Pages → FAQ → Quick Answers**
+- The questions in the product page's "Shipping & Returns" panel.

@@ -677,3 +677,10 @@ button.trust-link:hover{ color:var(--rust); }
 .faq-item{ border-bottom:1px solid var(--line); padding:12px 0; }
 .faq-item summary{ cursor:pointer; font-weight:700; font-size:.86rem; }
 .faq-item p{ font-size:.84rem; line-height:1.6; color:var(--ink-soft); margin:10px 0 0; }
+/* Colour swatch version of an option button (colour/photo set per
+   attribute term in wp-admin). Text stays in the button for screen
+   readers but is hidden visually. */
+.option-pill.is-swatch{ width:30px; height:30px; padding:0; border:1px solid var(--line); border-radius:3px; font-size:0; color:transparent; }
+.option-pill.is-swatch:hover{ outline:1.5px solid var(--rust); outline-offset:2px; }
+.option-pill.is-swatch.is-active{ outline:1.5px solid var(--redrock); outline-offset:2px; border-color:var(--line); }
+.option-pill.is-swatch.is-unavailable{ opacity:.3; }

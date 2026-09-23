@@ -140,8 +140,8 @@ while ( have_posts() ) :
 				<div class="symbols-box">
 					<h2 class="symbols-title">The Symbols</h2>
 					<div class="badge-row">
-						<?php foreach ( $espire_symbols as $espire_slug ) : ?>
-							<?php espire_symbol_badge( $espire_slug ); ?>
+						<?php foreach ( $espire_symbols as $espire_symbol ) : ?>
+							<?php espire_symbol_badge( $espire_symbol ); ?>
 						<?php endforeach; ?>
 					</div>
 				</div>
@@ -182,8 +182,8 @@ while ( have_posts() ) :
 	// Slide-in panels, hidden until their buttons are clicked.
 	echo $espire_fit_guide_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built
 	espire_shipping_panel();
-	foreach ( $espire_symbols as $espire_slug ) {
-		espire_symbol_panel( $espire_slug );
+	foreach ( $espire_symbols as $espire_symbol ) {
+		espire_symbol_panel( $espire_symbol );
 	}
 
 	do_action( 'woocommerce_after_single_product' );
