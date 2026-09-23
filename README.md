@@ -1,29 +1,32 @@
 # Espire Clothing — WordPress theme
 
-The custom theme for espireclothing.com.au lives in [`espire-theme/`](espire-theme/).
-Edit the files here; GitHub uploads them to the site automatically.
+The custom theme for Espire Clothing lives in [`espire-theme/`](espire-theme/).
+Edit the files here; GitHub uploads them to the **staging** site automatically.
 
-## How changes reach the site
+- Staging (where this project is built): https://staging.espireclothing.com.au
+- Live (untouched until the project is finished and copied over): https://espireclothing.com.au
 
-> **Status:** the deploy workflow (`.github/workflows/deploy.yml`) is not added yet —
-> it's waiting on sign-off. Until then, upload the theme to the site by hand.
+## How changes reach staging
 
 | Where you push | What happens |
 | --- | --- |
-| any branch | PHP syntax check only — the live site is not touched |
-| `main` | syntax check, then `espire-theme/` is uploaded to VentraIP over FTPS |
+| any branch | PHP syntax check only — nothing is uploaded |
+| `main` | syntax check, then `espire-theme/` is uploaded to staging over FTPS |
 
-So the flow is: work on a branch → open a pull request → merge into `main` → live.
+Flow: work on a branch → pull request → merge into `main` → staging updates.
 Only changed files are uploaded (the deploy keeps a small
 `.ftp-deploy-sync-state.json` file in the theme folder on the server to track this —
-leave it there). A deploy can also be re-run by hand from the **Actions** tab
-("Check & deploy theme" → *Run workflow*).
+leave it there). A deploy can be re-run by hand from the **Actions** tab
+("Check & deploy theme to staging" → *Run workflow*).
+
+Until the FTP secrets below exist, the deploy step is skipped with a warning.
 
 ## One-time setup (VentraIP)
 
-1. **Create an FTP account** in VentraIP's cPanel → *FTP Accounts*. Limit its
-   directory to the theme folder if you like, e.g.
-   `public_html/wp-content/themes/espire-theme`.
+1. **Create an FTP account** in VentraIP's cPanel → *FTP Accounts*, limited to the
+   **staging** site's theme folder, e.g.
+   `staging.espireclothing.com.au/wp-content/themes/espire-theme`
+   (check the staging site's document root in cPanel → *Domains*).
 2. **Add four repository secrets** in GitHub → this repo → *Settings* →
    *Secrets and variables* → *Actions* → *New repository secret*:
 
@@ -32,11 +35,11 @@ leave it there). A deploy can also be re-run by hand from the **Actions** tab
    | `FTP_SERVER` | `ftp.espireclothing.com.au` (or the server hostname from VentraIP's welcome email) |
    | `FTP_USERNAME` | `deploy@espireclothing.com.au` |
    | `FTP_PASSWORD` | the FTP account's password |
-   | `FTP_THEME_DIR` | path to the theme folder **as that FTP account sees it**, ending in `/` — e.g. `/public_html/wp-content/themes/espire-theme/`, or just `/` if the account is limited to the theme folder |
+   | `FTP_THEME_DIR` | the theme folder **as that FTP account sees it**, ending in `/` — just `/` if the account is limited to the theme folder |
 
    Secrets are encrypted by GitHub and never appear in the code or logs.
-3. Make sure the theme folder name on the server matches (`espire-theme`), and
-   activate it in *Appearance → Themes* if it isn't already.
+3. Make sure the theme folder on staging is named `espire-theme` and is the active
+   theme (*Appearance → Themes*).
 
 ## Plugins the theme expects
 
