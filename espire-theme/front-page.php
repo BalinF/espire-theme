@@ -165,67 +165,51 @@ $espire_set = espire_shop_the_set();
 	</div>
 </div>
 
+<?php
+/**
+ * From Seed To Store — a garment sketch on the left, its journey through
+ * the symbols on the right. Which garment is picked per visit from the
+ * categories that have a journey set up (inc/journey.php); each step
+ * shows its symbol's mark and links to that symbol's page.
+ */
+$espire_journey = espire_homepage_journey();
+$espire_steps   = $espire_journey['steps'];
+?>
 <div class="section-wrap seed-section">
-	<?php // The tee drawing sits to the left of the heading and the journey row (a transparent copy of seed-to-store-tee.png, whose teal background is baked in). ?>
-	<img class="seed-tee" src="<?php echo esc_url( get_template_directory_uri() . '/assets/seed-to-store-tee-line.png' ); ?>" alt="">
+	<?php if ( $espire_journey['sketch'] ) : ?>
+		<img class="seed-tee" src="<?php echo esc_url( $espire_journey['sketch'] ); ?>" alt="">
+	<?php endif; ?>
 	<div class="seed-body">
-	<div class="section-head">
-		<h2>Our Tees: From Seed To Store</h2>
-	</div>
-	<?php
-	/**
-	 * "Seed to Store" journey steps. Every step uses the same generic
-	 * placeholder icon (a simple leaf mark) for now, kept deliberately
-	 * plain so nothing looks half-finished or mismatched. To swap in a
-	 * real icon for a step later: add an 'icon' key with a filename
-	 * (e.g. 'icon' => 'good-earth-icon.png') pointing to a file you've
-	 * uploaded into /assets/ — the loop below will use it automatically
-	 * in place of the placeholder mark.
-	 *
-	 * Each step is now a click target ('url' key) so it doubles as quick
-	 * navigation into that part of the story — matches the same pattern
-	 * already used for the single-product symbol badges (per the
-	 * site-inventory doc, those open a slide-in sidebar; the homepage
-	 * badges here link straight to the closest matching page until that
-	 * sidebar component + the dedicated symbol pages are built).
-	 */
-	$espire_journey_steps = array(
-		array( 'label' => 'Good Earth Cotton', 'url' => home_url( '/sustainability/' ) ),
-		array( 'label' => 'Melbourne Fabric', 'url' => home_url( '/sustainability/' ) ),
-		array( 'label' => 'Made in Store', 'icon' => 'made-in-store-icon.png', 'url' => home_url( '/made-in-store/' ) ),
-		array( 'label' => 'Australian Made', 'url' => home_url( '/australian-made/' ) ),
-		array( 'label' => 'Respired', 'url' => home_url( '/sustainability/' ) ),
-		array( 'label' => 'The Bad Batch', 'url' => home_url( '/product-category/the-bad-batch/' ) ),
-	);
-	$espire_step_count = count( $espire_journey_steps );
-	?>
-	<div class="d-slider">
-	<?php // Arrows show on mobile only, where the row is wider than the screen. ?>
-	<button type="button" class="d-arrow d-prev" aria-label="Scroll left" data-slide-prev="seed-to-store" data-slide-amount="container">
-		<?php espire_arrow_icon( 'prev' ); ?>
-	</button>
-	<div class="d-row" id="seed-to-store">
-		<?php foreach ( $espire_journey_steps as $espire_i => $espire_step ) : ?>
-			<div class="d-step">
-				<a class="ic" href="<?php echo esc_url( $espire_step['url'] ); ?>">
-					<?php if ( ! empty( $espire_step['icon'] ) && file_exists( get_template_directory() . '/assets/' . $espire_step['icon'] ) ) : ?>
-						<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/' . $espire_step['icon'] ); ?>" alt="" style="width:22px;height:auto;">
-					<?php else : ?>
-						<?php // Default placeholder mark — same for every step until a real icon is supplied above. ?>
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
+		<div class="section-head">
+			<h2><?php echo esc_html( $espire_journey['title'] ); ?></h2>
+		</div>
+		<div class="d-slider">
+			<?php // Arrows show on mobile only, where the row is wider than the screen. ?>
+			<button type="button" class="d-arrow d-prev" aria-label="Scroll left" data-slide-prev="seed-to-store" data-slide-amount="container">
+				<?php espire_arrow_icon( 'prev' ); ?>
+			</button>
+			<div class="d-row" id="seed-to-store">
+				<?php foreach ( $espire_steps as $espire_i => $espire_step ) : ?>
+					<div class="d-step">
+						<a class="ic" href="<?php echo esc_url( $espire_step['url'] ); ?>" aria-label="<?php echo esc_attr( $espire_step['label'] ); ?>">
+							<?php if ( $espire_step['symbol'] && ! empty( $espire_step['symbol']['icon'] ) ) : ?>
+								<?php espire_symbol_icon( $espire_step['symbol'] ); ?>
+							<?php else : ?>
+								<?php // Plain leaf mark for steps that aren't symbols. ?>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
+							<?php endif; ?>
+						</a>
+						<span class="lb"><?php echo esc_html( $espire_step['label'] ); ?></span>
+					</div>
+					<?php if ( $espire_i < count( $espire_steps ) - 1 ) : ?>
+						<div class="d-connector"></div>
 					<?php endif; ?>
-				</a>
-				<span class="lb"><?php echo esc_html( $espire_step['label'] ); ?></span>
+				<?php endforeach; ?>
 			</div>
-			<?php if ( $espire_i < $espire_step_count - 1 ) : ?>
-				<div class="d-connector"></div>
-			<?php endif; ?>
-		<?php endforeach; ?>
-	</div>
-	<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="seed-to-store" data-slide-amount="container">
-		<?php espire_arrow_icon( 'next' ); ?>
-	</button>
-	</div>
+			<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="seed-to-store" data-slide-amount="container">
+				<?php espire_arrow_icon( 'next' ); ?>
+			</button>
+		</div>
 	</div>
 </div>
 

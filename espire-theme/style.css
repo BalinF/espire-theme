@@ -162,7 +162,9 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .btn.olive:hover{ background:var(--rust); }
 
 /* ---------- Quicklinks bar (homepage) ---------- */
-.espire-quicklinks{ position:relative; background:var(--ink); overflow-x:auto; }
+.espire-quicklinks{ position:relative; background:var(--ink); }
+.espire-quicklinks-scroll{ overflow-x:auto; scroll-behavior:smooth; scrollbar-width:none; }
+.espire-quicklinks-scroll::-webkit-scrollbar{ display:none; }
 .espire-quicklinks-row{ display:flex; gap:0; max-width:1400px; margin:0 auto; }
 .espire-quicklinks-row a{
   display:flex; flex-direction:row-reverse; align-items:center; justify-content:center; gap:8px;
@@ -178,19 +180,21 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
    "swipeable" on sight. These small arrow buttons (desktop-hidden)
    nudge that same scroll and signal there's more to the row. */
 .ql-arrow{
-  display:none; position:absolute; top:50%; transform:translateY(-50%);
-  width:36px; height:36px; border-radius:50%; align-items:center; justify-content:center;
-  background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.4); z-index:2; cursor:pointer;
-  color:#fff;
+  display:none; position:absolute; top:0; bottom:0; width:38px; z-index:2;
+  align-items:center; justify-content:center; background:var(--ink);
+  border:none; padding:0; cursor:pointer; color:#fff;
 }
-.ql-arrow .espire-arrow-mark{ width:8px; height:26px; }
-.ql-prev{ left:6px; }
-.ql-next{ right:6px; }
+.ql-arrow:hover{ color:var(--rust); }
+.ql-arrow .espire-arrow-mark{ width:9px; height:30px; }
+.ql-prev{ left:0; box-shadow:6px 0 8px -4px rgba(0,0,0,.6); }
+.ql-next{ right:0; box-shadow:-6px 0 8px -4px rgba(0,0,0,.6); }
 
 @media (max-width:700px){
   .espire-quicklinks-row{ width:max-content; min-width:100%; }
   .espire-quicklinks-row a{ flex:none; }
   .ql-arrow{ display:flex; }
+  /* first/last links can scroll fully clear of the end-cap arrows */
+  .espire-quicklinks-scroll{ padding:0 38px; }
 }
 
 /* ---------- Section layout ---------- */
@@ -1111,6 +1115,8 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .seed-tee{ flex:none; width:120px; height:auto; }
 .seed-body{ flex:1; min-width:0; }
 .seed-body .section-head{ margin-bottom:14px; }
+.seed-body .section-head h2{ font-size:clamp(1.25rem,2.4vw,1.6rem); }
+.d-step .ic svg, .d-step .ic img{ width:22px; height:22px; object-fit:contain; }
 @media (max-width:640px){
   .seed-section{ gap:14px; align-items:flex-start; }
   .seed-tee{ width:64px; margin-top:4px; }

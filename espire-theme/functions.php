@@ -26,6 +26,7 @@ require_once get_template_directory() . '/inc/pages.php';
 require_once get_template_directory() . '/inc/home.php';
 require_once get_template_directory() . '/inc/shop-filters.php';
 require_once get_template_directory() . '/inc/product-cards.php';
+require_once get_template_directory() . '/inc/journey.php';
 
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.
@@ -596,10 +597,12 @@ function espire_quicklinks_bar() {
 		array( 'label' => 'Design Your Own', 'url' => home_url( '/diy/' ) ),
 	);
 	?>
-	<div class="espire-quicklinks" id="quicklinks-scroll">
+	<?php // Only the inner strip scrolls; the arrows sit outside it so they stay put at each end. ?>
+	<div class="espire-quicklinks">
 		<button type="button" class="ql-arrow ql-prev" aria-label="Scroll left" data-slide-prev="quicklinks-scroll" data-slide-amount="container">
 			<?php espire_arrow_icon( 'prev' ); ?>
 		</button>
+		<div class="espire-quicklinks-scroll" id="quicklinks-scroll">
 		<div class="espire-quicklinks-row">
 			<?php foreach ( $espire_quicklinks as $espire_ql ) : ?>
 				<a href="<?php echo esc_url( $espire_ql['url'] ); ?>">
@@ -607,6 +610,7 @@ function espire_quicklinks_bar() {
 					<?php echo esc_html( $espire_ql['label'] ); ?>
 				</a>
 			<?php endforeach; ?>
+		</div>
 		</div>
 		<button type="button" class="ql-arrow ql-next" aria-label="Scroll right" data-slide-next="quicklinks-scroll" data-slide-amount="container">
 			<?php espire_arrow_icon( 'next' ); ?>

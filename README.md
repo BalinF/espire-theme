@@ -97,6 +97,12 @@ category's sub-categories are used as the Fit buttons. No plugin needed.
 **Product cards** — show colour swatches (or "4 Colours") and the size range
 from the same attributes, so a variation-swatches plugin isn't needed.
 
+**Homepage → From Seed To Store** (Products → Categories → edit → *Seed To
+Store Journey*) — upload a garment sketch and add its steps in order, one product
+tag per step (drag to reorder; optional custom label). Symbol tags show their own
+mark and link to their symbol page. The homepage shows a random category that has
+steps on each visit; with none set up, the original Tees journey shows.
+
 **Homepage → Shop The Set** (Pages → the homepage → *Shop The Set* box) — pick
 2–4 products, a photo and a title; photos, prices and the total fill in.
 
