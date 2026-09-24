@@ -1,0 +1,80 @@
+name: Check & deploy theme to staging
+
+# Every push: check the theme's PHP for syntax errors.
+# Push to main (or a manual run from the Actions tab): also upload
+# espire-theme/ to staging.espireclothing.com.au on VentraIP over FTPS.
+# The live site (espireclothing.com.au) is never touched by this workflow.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: none
+      - name: PHP syntax check
+        run: |
+          find espire-theme -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      # Installable theme zip for manual uploads: open this run in the
+      # Actions tab → "Artifacts" → espire-theme. The download holds the
+      # espire-theme/ folder, ready for Appearance → Themes → Upload Theme.
+      - name: Package theme
+        run: |
+          mkdir -p build
+          cp -r espire-theme build/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: espire-theme
+          path: build/
+          retention-days: 30
+
+  deploy-staging:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.espireclothing.com.au
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check FTP secrets are set
+        id: secrets
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_THEME_DIR: ${{ secrets.FTP_THEME_DIR }}
+        run: |
+          missing=""
+          for v in FTP_SERVER FTP_USERNAME FTP_PASSWORD FTP_THEME_DIR; do
+            [ -z "${!v}" ] && missing="$missing $v"
+          done
+          if [ -n "$missing" ]; then
+            echo "::warning::Skipping staging deploy — secrets not set:$missing (see README.md)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload theme to staging
+        if: steps.secrets.outputs.ready == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./espire-theme/
+          server-dir: ${{ secrets.FTP_THEME_DIR }}

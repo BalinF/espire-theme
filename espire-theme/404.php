@@ -12,16 +12,21 @@ get_header();
 
 <div class="notfound-wrap">
 	<div class="code">404</div>
-	<h1>Page Not Found</h1>
-	<p>The page you're looking for doesn't exist, or may have moved.</p>
+	<span class="notfound-script">well, that thread's come loose</span>
+	<h1>We Couldn't Find That Page</h1>
+	<p>The page you're looking for may have been moved, renamed, or doesn't exist. Try a search, or head back to one of the pages below.</p>
 
+	<?php // Searches products (WooCommerce's product search results page). ?>
 	<form class="notfound-search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-		<input type="search" name="s" placeholder="Search the site…" value="<?php echo esc_attr( get_search_query() ); ?>">
+		<label class="screen-reader-text" for="notfound-s">Search products</label>
+		<input type="search" id="notfound-s" name="s" placeholder="Search products…" value="<?php echo esc_attr( get_search_query() ); ?>">
+		<input type="hidden" name="post_type" value="product">
 		<button type="submit" class="btn olive">Search</button>
 	</form>
 
-	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn olive" style="margin-bottom:26px;display:inline-block;">Back To Homepage</a>
+	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn olive notfound-home">Back To Homepage</a>
 
+	<p class="notfound-links-label">Or Try One Of These</p>
 	<div class="notfound-links">
 		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>">Shop Store</a>
 		<a href="<?php echo esc_url( home_url( '/product-category/shirts/' ) ); ?>">Shirts</a>

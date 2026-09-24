@@ -55,22 +55,10 @@ espire_quicklinks_bar();
  * feature all of them without endless vertical scrolling. Real photos
  * are used where we have them; everything else gets a plain on-brand
  * placeholder panel (no stock-photo clutter) until real shots exist —
- * swap a category's 'image' key to a filename in /assets/ once one's
- * supplied, same pattern as the Seed to Store icons above.
+ * swap a category's 'image' key (inc/collections.php) to a filename in
+ * /assets/ once one's supplied, same pattern as the Seed to Store icons above.
  */
-$espire_collections = array(
-	array( 'label' => 'The Hoodie Bar', 'url' => '/product-category/hoodies/', 'image' => 'homepage-hoodies.jpg', 'alt' => 'Couple wearing matching Espire hoodies', 'copy' => 'Off the rack, or built your way — same base garment, your call.', 'cta' => 'Shop Hoodies' ),
-	array( 'label' => 'The Tee Bar', 'url' => '/product-category/tees/', 'image' => 'homepage-tees.jpg', 'alt' => 'Couple wearing Espire tees', 'copy' => '200GSM Merino as standard, or design a print run of your own.', 'cta' => 'Shop Tees' ),
-	array( 'label' => 'Leg Hoodies', 'url' => '/product-category/leg-hoodies/', 'image' => 'leg-hoods-popup-05-mu4smsn5-205h.webp', 'alt' => 'Couple wearing Espire tees and joggers', 'copy' => 'Ready-made joggers and leg hoodies, cut and sewn in Bright.', 'cta' => 'Shop Leg Hoodies' ),
-	array( 'label' => 'Shirts', 'url' => '/product-category/shirts/', 'copy' => 'Fitted and slim cuts, made to order.', 'cta' => 'Shop Shirts' ),
-	array( 'label' => 'Kids', 'url' => '/product-category/kids/', 'copy' => 'Hoodies, tees and tresses sized down for the little ones.', 'cta' => 'Shop Kids' ),
-	array( 'label' => 'The Bad Batch', 'url' => '/product-category/the-bad-batch/', 'copy' => 'Made from fabric off-cuts — small runs, once they\'re gone they\'re gone.', 'cta' => 'Shop The Bad Batch' ),
-	array( 'label' => "Nanna's Threads", 'url' => '/product-category/nannas-threads/', 'copy' => 'Hand-knitted pieces, beanies included.', 'cta' => 'Shop Nanna\'s Threads' ),
-	array( 'label' => 'Gloves', 'url' => '/product-category/gloves/', 'copy' => 'Australian made, built for the cold.', 'cta' => 'Shop Gloves' ),
-	array( 'label' => 'Shorts', 'url' => '/product-category/shorts/', 'copy' => 'Cut and sewn in Bright, same fabric as the joggers.', 'cta' => 'Shop Shorts' ),
-	array( 'label' => 'Socks', 'url' => '/product-category/socks/', 'copy' => 'The small stuff, made properly.', 'cta' => 'Shop Socks' ),
-	array( 'label' => 'UGG Boots', 'url' => '/product-category/ugg-boots/', 'copy' => 'Australian made and owned, through and through.', 'cta' => 'Shop UGG Boots' ),
-);
+$espire_collections = espire_collection_defaults(); // list lives in inc/collections.php
 ?>
 <div class="section-wrap">
 	<div class="section-head">
@@ -117,34 +105,47 @@ $espire_collections = array(
 	</div>
 </div>
 
+<?php
+/**
+ * Shop The Set — a hand-picked outfit (Site Map: curated per season, not a
+ * live "popular" query). Picked on the homepage in wp-admin (Pages → the
+ * homepage → "Shop The Set" box, see inc/home.php): a lifestyle photo, a
+ * title, and 2–4 products. Each product shows its own photo, name and
+ * price; the set total is added up underneath. Until products are picked,
+ * the placeholder set below shows.
+ */
+$espire_set = espire_shop_the_set();
+?>
 <div class="section-wrap">
 	<div class="section-head">
 		<h2>Shop The Set</h2>
 		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="view-all">Shop All &rarr;</a>
 	</div>
-	<!-- TODO: this whole "Shop The Set" block is hand-curated per the
-	     site-inventory doc (an ACF field picking 3–4 real products each
-	     season), not a live query. For now it's static placeholder
-	     content matching the mockup — swap for real ACF-selected
-	     products once that field is set up. -->
 	<div class="look">
 		<div class="look-shot">
-			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/story-couple-hoodies.jpg' ); ?>" alt="Couple wearing matching rust and black Espire hoodies">
+			<img src="<?php echo esc_url( $espire_set['image'] ); ?>" alt="">
 		</div>
 		<div class="look-info">
 			<div class="look-head">
-				<div class="kicker">This Week's Set</div>
-				<h2>The Weekend Layer</h2>
-				<p>One outfit, styled head to toe — swap any piece for your size and colour before adding the set to cart.</p>
+				<div class="kicker"><?php echo esc_html( $espire_set['kicker'] ); ?></div>
+				<h2><?php echo esc_html( $espire_set['title'] ); ?></h2>
+				<p><?php echo esc_html( $espire_set['text'] ); ?></p>
 			</div>
-			<div class="look-list">
-				<div class="look-item"><span class="num">1</span><div><div class="li-name">200GSM Merino Tee</div><div class="li-meta">Tees &middot; Ocean Blue</div></div><span class="li-price">$89.00</span></div>
-				<div class="look-item"><span class="num">2</span><div><div class="li-name">Classic Hoodie</div><div class="li-meta">Hoodies &middot; Stone</div></div><span class="li-price">$109.00</span></div>
-				<div class="look-item"><span class="num">3</span><div><div class="li-name">Merino Joggers</div><div class="li-meta">Leg Hoodies &middot; Stone</div></div><span class="li-price">$99.00</span></div>
+			<div class="look-items">
+				<?php foreach ( $espire_set['items'] as $espire_item ) : ?>
+					<a class="look-item" href="<?php echo esc_url( $espire_item['url'] ); ?>">
+						<span class="li-shot"><img src="<?php echo esc_url( $espire_item['image'] ); ?>" alt="" loading="lazy"></span>
+						<span class="li-name"><?php echo esc_html( $espire_item['name'] ); ?></span>
+						<?php if ( $espire_item['meta'] ) : ?>
+							<span class="li-meta"><?php echo esc_html( $espire_item['meta'] ); ?></span>
+						<?php endif; ?>
+						<span class="li-price"><?php echo wp_kses_post( $espire_item['price_html'] ); ?></span>
+					</a>
+				<?php endforeach; ?>
 			</div>
 			<div class="look-cta">
-				<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="btn olive">Shop This Set</a>
-				<span class="total">3 pieces &middot; $297.00 together</span>
+				<span class="total"><?php echo esc_html( count( $espire_set['items'] ) ); ?> pieces &middot; <?php echo wp_kses_post( $espire_set['total_html'] ); ?> together</span>
+				<a href="<?php echo esc_url( $espire_set['cta_url'] ); ?>" class="btn olive">Shop This Set</a>
 			</div>
 		</div>
 	</div>
@@ -164,57 +165,51 @@ $espire_collections = array(
 	</div>
 </div>
 
-<div class="section-wrap">
-	<div class="section-head">
-		<div class="head-title">
-			<img class="head-mark" src="<?php echo esc_url( get_template_directory_uri() . '/assets/seed-to-store-tee.png' ); ?>" alt="">
-			<h2>Our Tees: From Seed To Store</h2>
+<?php
+/**
+ * From Seed To Store — a garment sketch on the left, its journey through
+ * the symbols on the right. Which garment is picked per visit from the
+ * categories that have a journey set up (inc/journey.php); each step
+ * shows its symbol's mark and links to that symbol's page.
+ */
+$espire_journey = espire_homepage_journey();
+$espire_steps   = $espire_journey['steps'];
+?>
+<div class="section-wrap seed-section">
+	<?php if ( $espire_journey['sketch'] ) : ?>
+		<img class="seed-tee" src="<?php echo esc_url( $espire_journey['sketch'] ); ?>" alt="">
+	<?php endif; ?>
+	<div class="seed-body">
+		<div class="section-head">
+			<h2><?php echo esc_html( $espire_journey['title'] ); ?></h2>
 		</div>
-	</div>
-	<?php
-	/**
-	 * "Seed to Store" journey steps. Every step uses the same generic
-	 * placeholder icon (a simple leaf mark) for now, kept deliberately
-	 * plain so nothing looks half-finished or mismatched. To swap in a
-	 * real icon for a step later: add an 'icon' key with a filename
-	 * (e.g. 'icon' => 'good-earth-icon.png') pointing to a file you've
-	 * uploaded into /assets/ — the loop below will use it automatically
-	 * in place of the placeholder mark.
-	 *
-	 * Each step is now a click target ('url' key) so it doubles as quick
-	 * navigation into that part of the story — matches the same pattern
-	 * already used for the single-product symbol badges (per the
-	 * site-inventory doc, those open a slide-in sidebar; the homepage
-	 * badges here link straight to the closest matching page until that
-	 * sidebar component + the dedicated symbol pages are built).
-	 */
-	$espire_journey_steps = array(
-		array( 'label' => 'Good Earth Cotton', 'url' => home_url( '/sustainability/' ) ),
-		array( 'label' => 'Melbourne Fabric', 'url' => home_url( '/sustainability/' ) ),
-		array( 'label' => 'Made in Store', 'icon' => 'made-in-store-icon.png', 'url' => home_url( '/made-in-store/' ) ),
-		array( 'label' => 'Australian Made', 'url' => home_url( '/australian-made/' ) ),
-		array( 'label' => 'Respired', 'url' => home_url( '/sustainability/' ) ),
-		array( 'label' => 'The Bad Batch', 'url' => home_url( '/product-category/the-bad-batch/' ) ),
-	);
-	$espire_step_count = count( $espire_journey_steps );
-	?>
-	<div class="d-row">
-		<?php foreach ( $espire_journey_steps as $espire_i => $espire_step ) : ?>
-			<div class="d-step">
-				<a class="ic" href="<?php echo esc_url( $espire_step['url'] ); ?>">
-					<?php if ( ! empty( $espire_step['icon'] ) && file_exists( get_template_directory() . '/assets/' . $espire_step['icon'] ) ) : ?>
-						<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/' . $espire_step['icon'] ); ?>" alt="" style="width:22px;height:auto;">
-					<?php else : ?>
-						<?php // Default placeholder mark — same for every step until a real icon is supplied above. ?>
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
+		<div class="d-slider">
+			<?php // Arrows show on mobile only, where the row is wider than the screen. ?>
+			<button type="button" class="d-arrow d-prev" aria-label="Scroll left" data-slide-prev="seed-to-store" data-slide-amount="container">
+				<?php espire_arrow_icon( 'prev' ); ?>
+			</button>
+			<div class="d-row" id="seed-to-store">
+				<?php foreach ( $espire_steps as $espire_i => $espire_step ) : ?>
+					<div class="d-step">
+						<a class="ic" href="<?php echo esc_url( $espire_step['url'] ); ?>" aria-label="<?php echo esc_attr( $espire_step['label'] ); ?>">
+							<?php if ( $espire_step['symbol'] && ! empty( $espire_step['symbol']['icon'] ) ) : ?>
+								<?php espire_symbol_icon( $espire_step['symbol'] ); ?>
+							<?php else : ?>
+								<?php // Plain leaf mark for steps that aren't symbols. ?>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
+							<?php endif; ?>
+						</a>
+						<span class="lb"><?php echo esc_html( $espire_step['label'] ); ?></span>
+					</div>
+					<?php if ( $espire_i < count( $espire_steps ) - 1 ) : ?>
+						<div class="d-connector"></div>
 					<?php endif; ?>
-				</a>
-				<span class="lb"><?php echo esc_html( $espire_step['label'] ); ?></span>
+				<?php endforeach; ?>
 			</div>
-			<?php if ( $espire_i < $espire_step_count - 1 ) : ?>
-				<div class="d-connector"></div>
-			<?php endif; ?>
-		<?php endforeach; ?>
+			<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="seed-to-store" data-slide-amount="container">
+				<?php espire_arrow_icon( 'next' ); ?>
+			</button>
+		</div>
 	</div>
 </div>
 

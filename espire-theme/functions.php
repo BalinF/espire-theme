@@ -16,6 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Bigger features live in their own files under /inc to keep this one short.
+require_once get_template_directory() . '/inc/symbols.php';
+require_once get_template_directory() . '/inc/product-page.php';
+require_once get_template_directory() . '/inc/cart-checkout.php';
+require_once get_template_directory() . '/inc/collections.php';
+require_once get_template_directory() . '/inc/story.php';
+require_once get_template_directory() . '/inc/pages.php';
+require_once get_template_directory() . '/inc/home.php';
+require_once get_template_directory() . '/inc/shop-filters.php';
+require_once get_template_directory() . '/inc/product-cards.php';
+require_once get_template_directory() . '/inc/journey.php';
+
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.
  * Hooked to 'after_setup_theme', which is the standard place to do this.
@@ -33,6 +45,12 @@ function espire_theme_setup() {
 	// without this, WooCommerce falls back to wrapping everything in
 	// extra markup that's harder to style.
 	add_theme_support( 'woocommerce' );
+
+	// WooCommerce's own product gallery features: hover zoom, click-to-
+	// open lightbox, and the thumbnail slider (used on single-product.php).
+	add_theme_support( 'wc-product-gallery-zoom' );
+	add_theme_support( 'wc-product-gallery-lightbox' );
+	add_theme_support( 'wc-product-gallery-slider' );
 
 	// Register a menu "location" called "primary". This is what makes
 	// Appearance > Menus show a place to assign a menu to the header —
@@ -106,9 +124,9 @@ add_action( 'woocommerce_before_shop_loop', function () {
  * generic chevron. One shared function so every arrow on the site is
  * the exact same mark, not slightly different hand-copies of it.
  *
- * It's drawn tall/thin in its native orientation, so this rotates it
- * -90deg to point left by default; pass 'next' to mirror it so it
- * points right instead. fill="currentColor" (not stroke) because the
+ * It's shown upright — tall and thin, as drawn — with its point facing
+ * left by default; pass 'next' for the right-facing version (the CSS in
+ * style.css, .espire-arrow-mark, does the mirroring). fill="currentColor" (not stroke) because the
  * source mark is a solid shape, so it picks up whatever text colour is
  * already set on its container/button, light or dark, automatically.
  *
@@ -159,6 +177,15 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'instructions' => 'Short line under the banner title, e.g. "Heavyweight, made to last."',
 				),
 				array(
+					'key'           => 'field_espire_cat_emblem',
+					'label'         => 'Category Emblem',
+					'name'          => 'category_emblem',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'thumbnail',
+					'instructions'  => 'The collection\'s badge (e.g. the Shirts emblem). Shown next to the product name and description on every product in this category — sub-categories use their parent\'s if left blank.',
+				),
+				array(
 					'key'          => 'field_espire_cat_sidebar_intro',
 					'label'        => 'Sidebar Intro Copy',
 					'name'         => 'category_sidebar_intro',
@@ -185,6 +212,62 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'name'  => 'fit_description',
 							'type'  => 'text',
 						),
+						// Everything below feeds the Fit Guide panel on product
+						// pages (see espire_fit_guide_panel() in inc/product-page.php).
+						// A fit with none of these filled in just doesn't show there.
+						array(
+							'key'           => 'field_espire_fit_image',
+							'label'         => 'Fit Guide Photo',
+							'name'          => 'fit_image',
+							'type'          => 'image',
+							'return_format' => 'url',
+							'preview_size'  => 'thumbnail',
+						),
+						array(
+							'key'          => 'field_espire_fit_intro',
+							'label'        => 'Fit Guide Intro',
+							'name'         => 'fit_intro',
+							'type'         => 'textarea',
+							'rows'         => 3,
+							'instructions' => 'e.g. "Our slim cut is fairly generous, with a tapered shape and higher shoulders…"',
+						),
+						array(
+							'key'          => 'field_espire_fit_model_note',
+							'label'        => 'Model Note',
+							'name'         => 'fit_model_note',
+							'type'         => 'text',
+							'instructions' => 'e.g. "Model is wearing size M, 180cm tall."',
+						),
+						array(
+							'key'          => 'field_espire_fit_size_notes',
+							'label'        => 'Size Notes',
+							'name'         => 'fit_size_notes',
+							'type'         => 'repeater',
+							'layout'       => 'table',
+							'button_label' => 'Add Size',
+							'sub_fields'   => array(
+								array(
+									'key'   => 'field_espire_fit_size_notes_size',
+									'label' => 'Size',
+									'name'  => 'size',
+									'type'  => 'text',
+								),
+								array(
+									'key'   => 'field_espire_fit_size_notes_note',
+									'label' => 'Note',
+									'name'  => 'note',
+									'type'  => 'text',
+								),
+							),
+						),
+						array(
+							'key'          => 'field_espire_fit_measurements',
+							'label'        => 'Measurements (cm)',
+							'name'         => 'fit_measurements',
+							'type'         => 'textarea',
+							'rows'         => 7,
+							'instructions' => "One row per line, cells separated by | — first line is the sizes. Example:\n| XS | S | M | L | XL\nChest (B) | 109 | 114 | 119 | 124 | 129",
+						),
 					),
 				),
 				array(
@@ -205,6 +288,293 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 				),
 			),
 		) );
+
+		/**
+		 * Product page extras (Products > edit a product): the short
+		 * "facts" lines under its description. (Symbols come from the
+		 * product's tags — see the "Symbol" box on tags below.)
+		 */
+		acf_add_local_field_group( array(
+			'key'      => 'group_espire_product_page',
+			'title'    => 'Product Page Extras',
+			'fields'   => array(
+				array(
+					'key'          => 'field_espire_product_raw_materials',
+					'label'        => 'Raw Materials',
+					'name'         => 'product_raw_materials',
+					'type'         => 'text',
+					'instructions' => 'e.g. "100% Australian Merino". Leave any of these blank to hide that line.',
+				),
+				array(
+					'key'          => 'field_espire_product_fabric',
+					'label'        => 'Fabric',
+					'name'         => 'product_fabric',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Woven and dyed into 200gsm fabric in Melbourne, Victoria"',
+				),
+				array(
+					'key'          => 'field_espire_product_stitched',
+					'label'        => 'Stitched',
+					'name'         => 'product_stitched',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Our store, Bright Victoria"',
+				),
+				array(
+					'key'          => 'field_espire_product_care',
+					'label'        => 'Care',
+					'name'         => 'product_care',
+					'type'         => 'text',
+					'instructions' => 'e.g. "5% shrinkage in length, cold machine wash only"',
+				),
+			),
+			'location' => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'product',
+					),
+				),
+			),
+			'position' => 'normal',
+		) );
+
+		/**
+		 * Symbols (Products > Tags > edit a tag). A tag with "Show as
+		 * symbol" on shows as a badge on every product carrying it; these
+		 * fields fill in its badge and slide-in panel. Blank fields fall
+		 * back to the built-in copy in inc/symbols.php.
+		 */
+		acf_add_local_field_group( array(
+			'key'      => 'group_espire_symbol_tag',
+			'title'    => 'Symbol',
+			'fields'   => array(
+				array(
+					'key'           => 'field_espire_symbol_enabled',
+					'label'         => 'Show as symbol',
+					'name'          => 'symbol_enabled',
+					'type'          => 'select',
+					'choices'       => array(
+						'auto' => 'Automatic (on for the built-in symbols: Australian Made, Respired, Made In Store, Good Earth Cotton, Belgian Linen)',
+						'yes'  => 'Yes — show this tag as a symbol badge',
+						'no'   => 'No',
+					),
+					'default_value' => 'auto',
+				),
+				array(
+					'key'           => 'field_espire_symbol_icon',
+					'label'         => 'Icon',
+					'name'          => 'symbol_icon',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'thumbnail',
+					'instructions'  => 'The mark in the middle of the badge. Single-colour artwork on a transparent background (PNG or SVG) works best — it\'s printed in ink colour automatically.',
+				),
+				array(
+					'key'          => 'field_espire_symbol_ring_text',
+					'label'        => 'Badge Ring Text',
+					'name'         => 'symbol_ring_text',
+					'type'         => 'text',
+					'instructions' => 'Printed around the circle, e.g. "AUSTRALIAN MADE AND OWNED". Longer text is shrunk to fit.',
+				),
+				array(
+					'key'   => 'field_espire_symbol_order',
+					'label' => 'Badge Order',
+					'name'  => 'symbol_order',
+					'type'  => 'number',
+					'instructions' => 'Lower numbers show first. Leave blank to use the default order.',
+				),
+				array(
+					'key'          => 'field_espire_symbol_tagline',
+					'label'        => 'Panel Tagline',
+					'name'         => 'symbol_tagline',
+					'type'         => 'text',
+					'instructions' => 'Under the name in the panel\'s black title bar, e.g. "Made In Bright, Victoria."',
+				),
+				array(
+					'key'          => 'field_espire_symbol_heading',
+					'label'        => 'Panel Heading',
+					'name'         => 'symbol_heading',
+					'type'         => 'text',
+					'instructions' => 'e.g. "The Symbol", "The Fabric", "The Program".',
+				),
+				array(
+					'key'   => 'field_espire_symbol_intro',
+					'label' => 'Panel Intro',
+					'name'  => 'symbol_intro',
+					'type'  => 'textarea',
+					'rows'  => 3,
+				),
+				array(
+					'key'          => 'field_espire_symbol_points',
+					'label'        => 'Panel Points',
+					'name'         => 'symbol_points',
+					'type'         => 'textarea',
+					'rows'         => 5,
+					'instructions' => 'One point per line.',
+				),
+				array(
+					'key'           => 'field_espire_symbol_banner',
+					'label'         => 'Symbol Page Banner',
+					'name'          => 'symbol_banner',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'medium',
+					'instructions'  => 'Top photo on this symbol\'s own page (/product-tag/<slug>/).',
+				),
+				array(
+					'key'           => 'field_espire_symbol_diagram',
+					'label'         => 'Journey Diagram',
+					'name'          => 'symbol_diagram',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'medium',
+					'instructions'  => 'Optional hand-drawn journey artwork (e.g. Field → Weaving → Bright Workroom) shown on the symbol page.',
+				),
+				array(
+					'key'          => 'field_espire_symbol_diagram_label',
+					'label'        => 'Diagram Heading',
+					'name'         => 'symbol_diagram_label',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Field To Hanger". Default: "The Journey".',
+				),
+				array(
+					'key'          => 'field_espire_symbol_cert_text',
+					'label'        => 'Certification Line',
+					'name'         => 'symbol_cert_text',
+					'type'         => 'textarea',
+					'rows'         => 2,
+					'instructions' => 'Optional strip on the symbol page, e.g. "European Flax® certified. A guarantee of traceability…"',
+				),
+				array(
+					'key'           => 'field_espire_symbol_cert_icon',
+					'label'         => 'Certification Mark',
+					'name'          => 'symbol_cert_icon',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'thumbnail',
+				),
+				array(
+					'key'          => 'field_espire_symbol_story_label',
+					'label'        => 'Story Button Text',
+					'name'         => 'symbol_story_label',
+					'type'         => 'text',
+					'instructions' => 'e.g. "Read The Full Story".',
+				),
+				array(
+					'key'   => 'field_espire_symbol_story_url',
+					'label' => 'Story Button Link',
+					'name'  => 'symbol_story_url',
+					'type'  => 'url',
+				),
+				array(
+					'key'          => 'field_espire_symbol_shop_label',
+					'label'        => 'Shop Button Text',
+					'name'         => 'symbol_shop_label',
+					'type'         => 'text',
+					'instructions' => 'Links to this tag\'s own page (all products with this symbol). e.g. "Shop Belgian Linen Pieces".',
+				),
+			),
+			'location' => array(
+				array(
+					array(
+						'param'    => 'taxonomy',
+						'operator' => '==',
+						'value'    => 'product_tag',
+					),
+				),
+			),
+		) );
+
+		/**
+		 * Colour swatches (Products > Attributes > Configure terms > edit
+		 * a term, e.g. Colour > Navy). When a term has a swatch, product
+		 * pages show it as a coloured square instead of a text button.
+		 */
+		$espire_attribute_locations = array();
+		if ( function_exists( 'wc_get_attribute_taxonomy_names' ) ) {
+			foreach ( wc_get_attribute_taxonomy_names() as $espire_attr ) {
+				$espire_attribute_locations[] = array(
+					array(
+						'param'    => 'taxonomy',
+						'operator' => '==',
+						'value'    => $espire_attr,
+					),
+				);
+			}
+		}
+		if ( $espire_attribute_locations ) {
+			acf_add_local_field_group( array(
+				'key'      => 'group_espire_attribute_swatch',
+				'title'    => 'Swatch',
+				'fields'   => array(
+					array(
+						'key'          => 'field_espire_swatch_colour',
+						'label'        => 'Swatch Colour',
+						'name'         => 'swatch_colour',
+						'type'         => 'color_picker',
+						'instructions' => 'Leave blank to keep this option as a text button.',
+					),
+					array(
+						'key'           => 'field_espire_swatch_image',
+						'label'         => 'Swatch Image',
+						'name'          => 'swatch_image',
+						'type'          => 'image',
+						'return_format' => 'url',
+						'preview_size'  => 'thumbnail',
+						'instructions'  => 'Optional — a fabric photo for marles/prints/trims. Used instead of the colour when set.',
+					),
+				),
+				'location' => $espire_attribute_locations,
+			) );
+		}
+
+		/**
+		 * Shipping & Returns quick answers — edited on the FAQ page itself
+		 * (Pages > FAQ), shown in the slide-in panel on every product page.
+		 */
+		$espire_faq_page = get_page_by_path( 'faq' );
+		if ( $espire_faq_page ) {
+			acf_add_local_field_group( array(
+				'key'      => 'group_espire_faq_quick',
+				'title'    => 'Product Page Quick Answers',
+				'fields'   => array(
+					array(
+						'key'          => 'field_espire_faq_quick',
+						'label'        => 'Quick Answers',
+						'name'         => 'faq_quick_answers',
+						'type'         => 'repeater',
+						'layout'       => 'block',
+						'button_label' => 'Add Question',
+						'instructions' => 'Shown in the "Shipping & Returns" panel on product pages — keep it to the 3–4 questions people ask before buying.',
+						'sub_fields'   => array(
+							array(
+								'key'   => 'field_espire_faq_quick_q',
+								'label' => 'Question',
+								'name'  => 'question',
+								'type'  => 'text',
+							),
+							array(
+								'key'   => 'field_espire_faq_quick_a',
+								'label' => 'Answer',
+								'name'  => 'answer',
+								'type'  => 'textarea',
+								'rows'  => 3,
+							),
+						),
+					),
+				),
+				'location' => array(
+					array(
+						array(
+							'param'    => 'page',
+							'operator' => '==',
+							'value'    => (string) $espire_faq_page->ID,
+						),
+					),
+				),
+			) );
+		}
 	} );
 }
 
@@ -227,10 +597,12 @@ function espire_quicklinks_bar() {
 		array( 'label' => 'Design Your Own', 'url' => home_url( '/diy/' ) ),
 	);
 	?>
-	<div class="espire-quicklinks" id="quicklinks-scroll">
+	<?php // Only the inner strip scrolls; the arrows sit outside it so they stay put at each end. ?>
+	<div class="espire-quicklinks">
 		<button type="button" class="ql-arrow ql-prev" aria-label="Scroll left" data-slide-prev="quicklinks-scroll" data-slide-amount="container">
 			<?php espire_arrow_icon( 'prev' ); ?>
 		</button>
+		<div class="espire-quicklinks-scroll" id="quicklinks-scroll">
 		<div class="espire-quicklinks-row">
 			<?php foreach ( $espire_quicklinks as $espire_ql ) : ?>
 				<a href="<?php echo esc_url( $espire_ql['url'] ); ?>">
@@ -238,6 +610,7 @@ function espire_quicklinks_bar() {
 					<?php echo esc_html( $espire_ql['label'] ); ?>
 				</a>
 			<?php endforeach; ?>
+		</div>
 		</div>
 		<button type="button" class="ql-arrow ql-next" aria-label="Scroll right" data-slide-next="quicklinks-scroll" data-slide-amount="container">
 			<?php espire_arrow_icon( 'next' ); ?>

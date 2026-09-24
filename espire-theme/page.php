@@ -16,6 +16,32 @@
  * automatically, no code changes needed for everyday text edits.
  */
 get_header();
+
+/**
+ * Cart, Checkout and My Account are WooCommerce's own pages — they get a
+ * plain heading instead of the big banner, so the shop content sits
+ * right at the top (see inc/cart-checkout.php).
+ */
+if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) ) :
+	?>
+	<div class="woo-page">
+		<?php if ( espire_is_checkout_form() ) : ?>
+			<nav class="product-crumb woo-crumb" aria-label="Breadcrumb">
+				<a href="<?php echo esc_url( wc_get_cart_url() ); ?>">Cart</a> / <b>Checkout</b>
+			</nav>
+		<?php endif; ?>
+		<h1 class="woo-page-title"><?php the_title(); ?></h1>
+		<?php
+		while ( have_posts() ) :
+			the_post();
+			the_content();
+		endwhile;
+		?>
+	</div>
+	<?php
+	get_footer();
+	return;
+endif;
 ?>
 
 <div class="page-banner">

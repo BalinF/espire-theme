@@ -44,6 +44,11 @@ body{
 }
 
 a{ color:inherit; text-decoration:none; }
+
+/* WordPress's standard "screen-reader-text": hidden on screen, still read
+   aloud by screen readers (WooCommerce uses it for labels like "Qty"). */
+.screen-reader-text{ border:0; clip:rect(1px,1px,1px,1px); clip-path:inset(50%); height:1px; margin:-1px; overflow:hidden; padding:0; position:absolute !important; width:1px; word-wrap:normal !important; }
+.screen-reader-text:focus{ clip:auto !important; clip-path:none; height:auto; width:auto; display:block; z-index:100000; background:var(--white); padding:12px 20px; }
 img{ max-width:100%; display:block; }
 
 h1,h2,h3{
@@ -149,13 +154,17 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .hero-content .tagline{ font-size:clamp(1.8rem,3.6vw,2.9rem); max-width:820px; line-height:1.28; text-shadow:0 3px 14px rgba(0,0,0,.55); font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; }
 .hero-content .cta-row{ display:flex; gap:14px; }
 .btn{ display:inline-block; padding:13px 26px; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; border:none; }
-.btn.solid{ background:#fff; color:var(--ink); }
-.btn.outline{ border:1.5px solid #fff; color:#fff; background:transparent; }
+.btn.solid{ background:#fff; color:var(--ink); transition:background .15s ease, color .15s ease; }
+.btn.solid:hover{ background:var(--rust); color:#fff; }
+.btn.outline{ border:1.5px solid #fff; color:#fff; background:transparent; transition:background .15s ease, border-color .15s ease; }
+.btn.outline:hover{ background:var(--rust); border-color:var(--rust); color:#fff; }
 .btn.olive{ background:var(--olive); color:#fff; }
 .btn.olive:hover{ background:var(--rust); }
 
 /* ---------- Quicklinks bar (homepage) ---------- */
-.espire-quicklinks{ position:relative; background:var(--ink); overflow-x:auto; }
+.espire-quicklinks{ position:relative; background:var(--ink); }
+.espire-quicklinks-scroll{ overflow-x:auto; scroll-behavior:smooth; scrollbar-width:none; }
+.espire-quicklinks-scroll::-webkit-scrollbar{ display:none; }
 .espire-quicklinks-row{ display:flex; gap:0; max-width:1400px; margin:0 auto; }
 .espire-quicklinks-row a{
   display:flex; flex-direction:row-reverse; align-items:center; justify-content:center; gap:8px;
@@ -171,27 +180,27 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
    "swipeable" on sight. These small arrow buttons (desktop-hidden)
    nudge that same scroll and signal there's more to the row. */
 .ql-arrow{
-  display:none; position:absolute; top:50%; transform:translateY(-50%);
-  width:28px; height:28px; border-radius:50%; align-items:center; justify-content:center;
-  background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.4); z-index:2; cursor:pointer;
-  color:#fff;
+  display:none; position:absolute; top:0; bottom:0; width:38px; z-index:2;
+  align-items:center; justify-content:center; background:var(--ink);
+  border:none; padding:0; cursor:pointer; color:#fff;
 }
-.ql-arrow .espire-arrow-mark{ width:6px; height:20px; }
-.ql-prev{ left:6px; }
-.ql-next{ right:6px; }
+.ql-arrow:hover{ color:var(--rust); }
+.ql-arrow .espire-arrow-mark{ width:9px; height:30px; }
+.ql-prev{ left:0; box-shadow:6px 0 8px -4px rgba(0,0,0,.6); }
+.ql-next{ right:0; box-shadow:-6px 0 8px -4px rgba(0,0,0,.6); }
 
 @media (max-width:700px){
   .espire-quicklinks-row{ width:max-content; min-width:100%; }
   .espire-quicklinks-row a{ flex:none; }
   .ql-arrow{ display:flex; }
+  /* first/last links can scroll fully clear of the end-cap arrows */
+  .espire-quicklinks-scroll{ padding:0 38px; }
 }
 
 /* ---------- Section layout ---------- */
 .section-wrap{ padding:46px 5%; max-width:1400px; margin:0 auto; }
 .section-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:16px; flex-wrap:wrap; }
 .section-head h2{ font-size:1.05rem; }
-.head-title{ display:flex; align-items:center; gap:10px; }
-.section-head .head-mark{ width:auto; height:34px; color:var(--ink); flex:none; }
 .section-head .view-all{
   font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
   text-decoration:none; color:#fff; background:var(--olive); padding:9px 16px; border-radius:3px;
@@ -244,24 +253,35 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
      and 50%-of-the-whole-card would land the arrow down over the CTA
      button instead of the picture. 50% is just the fallback before JS runs. */
   top:var(--cs-photo-center, 50%);
-  transform:translateY(-50%); background:none; border:none; padding:10px;
+  transform:translateY(-50%); background:none; border:none; padding:6px;
   cursor:pointer; z-index:2; color:var(--ink);
 }
 .cs-arrow:hover{ color:var(--rust); }
-.cs-prev{ left:0; }
-.cs-next{ right:0; }
-.cs-arrow .espire-arrow-mark{ width:16px; height:58px; filter:drop-shadow(0 1px 3px rgba(0,0,0,.35)); }
+/* Just outside the cards, in the page's side margin */
+.cs-prev{ left:-46px; }
+.cs-next{ right:-46px; }
+.cs-arrow .espire-arrow-mark{ width:22px; height:80px; }
 
 /* Espire's own arrow mark (see espire_arrow_icon() in functions.php) —
-   shared sizing/rotation for every prev/next control on the site, so
-   .cs-arrow, .ql-arrow and anything added later all use it the same way. */
-.espire-arrow-mark{ width:9px; height:32px; transform:rotate(-90deg); flex:none; }
-.espire-arrow-mark.is-next{ transform:rotate(-90deg) scaleX(-1); }
+   shared sizing for every prev/next control on the site, so .cs-arrow,
+   .ql-arrow and anything added later all use it the same way. Shown
+   upright (tall and thin, as drawn): as drawn its point faces right, so
+   "next" uses it as-is and "prev" is mirrored. */
+.espire-arrow-mark{ width:9px; height:32px; flex:none; transform:scaleX(-1); }
+.espire-arrow-mark.is-next{ transform:none; }
 /* Kept visible (not hidden) on mobile, just scaled down a little —
    touch swipe alone isn't an obvious affordance, the arrows are what
    tells people there's more to see. */
 @media (max-width:900px){
-  .cs-arrow .espire-arrow-mark{ width:12px; height:44px; }
+  .cs-arrow .espire-arrow-mark{ width:16px; height:58px; }
+}
+/* Narrow screens have too little side margin for the arrows, so the
+   slider makes room for them inside its own edges instead. */
+@media (max-width:1100px){
+  .collection-slider{ padding:0 30px; }
+  .cs-prev{ left:0; }
+  .cs-next{ right:0; }
+  .cs-arrow{ padding:6px 2px; }
 }
 
 /* ---------- Full-bleed banners (DIY / Mission) ---------- */
@@ -273,24 +293,44 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .banner-strip p{ margin:0; font-size:1rem; line-height:1.55; color:#F1EEE4; text-shadow:0 1px 6px rgba(0,0,0,.4); }
 
 /* ---------- Shop The Set ---------- */
-.look{ display:grid; grid-template-columns:1.1fr 1fr; gap:0; border:1.5px solid var(--ink); background:var(--white); }
+.look{ display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:0; border:1.5px solid var(--ink); background:var(--white); }
 @media (max-width:900px){ .look{ grid-template-columns:1fr; } }
-.look-shot{ position:relative; aspect-ratio:4/5; overflow:hidden; }
+/* The photo fills whatever height the info column needs (no fixed tall
+   ratio), so the section is only as tall as its content. */
+.look-shot{ position:relative; min-height:260px; overflow:hidden; }
 .look-shot img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .look-info{ display:flex; flex-direction:column; }
-.look-head{ padding:26px 28px 16px; border-bottom:1px solid var(--line); }
+.look-head{ padding:22px 26px 14px; border-bottom:1px solid var(--line); }
 .look-head .kicker{ font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; margin-bottom:6px; }
-.look-head p{ margin:8px 0 0; font-size:.82rem; color:var(--ink-soft); line-height:1.55; }
-.look-item{ display:flex; align-items:center; gap:14px; padding:14px 28px; border-bottom:1px solid var(--line); }
-.look-item .num{ flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:.66rem; font-weight:700; }
-.look-item .li-name{ flex:1; font-weight:700; font-size:.86rem; }
-.look-item .li-meta{ font-size:.74rem; color:var(--ink-soft); margin-top:2px; font-weight:400; }
-.look-item .li-price{ font-weight:700; font-size:.84rem; color:var(--rust); }
-.look-cta{ padding:18px 28px; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
-.look-cta .total{ font-size:.78rem; color:var(--ink-soft); }
+.look-head p{ margin:6px 0 0; font-size:.82rem; color:var(--ink-soft); line-height:1.55; }
+/* The pieces side by side: photo, name, price */
+.look-items{ display:grid; grid-template-columns:repeat(auto-fit,minmax(0,1fr)); gap:16px; padding:18px 26px; border-bottom:1px solid var(--line); }
+.look-item{ display:flex; flex-direction:column; gap:4px; color:var(--ink); }
+.look-item .li-shot{ display:block; aspect-ratio:4/5; overflow:hidden; background:var(--card); margin-bottom:6px; }
+.look-item .li-shot img{ width:100%; height:100%; object-fit:cover; transition:transform .3s ease; }
+.look-item:hover .li-shot img{ transform:scale(1.03); }
+.look-item .li-name{ font-weight:700; font-size:.82rem; line-height:1.3; }
+.look-item:hover .li-name{ color:var(--rust); }
+.look-item .li-meta{ font-size:.72rem; color:var(--ink-soft); }
+.look-item .li-price{ font-weight:700; font-size:.82rem; color:var(--rust); }
+.look-item .li-price del{ color:var(--ink-soft); font-weight:400; margin-right:4px; }
+@media (max-width:520px){ .look-items{ gap:10px; padding:16px; } .look-item .li-name{ font-size:.74rem; } }
+.look-cta{ padding:16px 26px; display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.look-cta .total{ font-size:.86rem; font-weight:700; }
 
 /* ---------- From Seed To Store ---------- */
-.d-row{ display:flex; align-items:center; gap:0; overflow-x:auto; padding:6px 0; }
+.d-slider{ position:relative; }
+.d-row{ display:flex; align-items:center; gap:0; overflow-x:auto; padding:6px 0; scroll-behavior:smooth; scrollbar-width:none; }
+.d-row::-webkit-scrollbar{ display:none; }
+/* Swipe arrows for the Seed to Store row — mobile only, where the row is
+   wider than the screen (same arrow mark as the sliders). */
+.d-arrow{ display:none; position:absolute; top:34px; transform:translateY(-50%); z-index:2; background:none; border:none; padding:4px 2px; cursor:pointer; color:var(--ink); }
+.d-arrow:hover{ color:var(--rust); }
+.d-arrow .espire-arrow-mark{ width:12px; height:42px; }
+.d-prev{ left:0; }
+.d-next{ right:0; }
+/* The row makes room for the arrows at its sides, so they never cover a step */
+@media (max-width:900px){ .d-arrow{ display:block; } .d-slider{ padding:0 22px; } }
 .d-step{ display:flex; flex-direction:column; align-items:center; gap:8px; min-width:130px; }
 .d-step .ic{ width:56px; height:56px; border-radius:50%; border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; font-size:.5rem; font-weight:700; text-align:center; line-height:1.15; padding:4px; background:var(--white); color:var(--ink); transition:background .15s ease, color .15s ease, border-color .15s ease; }
 .d-step .ic img{ display:block; }
@@ -379,9 +419,19 @@ footer.site-footer{ background:var(--ink); border-top:1px solid rgba(255,255,255
 div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
 .woocommerce-breadcrumb{ font-size:.74rem; color:var(--ink-soft); margin-bottom:20px; }
 .woocommerce-breadcrumb a{ color:var(--ink-soft); }
-.woocommerce ul.products{ display:grid; grid-template-columns:repeat(4,1fr); gap:26px; list-style:none; margin:0; padding:0; }
+.woocommerce ul.products{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:26px; list-style:none; margin:0; padding:0; }
+/* WooCommerce's own stylesheet lays cards out with floats: fixed widths,
+   margins and clearfix ::before/::after. Inside a grid those spacers
+   become empty grid cells (pushing the first product along) and the
+   widths shrink every card — switch all of that off. */
+.woocommerce ul.products::before, .woocommerce ul.products::after{ display:none !important; content:none !important; }
+.woocommerce ul.products li.product{ width:auto !important; margin:0 !important; float:none !important; display:flex; flex-direction:column; }
+.woocommerce ul.products li.product > a.woocommerce-LoopProduct-link{ display:block; }
+/* Collection pages: breathing room around the product grid */
+.shop-grid{ max-width:1400px; margin:0 auto; padding:30px 5% 60px; }
+.shop-grid .woocommerce-info{ margin:0; }
+.woocommerce nav.woocommerce-pagination{ margin-top:30px; text-align:center; }
 @media (max-width:1000px){ .woocommerce ul.products{ grid-template-columns:repeat(2,1fr); } }
-.woocommerce ul.products li.product{ background:var(--white); border:1px solid var(--line); }
 .woocommerce ul.products li.product img{ aspect-ratio:3/4; object-fit:cover; width:100%; }
 .woocommerce ul.products li.product .woocommerce-loop-product__title{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; font-size:.82rem; padding:14px 14px 4px; margin:0; }
 .woocommerce ul.products li.product .price{ padding:0 14px 16px; font-weight:700; color:var(--rust); font-size:.86rem; }
@@ -442,27 +492,34 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
    with just the category name if nothing's been filled in yet.
    ============================================================ */
 .category-banner{
-  background:var(--ink) center/cover no-repeat;
-  min-height:220px;
-  display:flex; align-items:flex-end;
-  position:relative;
+  position:relative; min-height:300px; overflow:hidden; background:var(--ink);
+  display:flex; align-items:center;
 }
-.category-banner::before{
-  /* Darkens a photo banner so white text stays readable; harmless
-     no-op look on the plain-color fallback since there's no image
-     under it to darken. */
-  content:''; position:absolute; inset:0; background:rgba(0,0,0,.28);
+.category-banner-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.category-banner::after{
+  /* darkens the photo so the white text stays readable */
+  content:''; position:absolute; inset:0; background:rgba(10,10,8,.36);
+}
+.category-banner-emblem{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:2;
+  width:150px; height:160px; object-fit:contain; filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));
 }
 .category-banner-inner{
-  position:relative; z-index:1; padding:40px 5% 28px; color:#fff; max-width:700px;
+  position:relative; z-index:3; padding:40px 5%; color:#fff; max-width:min(520px,40%);
+  display:flex; flex-direction:column; gap:8px;
 }
 .category-banner-inner h1{
   font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase;
-  font-size:clamp(1.8rem,4vw,2.6rem); margin:0 0 8px;
+  font-size:clamp(1.8rem,4vw,2.6rem); margin:0; text-shadow:0 2px 8px rgba(0,0,0,.5);
 }
-.category-banner-inner p{ font-size:.9rem; opacity:.92; margin:0; }
+.category-banner-inner p{ font-size:.9rem; line-height:1.5; margin:0; color:#F1EEE4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+@media (max-width:760px){
+  .category-banner{ min-height:240px; align-items:flex-end; }
+  .category-banner-inner{ max-width:none; padding:30px 5% 24px; }
+  .category-banner-emblem{ width:84px; height:90px; top:34%; }
+}
 
-.fit-filter-row{ background:var(--card); border-bottom:1px solid var(--line); }
+.fit-filter-row{ background:transparent; border-bottom:1px solid var(--line); }
 .fit-filter-row-inner{
   max-width:1400px; margin:0 auto; padding:14px 5%;
   display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;
@@ -507,3 +564,584 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .fits-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
 .fits-list li{ display:flex; flex-direction:column; font-size:.85rem; border-bottom:1px solid var(--line); padding-bottom:8px; }
 .fits-list li span{ color:var(--ink-soft); font-size:.78rem; }
+
+/* Any panel opened through main.js gets "is-open" on itself and its
+   overlay — so new panels (Fit Guide, symbols, shipping…) need no
+   per-panel rules like the two above. */
+.panel-overlay.is-open{ opacity:1; pointer-events:auto; }
+.info-panel.is-open{ transform:translateX(0); }
+.info-panel{ width:min(440px,92vw); }
+.panel-textlink{ display:block; text-align:center; margin-top:14px; font-size:.78rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+button.btn-block{ border:none; }
+
+/* ============================================================
+   SINGLE PRODUCT — single-product.php
+   Follows the Site Map's SingleProduct artboard: gallery with
+   thumbnails down the left, buy box on the right, then white
+   black-bordered cards for the description and symbols.
+   ============================================================ */
+.product-page{ max-width:1400px; margin:0 auto; }
+.product-page .woocommerce-notices-wrapper{ padding:14px 5% 0; }
+.product-crumb{ padding:14px 5% 0; font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); }
+.product-crumb a:hover{ color:var(--rust); }
+
+.product-main{ display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:28px; padding:18px 5% 8px; align-items:start; }
+@media (max-width:900px){ .product-main{ grid-template-columns:1fr; } }
+
+/* WooCommerce gallery: main image on the right, thumbnails in a column
+   on the left (the slider puts them underneath by default). */
+.product-gallery .woocommerce-product-gallery{ position:relative; display:grid; grid-template-columns:64px minmax(0,1fr); gap:12px; margin:0; opacity:1 !important; }
+.product-gallery .woocommerce-product-gallery .flex-viewport,
+.product-gallery .woocommerce-product-gallery > .woocommerce-product-gallery__wrapper{ grid-column:2; grid-row:1; border:1px solid var(--line); background:var(--card); }
+.product-gallery .woocommerce-product-gallery__wrapper{ margin:0; }
+.product-gallery .woocommerce-product-gallery__image img{ width:100%; height:auto; }
+.product-gallery .flex-control-thumbs{ grid-column:1; grid-row:1; list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.product-gallery .flex-control-thumbs img{ aspect-ratio:1; object-fit:cover; width:100%; border:1px solid var(--line); border-radius:3px; cursor:pointer; opacity:1; transition:border-color .15s ease; }
+.product-gallery .flex-control-thumbs img:hover{ border-color:var(--rust); }
+.product-gallery .flex-control-thumbs img.flex-active{ border-color:var(--redrock); }
+.product-gallery .woocommerce-product-gallery__trigger{ position:absolute; top:10px; right:10px; z-index:3; width:34px; height:34px; border-radius:50%; background:var(--white); border:1px solid var(--line); font-size:0; }
+.product-gallery .woocommerce-product-gallery__trigger::after{ content:"⤢"; font-size:1rem; display:flex; align-items:center; justify-content:center; height:100%; color:var(--ink); }
+@media (max-width:640px){
+  .product-gallery .woocommerce-product-gallery{ grid-template-columns:1fr; }
+  .product-gallery .flex-control-thumbs{ grid-row:2; grid-column:1; flex-direction:row; overflow-x:auto; }
+  .product-gallery .flex-control-thumbs li{ flex:0 0 56px; }
+  .product-gallery .woocommerce-product-gallery .flex-viewport,
+  .product-gallery .woocommerce-product-gallery > .woocommerce-product-gallery__wrapper{ grid-column:1; }
+}
+
+.product-info{ display:flex; flex-direction:column; gap:16px; }
+.info-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
+.info-top h1{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.01em; font-size:1.5rem; line-height:1.15; margin:0; }
+.product-emblem{ flex:none; width:64px; height:68px; object-fit:contain; }
+.product-price{ font-size:1.15rem; font-weight:700; font-variant-numeric:tabular-nums; color:var(--rust); }
+.product-price del{ color:var(--ink-soft); font-weight:400; opacity:.7; margin-right:6px; }
+
+.avail-bar{ display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--ink); color:#fff; padding:11px 16px; font-size:.74rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; }
+.avail-link{ background:none; border:none; color:inherit; font:inherit; text-transform:inherit; letter-spacing:.05em; cursor:pointer; display:flex; align-items:center; gap:7px; padding:0; }
+.avail-link:hover{ color:var(--rust); }
+.arrow-circle{ width:16px; height:16px; border-radius:50%; border:1px solid currentColor; display:flex; align-items:center; justify-content:center; flex:none; }
+.arrow-circle svg{ width:8px; height:8px; }
+
+/* WooCommerce's add-to-cart form, laid out as stacked option fields */
+.product-info form.cart{ margin:0; display:flex; flex-direction:column; gap:16px; }
+.product-info table.variations{ width:100%; border-collapse:collapse; }
+.product-info table.variations tr{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.product-info table.variations th, .product-info table.variations td{ padding:0; text-align:left; }
+.product-info table.variations th label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
+.product-info table.variations select{ width:100%; padding:10px 12px; border:1px solid var(--ink); background:var(--white); font:inherit; font-size:.85rem; }
+.product-info .reset_variations{ display:inline-block; margin-top:8px; font-size:.72rem; text-decoration:underline; color:var(--ink-soft); }
+.product-info .woocommerce-variation-price{ font-weight:700; color:var(--rust); }
+.product-info .woocommerce-variation-availability .stock{ font-size:.8rem; color:var(--ink-soft); margin:4px 0 0; }
+.product-info .woocommerce-variation-add-to-cart,
+.product-info form.cart:not(.variations_form){ display:flex; gap:10px; align-items:stretch; flex-direction:row; }
+.product-info .quantity input.qty{ height:100%; min-height:48px; width:64px; padding:0 8px; border:1px solid var(--ink); text-align:center; font:inherit; }
+.woocommerce .product-info button.single_add_to_cart_button{ flex:1; background:var(--olive); color:var(--white); border:none; border-radius:3px; padding:14px; font-size:.84rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; transition:background .15s ease; }
+.woocommerce .product-info button.single_add_to_cart_button:hover{ background:var(--rust); }
+.woocommerce .product-info button.single_add_to_cart_button.disabled{ opacity:.55; cursor:not-allowed; }
+
+/* Pills that replace the option dropdowns (built by main.js) */
+select.is-pill-source{ position:absolute !important; width:1px !important; height:1px !important; opacity:0; pointer-events:none; }
+.option-pills{ display:flex; gap:8px; flex-wrap:wrap; }
+.option-pill{ padding:8px 16px; border-radius:2px; border:1px solid var(--ink); font:inherit; font-size:.76rem; font-weight:600; letter-spacing:.01em; cursor:pointer; background:var(--white); color:var(--ink); transition:border-color .15s ease; }
+.option-pill:hover{ border-color:var(--rust); }
+.option-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.option-pill.is-unavailable{ opacity:.35; text-decoration:line-through; }
+.option-pills.is-size .option-pill{ width:38px; height:38px; padding:0; border-radius:50%; background:var(--ink); color:var(--white); font-size:.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.option-pills.is-size .option-pill.is-active{ outline:1.5px solid var(--redrock); outline-offset:2px; background:var(--redrock); }
+.option-pill:focus-visible{ outline:2px solid var(--rust); outline-offset:2px; }
+
+.ship-note{ display:flex; align-items:center; gap:8px; font-size:.74rem; color:var(--ink-soft); margin:0; }
+
+/* Description + symbols cards */
+.product-section{ padding:20px 5% 6px; }
+.desc-box, .symbols-box{ border:1.5px solid var(--ink); border-radius:4px; background:var(--white); padding:28px 32px; }
+.desc-box{ display:flex; gap:30px; align-items:flex-start; }
+.desc-text{ flex:1; min-width:0; }
+.desc-box h2{ font-size:1rem; margin-bottom:10px; }
+.desc-body{ font-size:.86rem; line-height:1.7; color:var(--ink-soft); }
+.desc-body p{ margin:0 0 12px; }
+.desc-emblem{ flex:none; width:96px; height:102px; object-fit:contain; }
+.facts{ margin:0; font-size:.82rem; line-height:1.9; color:var(--ink-soft); }
+.facts dt{ display:inline; color:var(--ink); font-weight:700; }
+.facts dt::after{ content:" —"; }
+.facts dd{ display:inline; margin:0; }
+.trust-lines{ display:flex; gap:24px; flex-wrap:wrap; margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }
+.trust-item{ flex:1; min-width:200px; display:flex; gap:10px; align-items:flex-start; font-size:.78rem; color:var(--ink-soft); text-align:left; }
+.trust-item svg{ flex:none; width:18px; height:18px; margin-top:1px; color:var(--ink); }
+button.trust-link{ background:none; border:none; padding:0; font:inherit; font-size:.78rem; cursor:pointer; }
+button.trust-link span{ text-decoration:underline; text-underline-offset:2px; }
+button.trust-link:hover{ color:var(--rust); }
+@media (max-width:640px){
+  .desc-box{ flex-direction:column-reverse; padding:22px 18px; }
+  .symbols-box{ padding:22px 14px; }
+}
+
+.symbols-title{ text-align:center; font-size:1rem; padding-bottom:16px; margin-bottom:22px; border-bottom:1px solid var(--line); }
+.badge-row{ display:flex; align-items:flex-start; justify-content:center; gap:30px; flex-wrap:wrap; }
+.symbol-badge{ width:98px; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; background:none; border:none; padding:0; font:inherit; color:var(--ink); }
+.symbol-badge .ring-wrap{ position:relative; width:98px; height:98px; display:block; }
+.symbol-badge .ring-wrap > svg{ width:100%; height:100%; color:var(--ink); transition:color .15s ease; }
+.symbol-badge .center-ic{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:22px; height:22px; display:flex; align-items:center; justify-content:center; }
+/* Symbol marks are single-ink artwork (some supplied white, for dark
+   backgrounds) — brightness(0) prints them in solid ink on light badges. */
+.symbol-badge .center-ic img{ width:100%; height:auto; filter:brightness(0); }
+.symbol-badge .center-ic svg{ width:100%; height:100%; transition:color .15s ease; }
+.symbol-badge .lb{ font-size:.6rem; text-transform:uppercase; letter-spacing:.03em; text-align:center; font-weight:700; color:var(--ink-soft); transition:color .15s ease; }
+.symbol-badge:hover .ring-wrap > svg, .symbol-badge:hover .center-ic svg, .symbol-badge:hover .lb{ color:var(--rust); }
+.symbol-badge:focus-visible{ outline:2px solid var(--rust); outline-offset:4px; border-radius:50%; }
+
+.lifestyle-banner{ position:relative; height:260px; overflow:hidden; margin-top:20px; }
+.lifestyle-banner img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.lifestyle-banner .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.28); }
+.lifestyle-banner .banner-text{ position:absolute; inset:0; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; }
+.lifestyle-banner h2{ color:#fff; font-size:1.6rem; text-shadow:0 3px 10px rgba(0,0,0,.6); }
+.lifestyle-banner a{ font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#fff; border:1px solid #fff; padding:8px 18px; }
+.lifestyle-banner a:hover{ background:#fff; color:var(--ink); }
+
+.related-products{ padding-bottom:50px; }
+.related-products h2{ font-size:1.1rem; margin-bottom:16px; }
+
+/* Slide-in panel contents: symbol title bar, Fit Guide, FAQ */
+.symbol-panel{ padding-top:0; }
+.panel-titlebar{ display:flex; align-items:center; gap:12px; background:var(--ink); color:#fff; margin:0 -24px 18px; padding:18px 24px; }
+.panel-titlebar h3{ color:#fff; margin:0; font-size:1.1rem; }
+.panel-titlebar p{ margin:2px 0 0; font-size:.78rem; color:#E7E3D2; }
+.panel-titlebar .panel-close{ margin:0 0 0 auto; color:#fff; }
+.panel-mark{ flex:none; width:40px; height:40px; border-radius:50%; background:var(--white); color:var(--ink); display:flex; align-items:center; justify-content:center; padding:9px; }
+.panel-mark img, .panel-mark svg{ width:100%; height:100%; object-fit:contain; }
+.panel-mark img{ filter:brightness(0); }
+.info-panel .panel-close svg{ width:22px; height:22px; display:block; }
+.panel-points{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.panel-points li{ position:relative; padding-left:18px; font-size:.84rem; line-height:1.55; }
+.panel-points li::before{ content:""; position:absolute; left:0; top:.55em; width:7px; height:7px; background:var(--rust); border-radius:50%; }
+.panel-links{ display:flex; flex-direction:column; gap:8px; margin-top:22px; }
+.panel-links .btn{ text-align:center; }
+
+.fit-tabs{ display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:8px; margin:6px 0 18px; }
+.fit-tab{ border:1.5px solid var(--ink); background:var(--white); padding:10px 6px; font:inherit; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; cursor:pointer; color:var(--ink); }
+.fit-tab.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.fit-photo{ width:100%; aspect-ratio:4/3; object-fit:cover; margin-bottom:12px; }
+.fit-model-note{ font-size:.74rem; color:var(--ink-soft); margin:6px 0 0; }
+.size-notes{ margin:16px 0 0; display:grid; grid-template-columns:auto 1fr; gap:8px 12px; font-size:.8rem; }
+.size-notes dt{ font-weight:700; }
+.size-notes dd{ margin:0; color:var(--ink-soft); line-height:1.5; }
+.measure-table-wrap{ overflow-x:auto; margin-top:18px; }
+.measure-table{ width:100%; border-collapse:collapse; font-size:.78rem; font-variant-numeric:tabular-nums; }
+.measure-table th, .measure-table td{ padding:7px 6px; border-bottom:1px solid var(--line); text-align:center; }
+.measure-table thead th{ border-bottom:2px solid var(--ink); font-size:.7rem; }
+.measure-table tbody th{ text-align:left; font-weight:700; white-space:nowrap; }
+
+.faq-item{ border-bottom:1px solid var(--line); padding:12px 0; }
+.faq-item summary{ cursor:pointer; font-weight:700; font-size:.86rem; }
+.faq-item p{ font-size:.84rem; line-height:1.6; color:var(--ink-soft); margin:10px 0 0; }
+/* Colour swatch version of an option button (colour/photo set per
+   attribute term in wp-admin). Text stays in the button for screen
+   readers but is hidden visually. */
+.option-pill.is-swatch{ width:30px; height:30px; padding:0; border:1px solid var(--line); border-radius:3px; font-size:0; color:transparent; }
+.option-pill.is-swatch:hover{ outline:1.5px solid var(--rust); outline-offset:2px; }
+.option-pill.is-swatch.is-active{ outline:1.5px solid var(--redrock); outline-offset:2px; border-color:var(--line); }
+.option-pill.is-swatch.is-unavailable{ opacity:.3; }
+
+/* ============================================================
+   CART, CHECKOUT, MY ACCOUNT — shared page shell (page.php)
+   These are WooCommerce's own pages; everything below restyles
+   WooCommerce's markup, no template files are replaced
+   (see inc/cart-checkout.php).
+   ============================================================ */
+.woo-page{ max-width:1400px; margin:0 auto; padding:18px 5% 60px; }
+.woo-page .woo-crumb{ padding:0 0 10px; }
+.woo-page-title{ font-size:clamp(1.5rem,3vw,2rem); margin:0 0 22px; }
+.woo-page div.woocommerce{ max-width:none; padding:0; margin:0; }
+
+/* Quantity stepper (main.js adds the – / + buttons) */
+.quantity.has-stepper{ display:inline-flex; align-items:stretch; border:1px solid var(--line); background:var(--white); }
+.quantity.has-stepper input.qty{ width:40px; min-height:0; height:auto; border:none; border-left:1px solid var(--line); border-right:1px solid var(--line); text-align:center; font:inherit; font-weight:700; font-size:.82rem; padding:6px 0; -moz-appearance:textfield; }
+.quantity.has-stepper input.qty::-webkit-outer-spin-button,
+.quantity.has-stepper input.qty::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.qty-step{ width:32px; background:none; border:none; cursor:pointer; font-size:.95rem; color:var(--ink); }
+.qty-step:hover{ color:var(--rust); }
+.product-info .quantity.has-stepper{ border-color:var(--ink); }
+.product-info .quantity.has-stepper input.qty{ width:44px; border-color:var(--ink); }
+
+/* ============================================================
+   CART — Site Map "Cart" artboard: line items left, totals card right
+   ============================================================ */
+.woocommerce-cart .woo-page div.woocommerce{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:32px; align-items:start; }
+/* :where() keeps this catch-all weaker than the column rules below */
+:where(.woocommerce-cart .woo-page div.woocommerce) > *{ grid-column:1 / -1; }
+.woocommerce-cart .woo-page .woocommerce-cart-form{ grid-column:1; }
+.woocommerce-cart .woo-page .cart-collaterals{ grid-column:2; width:auto; }
+@media (max-width:900px){
+  .woocommerce-cart .woo-page div.woocommerce{ grid-template-columns:1fr; }
+  .woocommerce-cart .woo-page .cart-collaterals{ grid-column:1; }
+}
+
+.woocommerce-cart table.cart{ margin:0; border:none; }
+.woocommerce-cart table.cart img{ width:64px; height:76px; object-fit:cover; }
+.woocommerce-cart table.cart .product-name a{ font-weight:700; font-size:.86rem; color:var(--ink); }
+.woocommerce-cart table.cart .product-name a:hover{ color:var(--rust); }
+.woocommerce-cart table.cart dl.variation{ margin:3px 0 0; font-size:.76rem; color:var(--ink-soft); }
+.woocommerce-cart table.cart dl.variation dt, .woocommerce-cart table.cart dl.variation dd, .woocommerce-cart table.cart dl.variation p{ display:inline; margin:0; font-weight:400; }
+.woocommerce-cart table.cart .product-subtotal{ font-weight:700; }
+/* Remove "×" becomes a small "Remove" text link */
+.woocommerce-cart table.cart a.remove{ font-size:0 !important; width:auto; height:auto; background:none !important; color:var(--ink-soft) !important; border-radius:0; }
+.woocommerce-cart table.cart a.remove::after{ content:"Remove"; font-size:.72rem; text-decoration:underline; text-underline-offset:2px; font-weight:400; }
+.woocommerce-cart table.cart a.remove:hover::after{ color:var(--redrock); }
+
+/* Desktop: each row is a grid so columns read Product · Qty · Price · Subtotal · Remove */
+@media (min-width:769px){
+  .woocommerce-cart table.cart thead tr,
+  .woocommerce-cart table.cart tr.cart_item{
+    display:grid; grid-template-columns:76px minmax(0,1fr) 120px 90px 100px 70px;
+    grid-template-areas:"thumb name qty price sub remove"; align-items:center; column-gap:14px;
+  }
+  .woocommerce-cart table.cart thead tr{ border-bottom:1px solid var(--line); }
+  .woocommerce-cart table.cart tr.cart_item{ border-bottom:1px solid var(--line); padding:16px 0; }
+  .woocommerce-cart table.cart th, .woocommerce-cart table.cart td{ border:none; padding:0; }
+  .woocommerce-cart table.cart thead th{ font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-weight:700; padding:0 0 10px; }
+  .woocommerce-cart table.cart .product-thumbnail{ grid-area:thumb; }
+  .woocommerce-cart table.cart .product-name{ grid-area:name; }
+  .woocommerce-cart table.cart thead .product-name{ grid-column:thumb-start / name-end; }
+  .woocommerce-cart table.cart .product-quantity{ grid-area:qty; }
+  .woocommerce-cart table.cart .product-price{ grid-area:price; text-align:right; }
+  .woocommerce-cart table.cart .product-subtotal{ grid-area:sub; text-align:right; }
+  .woocommerce-cart table.cart .product-remove{ grid-area:remove; text-align:right; }
+  .woocommerce-cart table.cart thead .product-thumbnail{ display:none; }
+}
+.woocommerce-cart table.cart td.actions{ padding:18px 0 0; border:none; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.woocommerce-cart table.cart td.actions .coupon{ display:flex; gap:8px; }
+.woocommerce-cart table.cart td.actions .coupon input.input-text{ width:180px; border:1px solid var(--line); padding:9px 10px; font:inherit; font-size:.8rem; background:var(--white); }
+.woocommerce-cart table.cart td.actions .coupon .button{ background:var(--ink); padding:9px 14px; font-size:.72rem; }
+/* The cart updates itself when a quantity changes (main.js), so the
+   "Update cart" button is only a quiet fallback. */
+.woocommerce-cart table.cart td.actions button[name="update_cart"]{ background:none; color:var(--ink-soft); text-decoration:underline; padding:9px 0; font-size:.72rem; }
+.woocommerce-cart table.cart td.actions button[name="update_cart"]:disabled{ visibility:hidden; }
+
+/* Totals card */
+.woocommerce-cart .cart-collaterals .cart_totals{ float:none; width:auto; max-width:none; margin:0; background:var(--card); border:1px solid var(--line); padding:22px 24px; }
+.woocommerce-cart .cart_totals h2{ font-size:.92rem; margin:0 0 12px; }
+.woocommerce-cart .cart_totals table.shop_table{ margin:0; border:none; }
+.woocommerce-cart .cart_totals table.shop_table th, .woocommerce-cart .cart_totals table.shop_table td{ border:none; border-bottom:1px solid var(--line); padding:10px 0; font-size:.84rem; color:var(--ink-soft); background:none; }
+.woocommerce-cart .cart_totals table.shop_table td{ text-align:right; }
+.woocommerce-cart .cart_totals .order-total th, .woocommerce-cart .cart_totals .order-total td{ color:var(--ink); font-weight:700; border-bottom:none; }
+.woocommerce-cart .cart_totals .woocommerce-shipping-methods{ list-style:none; margin:0; padding:0; }
+.woocommerce-cart .cart_totals .woocommerce-shipping-destination, .woocommerce-cart .cart_totals .shipping-calculator-button{ font-size:.74rem; }
+.woocommerce-cart .wc-proceed-to-checkout{ padding:16px 0 0; }
+body .woo-page .wc-proceed-to-checkout a.checkout-button{ display:block; text-align:center; background:var(--ink); color:#fff; padding:14px; font-size:.8rem; margin:0; border-radius:0; }
+body .woo-page .wc-proceed-to-checkout a.checkout-button:hover{ background:var(--rust); }
+.ship-progress{ margin:12px 0 0; font-size:.74rem; color:var(--ink-soft); text-align:center; }
+
+/* Empty cart */
+.woocommerce-cart .cart-empty.woocommerce-info{ background:none; border:none; text-align:center; font-size:.92rem; color:var(--ink-soft); padding:50px 0 0; }
+.woocommerce-cart .cart-empty.woocommerce-info::before{ content:""; display:block; width:56px; height:56px; margin:0 auto 16px; border:1.5px solid var(--line); border-radius:50%; position:static; background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23565E4F' stroke-width='1.8'%3E%3Ccircle cx='9' cy='21' r='1'/%3E%3Ccircle cx='20' cy='21' r='1'/%3E%3Cpath d='M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6'/%3E%3C/svg%3E") center / 24px no-repeat; }
+.woocommerce-cart .return-to-shop{ text-align:center; padding-bottom:60px; }
+.woocommerce-cart .return-to-shop .button{ background:var(--ink); }
+
+/* Cross-sells, moved under the cart */
+.woocommerce-cart .cross-sells{ grid-column:1 / -1; width:auto; float:none; margin-top:20px; }
+.woocommerce-cart .cross-sells h2{ font-size:1.1rem; margin-bottom:16px; }
+
+/* ============================================================
+   CHECKOUT — Site Map "Checkout" artboard: details left, sticky
+   order summary + payment card right, trimmed header (header.php)
+   ============================================================ */
+header.site-header.is-checkout .head-actions{ gap:8px; font-size:.78rem; }
+.woocommerce-checkout .woo-page form.checkout{
+  display:grid; grid-template-columns:minmax(0,1fr) 380px; column-gap:36px;
+  grid-template-areas:"details heading" "details review"; grid-template-rows:auto 1fr; align-items:start;
+}
+@media (max-width:900px){
+  .woocommerce-checkout .woo-page form.checkout{ grid-template-columns:1fr; grid-template-areas:"details" "heading" "review"; }
+}
+.woocommerce-checkout #customer_details{ grid-area:details; }
+.woocommerce-checkout #customer_details .col-1, .woocommerce-checkout #customer_details .col-2{ float:none; width:auto; }
+.woocommerce-checkout #customer_details h3{ font-size:.9rem; margin:0 0 14px; }
+.woocommerce-checkout .woocommerce-billing-fields, .woocommerce-checkout .woocommerce-shipping-fields, .woocommerce-checkout .woocommerce-additional-fields{ padding-bottom:26px; margin-bottom:26px; border-bottom:1px solid var(--line); }
+.woocommerce-checkout .woocommerce-additional-fields{ border-bottom:none; }
+.woocommerce-checkout .form-row label{ font-size:.68rem !important; letter-spacing:.06em !important; color:var(--ink-soft); }
+.woocommerce-checkout .form-row input.input-text, .woocommerce-checkout .form-row textarea, .woocommerce-checkout .form-row select, .woocommerce-checkout .select2-container .select2-selection{ border:1px solid var(--line); border-radius:0; background:var(--white); padding:11px 12px; font:inherit; font-size:.84rem; min-height:44px; }
+.woocommerce-checkout .form-row textarea{ min-height:80px; }
+.woocommerce-checkout #ship-to-different-address label{ font-size:.8rem; text-transform:none; letter-spacing:0; font-family:"Heebo",sans-serif; font-weight:400; color:var(--ink-soft); display:flex; align-items:center; gap:9px; }
+.woocommerce-checkout input[type="checkbox"], .woocommerce-checkout input[type="radio"]{ accent-color:var(--olive); width:15px; height:15px; }
+.woocommerce-checkout .espire-contact-email{ padding-bottom:10px; }
+
+/* Order summary card (heading + review share one bordered card) */
+.woocommerce-checkout #order_review_heading{ grid-area:heading; margin:0; font-size:.92rem; background:var(--card); border:1.5px solid var(--ink); border-bottom:none; border-radius:4px 4px 0 0; padding:22px 24px 6px; }
+.woocommerce-checkout #order_review{ grid-area:review; background:var(--card); border:1.5px solid var(--ink); border-top:none; border-radius:0 0 4px 4px; padding:6px 24px 22px; position:sticky; top:20px; }
+.woocommerce-checkout table.woocommerce-checkout-review-order-table{ border:none; margin:0 0 16px; }
+.woocommerce-checkout table.woocommerce-checkout-review-order-table thead{ display:none; }
+.woocommerce-checkout table.woocommerce-checkout-review-order-table th, .woocommerce-checkout table.woocommerce-checkout-review-order-table td{ border:none; border-bottom:1px solid var(--line); padding:10px 0; font-size:.84rem; background:none; }
+.woocommerce-checkout table.woocommerce-checkout-review-order-table tfoot th{ font-weight:400; color:var(--ink-soft); text-align:left; }
+.woocommerce-checkout table.woocommerce-checkout-review-order-table td.product-total, .woocommerce-checkout table.woocommerce-checkout-review-order-table tfoot td{ text-align:right; white-space:nowrap; font-weight:700; }
+.woocommerce-checkout table.woocommerce-checkout-review-order-table .order-total th, .woocommerce-checkout table.woocommerce-checkout-review-order-table .order-total td{ font-weight:700; color:var(--ink); font-size:1rem; border-bottom:none; }
+.woocommerce-checkout td.product-name{ display:grid; grid-template-columns:48px minmax(0,1fr) auto; column-gap:12px; align-items:center; }
+.woocommerce-checkout td.product-name .oi-thumb{ grid-row:1 / span 2; }
+.woocommerce-checkout td.product-name .oi-thumb img{ width:48px; height:58px; object-fit:cover; }
+.woocommerce-checkout td.product-name .oi-name{ font-weight:700; font-size:.8rem; }
+.woocommerce-checkout td.product-name .product-quantity{ font-weight:400; font-size:.72rem; color:var(--ink-soft); }
+.woocommerce-checkout td.product-name dl.variation{ grid-column:2 / -1; margin:2px 0 0; font-size:.72rem; color:var(--ink-soft); }
+.woocommerce-checkout td.product-name dl.variation dt, .woocommerce-checkout td.product-name dl.variation dd, .woocommerce-checkout td.product-name dl.variation p{ display:inline; margin:0; font-weight:400; }
+.woocommerce-checkout ul#shipping_method{ list-style:none; margin:0; padding:0; }
+
+/* Payment */
+.woocommerce-checkout #payment{ background:none; border-radius:0; }
+.woocommerce-checkout #payment ul.payment_methods{ border:1px solid var(--line); background:var(--white); padding:0; margin:0 0 16px; list-style:none; }
+.woocommerce-checkout #payment ul.payment_methods li{ padding:13px 14px; border-bottom:1px solid var(--line); font-size:.82rem; font-weight:700; }
+.woocommerce-checkout #payment ul.payment_methods li:last-child{ border-bottom:none; }
+.woocommerce-checkout #payment div.payment_box{ background:none; color:var(--ink-soft); font-weight:400; font-size:.74rem; line-height:1.5; margin:8px 0 0 24px; padding:0; }
+.woocommerce-checkout #payment div.payment_box::before{ display:none; }
+.woocommerce-checkout #payment div.form-row{ padding:0; margin:0; }
+body .woo-page #payment #place_order{ width:100%; float:none; background:var(--ink); color:#fff; padding:15px; font-size:.82rem; border-radius:0; }
+body .woo-page #payment #place_order:hover{ background:#000; }
+.woocommerce-checkout .woocommerce-privacy-policy-text, .woocommerce-checkout .woocommerce-terms-and-conditions-wrapper{ font-size:.68rem; color:var(--ink-soft); line-height:1.5; text-align:center; margin-bottom:12px; }
+.woocommerce-checkout .woocommerce-privacy-policy-text a{ text-decoration:underline; text-underline-offset:2px; }
+.secure-note{ display:flex; align-items:center; justify-content:center; gap:7px; font-size:.72rem; color:var(--ink-soft); margin:12px 0 0; }
+.secure-note svg{ width:14px; height:14px; flex:none; }
+.woocommerce-checkout .woocommerce-form-coupon-toggle .woocommerce-info{ font-size:.8rem; }
+.woocommerce-checkout .form-row textarea, .woocommerce-checkout .form-row input.input-text{ width:100%; box-sizing:border-box; }
+.woocommerce-cart table.cart .product-price{ color:var(--ink-soft); }
+
+/* Mobile cart: each item becomes a compact card — photo left; name, then
+   quantity + subtotal, then Remove on the right. Overrides WooCommerce's
+   own small-screen table so the layout is the same everywhere. */
+@media (max-width:768px){
+  .woocommerce-cart table.cart, .woocommerce-cart table.cart tbody{ display:block; width:100%; }
+  .woocommerce-cart table.cart thead{ display:none; }
+  .woocommerce-cart table.cart tr.cart_item{
+    display:grid !important; grid-template-columns:64px minmax(0,1fr) auto; column-gap:14px; row-gap:8px;
+    grid-template-areas:"thumb name name" "thumb qty sub" "thumb remove remove";
+    padding:16px 0; border-bottom:1px solid var(--line);
+  }
+  .woocommerce-cart table.cart tr.cart_item td{ display:block !important; padding:0 !important; border:none !important; text-align:left !important; background:none !important; }
+  .woocommerce-cart table.cart tr.cart_item td::before{ display:none !important; }
+  .woocommerce-cart table.cart td.product-thumbnail{ grid-area:thumb; display:block !important; }
+  .woocommerce-cart table.cart td.product-name{ grid-area:name; }
+  .woocommerce-cart table.cart tr.cart_item td.product-price{ display:none !important; }
+  .woocommerce-cart table.cart td.product-quantity{ grid-area:qty; }
+  .woocommerce-cart table.cart td.product-subtotal{ grid-area:sub; align-self:center; text-align:right !important; }
+  .woocommerce-cart table.cart td.product-remove{ grid-area:remove; }
+  .woocommerce-cart table.cart tr:not(.cart_item){ display:block; }
+  .woocommerce-cart table.cart td.actions{ display:flex !important; flex-direction:column; align-items:stretch; }
+  .woocommerce-cart table.cart td.actions .coupon{ width:100%; }
+  .woocommerce-cart table.cart td.actions .coupon input.input-text{ flex:1; width:auto; min-width:0; }
+}
+
+/* ============================================================
+   STORE HUB — page-store.php: one tile per collection, same tile
+   look as the homepage "Shop By Collection" slider, laid out as a grid
+   ============================================================ */
+.store-hub{ max-width:1400px; margin:0 auto; }
+.store-intro{ max-width:640px; margin:0 0 26px; font-size:.95rem; line-height:1.6; color:var(--ink-soft); }
+.store-intro p{ margin:0 0 10px; }
+.collection-grid{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; }
+.collection-grid .collection-slide{ flex:none; display:flex; flex-direction:column; }
+.collection-grid .collection-slide .cs-body{ display:flex; flex-direction:column; flex:1; }
+.collection-grid .collection-slide .cs-link{ margin-top:auto; align-self:flex-start; }
+@media (max-width:1100px){ .collection-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:800px){ .collection-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:520px){ .collection-grid{ grid-template-columns:1fr; } }
+
+/* ============================================================
+   BRAND STORY PAGES — template-story.php (Australian Made,
+   F*ck Fast Fashion): hero, pillar cards, stat strip, shop
+   feature, definition, closing banner
+   ============================================================ */
+.story-label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:#E6E0C9; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.story-hero{ position:relative; min-height:340px; overflow:hidden; color:var(--white); background:var(--ink); display:flex; align-items:center; }
+.story-hero > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.story-hero .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.46); }
+.story-hero .content{ position:relative; z-index:2; padding:48px 6%; max-width:820px; display:flex; flex-direction:column; gap:10px; }
+.story-hero h1{ font-size:clamp(1.9rem,3.8vw,2.8rem); letter-spacing:.07em; line-height:1.1; text-shadow:0 2px 8px rgba(0,0,0,.5); text-wrap:balance; }
+.story-hero p{ margin:0; font-size:.95rem; line-height:1.55; color:#F1EEE4; max-width:600px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+
+.story-pillars{ max-width:1400px; margin:0 auto; padding:44px 5% 0; }
+.story-eyebrow{ text-align:center; font-family:"Heebo",sans-serif; font-size:.7rem; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; margin:0 0 26px; }
+.pillar-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
+@media (max-width:860px){ .pillar-grid{ grid-template-columns:1fr; } }
+.pillar{ background:var(--white); border:1.5px solid var(--ink); display:flex; flex-direction:column; overflow:hidden; }
+.pillar .p-shot{ height:150px; overflow:hidden; }
+.pillar .p-shot img{ width:100%; height:100%; object-fit:cover; }
+.pillar .p-body{ padding:20px 22px 22px; display:flex; flex-direction:column; gap:10px; flex:1; }
+.pillar h3{ font-size:1rem; }
+.pillar p{ margin:0; font-size:.86rem; color:var(--ink-soft); line-height:1.6; flex:1; }
+.pillar .p-link{ align-self:flex-start; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; background:var(--olive); color:#fff; padding:8px 13px; border-radius:3px; transition:background .15s ease; }
+.pillar .p-link:hover{ background:var(--rust); }
+
+.stat-strip{ display:flex; align-items:center; gap:26px; margin-top:44px; padding:26px 5%; background:var(--ink); color:#fff; }
+.stat-strip .stat-num{ font-family:"League Spartan","Arial Black",sans-serif; font-size:2.4rem; font-weight:800; flex:none; }
+.stat-strip .stat-text{ margin:0; font-size:.88rem; color:#D8D4C0; line-height:1.5; max-width:760px; }
+.stat-strip .stat-text b{ color:#fff; }
+
+.story-feature{ display:flex; align-items:stretch; gap:32px; max-width:calc(1400px - 10%); margin:44px auto 0; width:90%; background:var(--white); border:1.5px solid var(--ink); }
+.story-feature .sf-shot{ flex:none; width:300px; min-height:220px; background:var(--silver); overflow:hidden; }
+.story-feature .sf-shot img{ width:100%; height:100%; object-fit:cover; }
+.story-feature .sf-text{ padding:26px 28px 26px 0; display:flex; flex-direction:column; justify-content:center; gap:10px; }
+.story-feature h2{ font-size:1.15rem; }
+.story-feature p{ margin:0; font-size:.88rem; color:var(--ink-soft); line-height:1.6; max-width:480px; }
+.story-feature .btn{ align-self:flex-start; margin-top:4px; }
+@media (max-width:700px){
+  .story-feature{ flex-direction:column; gap:0; }
+  .story-feature .sf-shot{ width:100%; min-height:180px; }
+  .story-feature .sf-text{ padding:22px; }
+}
+
+.story-definition{ width:90%; max-width:calc(1400px - 10%); margin:30px auto 0; padding:18px 24px; border:1px dashed var(--line); background:var(--paper-alt); font-size:.86rem; color:var(--ink-soft); line-height:1.6; box-sizing:border-box; }
+.story-definition b{ color:var(--ink); }
+
+.story-closing{ position:relative; overflow:hidden; margin-top:44px; background:var(--ink); color:var(--white); display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; padding:38px 5%; }
+.story-closing > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.story-closing .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.6); z-index:1; }
+.story-closing .c-text{ position:relative; z-index:2; max-width:560px; display:flex; flex-direction:column; gap:10px; }
+.story-closing h2{ font-size:1.15rem; color:#fff; }
+.story-closing p{ margin:0; font-size:.9rem; color:#E4E0CF; line-height:1.6; }
+.story-closing .btn{ position:relative; z-index:2; background:#fff; color:var(--ink); flex:none; }
+.story-closing .btn:hover{ background:var(--rust); color:#fff; }
+/* Tall "feature" version: left-weighted gradient, button under the text */
+.story-closing.is-feature{ min-height:420px; flex-direction:column; align-items:flex-start; justify-content:center; padding:48px 6%; }
+.story-closing.is-feature .overlay{ background:linear-gradient(100deg,rgba(10,10,8,.74) 0%,rgba(10,10,8,.5) 45%,rgba(10,10,8,.15) 100%); }
+.story-closing.is-feature h2{ font-size:clamp(1.6rem,3.2vw,2.2rem); line-height:1.15; text-shadow:0 2px 8px rgba(0,0,0,.5); }
+.story-closing.is-feature .btn{ background:var(--olive); color:#fff; }
+.story-closing.is-feature .btn:hover{ background:var(--rust); }
+
+/* ============================================================
+   DIY — page-diy.php: collection-page look, cards go to Zakeke
+   ============================================================ */
+.fit-filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; align-self:center; margin-right:2px; }
+.fit-pill.is-active{ background:var(--redrock); border-color:var(--redrock); }
+.diy-products{ max-width:1400px; margin:0 auto; padding:28px 5% 60px; }
+.diy-products ul.products li.product a.diy-start{ display:inline-block; font-size:.68rem; padding:7px 12px; border-radius:3px; }
+.diy-empty{ font-size:.9rem; color:var(--ink-soft); text-align:center; padding:40px 0; }
+.diy-empty a{ text-decoration:underline; }
+.panel-rich{ font-size:.86rem; line-height:1.6; color:var(--ink-soft); }
+.panel-rich img{ height:auto; margin:10px 0; }
+.panel-rich table{ width:100%; border-collapse:collapse; font-size:.8rem; }
+.panel-rich th, .panel-rich td{ border-bottom:1px solid var(--line); padding:6px 4px; text-align:left; }
+
+/* ============================================================
+   CONTACT — page-contact.php: dark details panel left, form right.
+   The form is the page body (any form plugin); the rules below
+   restyle the common plugins' fields to match.
+   ============================================================ */
+.contact-wrap{ display:grid; grid-template-columns:1fr 1fr; }
+@media (max-width:820px){ .contact-wrap{ grid-template-columns:1fr; } }
+.contact-wrap .kicker{ font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; font-weight:700; }
+.contact-left{ padding:56px 6% 56px 5%; display:flex; flex-direction:column; gap:18px; background:var(--ink); color:var(--white); }
+.contact-left .kicker{ color:#D8D4C0; }
+.contact-left h1{ font-size:clamp(1.9rem,3vw,2.5rem); color:#fff; letter-spacing:.04em; text-wrap:balance; }
+.contact-left .lead{ margin:0; font-size:.9rem; color:#D8D4C0; line-height:1.6; max-width:400px; }
+.contact-details{ list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:14px; }
+.contact-details li{ display:flex; align-items:center; gap:12px; font-size:.9rem; }
+.contact-details svg{ width:18px; height:18px; flex:none; color:#D8D4C0; }
+.contact-details a:hover{ color:var(--rust); }
+.contact-right{ padding:56px 5% 56px 6%; display:flex; flex-direction:column; gap:16px; justify-content:center; }
+.contact-right .kicker{ color:var(--ink-soft); }
+.contact-right h2{ font-size:1.1rem; }
+.contact-fallback{ font-size:.9rem; color:var(--ink-soft); }
+.contact-fallback a{ text-decoration:underline; }
+.contact-form form p, .contact-form .wpforms-field, .contact-form .gfield{ margin:0 0 14px; }
+.contact-form label, .contact-form .wpforms-field-label, .contact-form .gfield_label{ display:block; font-size:.72rem !important; font-weight:700 !important; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft) !important; margin-bottom:6px; }
+.contact-form input[type="text"], .contact-form input[type="email"], .contact-form input[type="tel"], .contact-form textarea, .contact-form select{
+  width:100% !important; max-width:none !important; box-sizing:border-box; border:1px solid var(--line) !important; border-radius:0 !important; background:var(--white) !important;
+  padding:11px 12px !important; font:inherit; font-size:.86rem !important; color:var(--ink);
+}
+.contact-form textarea{ min-height:120px; resize:vertical; }
+.contact-form input[type="submit"], .contact-form button[type="submit"]{
+  background:var(--ink) !important; color:#fff !important; border:none !important; border-radius:0 !important; padding:13px 26px !important;
+  font:inherit; font-size:.78rem !important; font-weight:700 !important; text-transform:uppercase; letter-spacing:.05em; cursor:pointer;
+}
+.contact-form input[type="submit"]:hover, .contact-form button[type="submit"]:hover{ background:var(--rust) !important; }
+
+/* ============================================================
+   SYMBOL PAGES — taxonomy-product_tag.php (/product-tag/<symbol>/)
+   ============================================================ */
+.symbol-hero{ position:relative; min-height:360px; overflow:hidden; background:var(--ink); color:var(--white); display:flex; align-items:center; }
+.symbol-hero > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.symbol-hero .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.5); }
+.symbol-hero .content{ position:relative; z-index:2; padding:48px 6%; max-width:760px; display:flex; flex-direction:column; gap:8px; }
+.symbol-script{ font-family:"Caveat",cursive; font-size:1.7rem; line-height:1; color:#F1E8D6; text-shadow:0 1px 6px rgba(0,0,0,.5); }
+.symbol-hero h1{ font-size:clamp(2rem,4vw,2.9rem); letter-spacing:.07em; text-shadow:0 2px 8px rgba(0,0,0,.5); }
+.symbol-hero p{ margin:0; font-size:.95rem; line-height:1.55; color:#F1EEE4; max-width:600px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.symbol-hero-mark{ position:absolute; right:6%; bottom:36px; z-index:2; width:84px; height:84px; border-radius:50%; background:var(--white); color:var(--ink); padding:18px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,.35); }
+.symbol-hero-mark img, .symbol-hero-mark svg{ width:100%; height:100%; object-fit:contain; }
+.symbol-hero-mark img{ filter:brightness(0); }
+@media (max-width:640px){ .symbol-hero-mark{ display:none; } }
+
+.symbol-body{ max-width:900px; margin:0 auto; padding:40px 5% 10px; display:flex; flex-direction:column; gap:26px; }
+.symbol-points{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
+.symbol-points li{ position:relative; padding:0 0 16px 26px; border-bottom:1px solid var(--line); font-size:.95rem; line-height:1.6; }
+.symbol-points li::before{ content:""; position:absolute; left:0; top:.55em; width:9px; height:9px; border-radius:50%; background:var(--rust); }
+.symbol-diagram{ margin:0; border:1.5px solid var(--ink); background:var(--white); padding:22px; }
+.symbol-diagram figcaption{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; font-size:.9rem; margin-bottom:14px; }
+.symbol-diagram img{ width:100%; height:auto; }
+.symbol-cert{ display:flex; align-items:center; gap:18px; background:var(--card); border:1px solid var(--line); padding:18px 22px; }
+.symbol-cert img{ width:48px; height:auto; flex:none; filter:brightness(0); }
+.symbol-cert p{ margin:0; font-size:.88rem; line-height:1.6; color:var(--ink-soft); }
+.symbol-ctas{ display:flex; gap:12px; flex-wrap:wrap; }
+.btn.outline-ink{ border:1.5px solid var(--ink); color:var(--ink); background:transparent; }
+.btn.outline-ink:hover{ background:var(--ink); color:#fff; }
+.symbol-products{ max-width:1400px; margin:0 auto; padding:40px 5% 60px; scroll-margin-top:20px; }
+.symbol-products h2{ font-size:1.2rem; margin-bottom:18px; }
+
+/* 404 additions (404.php) */
+.notfound-script{ display:block; font-family:"Caveat",cursive; font-size:1.6rem; color:var(--olive); margin:6px 0 8px; }
+.notfound-wrap h1{ font-size:clamp(1.4rem,3vw,1.9rem); letter-spacing:.04em; }
+.notfound-home{ display:inline-block; margin-bottom:34px; }
+.notfound-links-label{ font-size:.68rem !important; text-transform:uppercase; letter-spacing:.1em; font-weight:700; margin:0 0 10px !important; }
+
+/* ============================================================
+   FILTER BAR — inc/shop-filters.php: Fit / Colour / Size across the
+   top of every collection page, green panel button on the right
+   ============================================================ */
+.filter-bar{ border-bottom:1px solid var(--line); }
+.filter-bar-inner{ max-width:1400px; margin:0 auto; padding:14px 5%; display:flex; align-items:center; gap:12px 26px; flex-wrap:wrap; }
+.filter-group{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
+.size-pill{ min-width:34px; height:34px; padding:0 6px; border-radius:999px; border:1px solid var(--ink); display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--ink); background:var(--white); transition:border-color .15s ease, background .15s ease, color .15s ease; }
+.size-pill:hover{ border-color:var(--rust); color:var(--rust); }
+.size-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.filter-swatch{ width:24px; height:24px; border-radius:50%; border:1px solid var(--line); background-size:cover; background-position:center; transition:box-shadow .15s ease; }
+.filter-swatch:hover{ box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--rust); }
+.filter-swatch.is-active{ box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--redrock); }
+.filter-bar .fit-pill{ border:1px solid var(--ink); color:var(--ink); background:var(--white); }
+.filter-bar .fit-pill:hover{ border-color:var(--rust); color:var(--rust); }
+.filter-bar .fit-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
+.filter-clear{ font-size:.72rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+.filter-clear:hover{ color:var(--rust); }
+.filter-panel-btn{ margin-left:auto; border:none; }
+@media (max-width:640px){ .filter-panel-btn{ margin-left:0; width:100%; text-align:center; } }
+
+/* Product cards (Site Map "Category Archive"): bordered card — photo,
+   name, colour dots, "Sizes S–XL · Slim fit", price. Extras come from
+   inc/product-cards.php. */
+.woocommerce ul.products li.product{ border:1.5px solid var(--ink); background:var(--white); transition:box-shadow .15s ease; }
+.woocommerce ul.products li.product:hover{ box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.woocommerce ul.products li.product img{ aspect-ratio:4/5; margin:0 !important; }
+.woocommerce ul.products li.product .woocommerce-loop-product__title{ font-family:"Heebo",sans-serif; text-transform:none; letter-spacing:0; font-weight:700; font-size:.92rem; padding:14px 16px 4px; }
+.woocommerce ul.products li.product:hover .woocommerce-loop-product__title{ color:var(--rust); }
+.card-swatches{ display:flex; align-items:center; gap:5px; padding:4px 16px 2px; }
+.card-swatch{ width:14px; height:14px; border-radius:50%; border:1px solid var(--line); background-size:cover; background-position:center; }
+.card-more{ font-size:.7rem; color:var(--ink-soft); margin-left:2px; }
+.card-meta{ display:block; padding:4px 16px 0; font-size:.8rem; color:var(--ink-soft); }
+.woocommerce ul.products li.product .price{ display:block; padding:6px 16px 18px; font-size:.9rem; font-variant-numeric:tabular-nums; }
+/* Category pages: three to a row, as in the design */
+.shop-grid ul.products{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+@media (max-width:900px){ .shop-grid ul.products{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
+@media (max-width:480px){ .shop-grid ul.products{ grid-template-columns:1fr; } }
+.trust-item a{ text-decoration:underline; text-underline-offset:2px; }
+.trust-item a:hover{ color:var(--rust); }
+
+/* Seed to Store: big tee drawing on the left, heading + journey row on the right */
+.seed-section{ display:flex; align-items:center; gap:34px; }
+.seed-tee{ flex:none; width:120px; height:auto; }
+.seed-body{ flex:1; min-width:0; }
+.seed-body .section-head{ margin-bottom:14px; }
+.seed-body .section-head h2{ font-size:clamp(1.25rem,2.4vw,1.6rem); }
+.d-step .ic svg, .d-step .ic img{ width:22px; height:22px; object-fit:contain; }
+@media (max-width:640px){
+  .seed-section{ gap:14px; align-items:flex-start; }
+  .seed-tee{ width:64px; margin-top:4px; }
+}
+/* Mark images in the journey circles are single-ink artwork, some supplied
+   white — print them in ink on the white circle, white on hover. */
+.d-step .ic img{ filter:brightness(0); }
+.d-step a.ic:hover img{ filter:brightness(0) invert(1); }
