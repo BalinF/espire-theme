@@ -8,11 +8,8 @@
  * banner/sidebar content becomes different per category without a
  * separate template for each.
  *
- * /store/ and /diy/ are real WordPress Pages (not category archives),
- * so they don't run through this file — they get their own
- * page-store.php / page-diy.php templates later, built to LOOK the
- * same as this one (per site-inventory.md's decision that they reuse
- * this layout with different banner content).
+ * /store/ is a real WordPress Page (page-store.php). /diy/ opens the
+ * DIY category's page, which runs through this file (see inc/pages.php).
  */
 
 get_header();
@@ -56,6 +53,26 @@ for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ) && funct
 }
 
 $espire_banner_title = $espire_banner_title ?: ( $espire_term ? $espire_term->name : 'Shop' );
+
+/**
+ * The DIY category (Pages → DIY → "Base Garment Category") is the Design
+ * Your Own page: /diy/ opens it (inc/pages.php). Its banner falls back to
+ * the DIY page's featured image and excerpt, its cards get "Start
+ * Designing" buttons, and the green button opens the DIY page's Design
+ * Guide when one is written.
+ */
+$espire_is_diy    = $espire_term && function_exists( 'espire_is_diy_category' ) && espire_is_diy_category( $espire_term );
+$espire_diy_page  = $espire_is_diy ? get_page_by_path( 'diy' ) : null;
+$espire_diy_guide = ( $espire_diy_page && function_exists( 'get_field' ) ) ? get_field( 'diy_design_guide', $espire_diy_page->ID ) : '';
+if ( $espire_diy_page ) {
+	$espire_own_banner = function_exists( 'get_field' ) ? get_field( 'category_banner_image', $espire_term_id ) : '';
+	if ( ! $espire_own_banner && ! get_term_meta( $espire_term->term_id, 'thumbnail_id', true ) && has_post_thumbnail( $espire_diy_page ) ) {
+		$espire_banner_image = get_the_post_thumbnail_url( $espire_diy_page, 'full' );
+	}
+	if ( ! $espire_banner_text ) {
+		$espire_banner_text = has_excerpt( $espire_diy_page ) ? get_the_excerpt( $espire_diy_page ) : 'Pick a base garment, then customise fabric, colour and print in the live designer — cut and sewn here in Bright once you\'re happy with it.';
+	}
+}
 
 /**
  * The main shop page (WooCommerce → Settings → Products → Shop page):
@@ -102,8 +119,8 @@ $espire_panel          = $espire_has_fit_guide ? 'fit-guide' : ( $espire_term ? 
 
 espire_filter_bar( array(
 	'category'    => $espire_term,
-	'panel'       => $espire_panel,
-	'panel_label' => 'Fit Guide',
+	'panel'       => $espire_diy_guide ? 'design-guide' : $espire_panel,
+	'panel_label' => $espire_diy_guide ? 'Design Guide' : 'Fit Guide',
 ) );
 ?>
 
@@ -118,6 +135,9 @@ echo '<div class="shop-grid' . ( $espire_show_tiles ? ' store-hub' : '' ) . '">'
 if ( $espire_show_tiles ) {
 	espire_store_tiles_grid();
 } elseif ( woocommerce_product_loop() ) {
+	if ( $espire_is_diy ) {
+		espire_diy_card_buttons( true ); // "Start Designing" on each card
+	}
 	do_action( 'woocommerce_before_shop_loop' );
 	woocommerce_product_loop_start();
 	if ( wc_get_loop_prop( 'total' ) ) {
@@ -129,6 +149,9 @@ if ( $espire_show_tiles ) {
 	}
 	woocommerce_product_loop_end();
 	do_action( 'woocommerce_after_shop_loop' );
+	if ( $espire_is_diy ) {
+		espire_diy_card_buttons( false );
+	}
 } else {
 	do_action( 'woocommerce_no_products_found' );
 }
@@ -137,7 +160,19 @@ echo '</div>';
 
 <?php echo $espire_fit_guide_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built ?>
 
-<?php if ( ! $espire_has_fit_guide && $espire_term ) : ?>
+<?php if ( $espire_diy_guide ) : ?>
+<div class="panel-overlay" data-panel-close="design-guide"></div>
+<aside class="info-panel" id="design-guide-panel" aria-label="Design Guide">
+	<button type="button" class="panel-close" aria-label="Close" data-panel-close="design-guide">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+	</button>
+	<h3>Design Guide</h3>
+	<div class="panel-rich"><?php echo wp_kses_post( $espire_diy_guide ); ?></div>
+	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
+</aside>
+<?php endif; ?>
+
+<?php if ( ! $espire_has_fit_guide && $espire_term && ! $espire_diy_guide ) : ?>
 <!-- Fallback "Fit Guide" slide-in for categories without full fit guide
      details yet (no measurements/size notes) — same right-anchored panel pattern
      as the mobile nav sidebar (see .mobile-sidebar in style.css and the

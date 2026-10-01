@@ -36,6 +36,36 @@ function espire_diy_category() {
 	return $term ?: null;
 }
 
+/** True on the DIY category's own page or any of its sub-categories. */
+function espire_is_diy_category( $term ) {
+	$diy = espire_diy_category();
+	while ( $diy && $term && ! is_wp_error( $term ) ) {
+		if ( (int) $term->term_id === (int) $diy->term_id ) {
+			return true;
+		}
+		$term = $term->parent ? get_term( $term->parent, 'product_cat' ) : null;
+	}
+	return false;
+}
+
+/**
+ * /diy/ (the "DIY" page every Design Your Own button links to) opens the
+ * DIY category's page instead, so DIY uses the same layout as the other
+ * collections: banner, filters, cards with "Start Designing". Without a
+ * DIY category the old DIY page still shows.
+ */
+add_action( 'template_redirect', function () {
+	if ( ! is_page( 'diy' ) || is_customize_preview() ) {
+		return;
+	}
+	$cat = espire_diy_category();
+	$url = $cat ? get_term_link( $cat ) : '';
+	if ( $url && ! is_wp_error( $url ) ) {
+		wp_safe_redirect( $url, 302 );
+		exit;
+	}
+} );
+
 /**
  * On the DIY page, product cards say "Start Designing" and go to the
  * product page (where the Zakeke designer opens) instead of adding to cart.
