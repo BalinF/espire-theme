@@ -116,6 +116,16 @@ Set a Swatch Colour to fix any colour that's guessed wrong.
 **Product cards** show colour dots (or "4 Colours") and a "Sizes S–XL · Classic
 fit" line from the same attributes, so a variation-swatches plugin isn't needed.
 
+**Menus (Appearance → Menus)**: two menus you can edit; tick its *Display location*
+at the bottom of the menu screen:
+- **Primary Header Menu**: the links across the top, and in the phone menu. Open an item
+  to pick its **Menu Icon** (pencil, shop front, globe, leaf, T-shirt …), choose *No
+  icon*, or upload your own. Left on *Automatic*, an icon is matched from the link.
+- **Category Bar**: the dark strip of collection links under the banners. Add
+  categories from *Product categories* on the left and drag to reorder.
+
+Until a menu is assigned, the built-in links show.
+
 **Homepage → From Seed To Store** (Products → Categories → edit → *Seed To
 Store Journey*) — upload a garment sketch and add its steps in order, one product
 tag per step (drag to reorder; optional custom label). Symbol tags show their own
