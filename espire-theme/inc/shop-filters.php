@@ -8,48 +8,104 @@
  * filtering — a link like /product-category/hoodies/?filter_colour=navy
  * already shows only the navy hoodies, with no plugin. This file just
  * builds the clickable options that make those links — Fit and Size
- * buttons, Colour swatches — from
- * the product attributes set up under Products → Attributes (any
- * attribute whose name contains "fit", "colour"/"color" or "size").
+ * buttons, Colour swatches — from the product attributes:
+ *   - every global attribute (Products → Attributes) whose name contains
+ *     "fit", "size" or "colour"/"color" — several can share a group, e.g.
+ *     "Size" and "Kids Size" both show under Size;
+ *   - plus attributes typed straight into a product (Product data →
+ *     Attributes → "Custom product attribute") with those names. WordPress
+ *     can't filter those on its own, so espire_local_filter_query() below
+ *     does it (links like ?f_size=m).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** Filter groups in bar order, with the attribute names that belong to each. */
+function espire_filter_patterns() {
+	return array(
+		'Fit'    => '/fit/i',
+		'Size'   => '/size/i',
+		'Colour' => '/colou?r/i',
+	);
+}
+
+/** Which filter group an attribute name belongs to ("Hoodie Colour" → Colour), or ''. */
+function espire_filter_label_for( $name ) {
+	foreach ( espire_filter_patterns() as $label => $pattern ) {
+		if ( preg_match( $pattern, $name ) ) {
+			return $label;
+		}
+	}
+	return '';
+}
+
 /**
- * The attributes the filter bar offers, in bar order: Fit, Size, Colour.
- * Each: array( label, taxonomy e.g. "pa_colour", query key e.g. "filter_colour" ).
+ * Global attributes the filter bar offers, in bar order (Fit, Size,
+ * Colour). Each: array( label, taxonomy e.g. "pa_colour", query key e.g.
+ * "filter_colour" ). Every matching attribute is included, not just the
+ * first, so a shop with "Colour" and "Hoodie Colour" gets both.
  */
 function espire_filter_attributes() {
 	if ( ! function_exists( 'wc_get_attribute_taxonomies' ) ) {
 		return array();
 	}
-	$wanted = array(
-		'Fit'    => '/fit/i',
-		'Size'   => '/size/i',
-		'Colour' => '/colou?r/i',
-	);
-	$found = array();
-	foreach ( $wanted as $label => $pattern ) {
-		foreach ( wc_get_attribute_taxonomies() as $attr ) {
-			if ( preg_match( $pattern, $attr->attribute_name ) || preg_match( $pattern, $attr->attribute_label ) ) {
-				$found[ $label ] = array( $label, wc_attribute_taxonomy_name( $attr->attribute_name ), 'filter_' . $attr->attribute_name );
-				break;
-			}
+	$found = array_fill_keys( array_keys( espire_filter_patterns() ), array() );
+	foreach ( wc_get_attribute_taxonomies() as $attr ) {
+		$label = espire_filter_label_for( $attr->attribute_name ) ?: espire_filter_label_for( $attr->attribute_label );
+		if ( $label ) {
+			$found[ $label ][] = array( $label, wc_attribute_taxonomy_name( $attr->attribute_name ), 'filter_' . $attr->attribute_name );
 		}
 	}
-	return array_values( $found );
+	return array_merge( ...array_values( $found ) );
+}
+
+/** Query key for a custom (typed-in) attribute group, e.g. Size → "f_size". */
+function espire_local_filter_key( $label ) {
+	return 'f_' . strtolower( $label );
+}
+
+/** Every query key the filter bar uses: WooCommerce's filter_* plus our f_*. */
+function espire_filter_keys() {
+	$keys = wp_list_pluck( espire_filter_attributes(), 2 );
+	foreach ( array_keys( espire_filter_patterns() ) as $label ) {
+		$keys[] = espire_local_filter_key( $label );
+	}
+	return array_unique( $keys );
 }
 
 /** True when any filter from the bar is switched on in the current URL. */
 function espire_filters_active() {
-	foreach ( espire_filter_attributes() as $attr ) {
-		if ( ! empty( $_GET[ $attr[2] ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- read-only filter
+	foreach ( espire_filter_keys() as $key ) {
+		if ( ! empty( $_GET[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- read-only filter
 			return true;
 		}
 	}
 	return false;
+}
+
+/** Published product IDs in a category (and its sub-categories), or in the whole shop. */
+function espire_category_product_ids( $category = null ) {
+	static $cache = array();
+	$id = $category ? $category->term_id : 0;
+	if ( ! isset( $cache[ $id ] ) ) {
+		$args = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+		);
+		if ( $category ) {
+			$args['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery
+				array( 'taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $category->term_id ),
+			);
+		}
+		$cache[ $id ] = get_posts( $args );
+		update_postmeta_cache( $cache[ $id ] ); // one query for every product's attributes
+	}
+	return $cache[ $id ];
 }
 
 /**
@@ -68,20 +124,7 @@ function espire_filter_terms( $taxonomy, $category = null ) {
 	if ( ! $category ) {
 		return $terms;
 	}
-	static $ids_by_cat = array(); // one product lookup per page, shared by every attribute
-	if ( ! isset( $ids_by_cat[ $category->term_id ] ) ) {
-		$ids_by_cat[ $category->term_id ] = get_posts( array(
-			'post_type'      => 'product',
-			'post_status'    => 'publish',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-			'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery
-				array( 'taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $category->term_id ),
-			),
-		) );
-	}
-	$ids = $ids_by_cat[ $category->term_id ];
+	$ids = espire_category_product_ids( $category );
 	if ( ! $ids ) {
 		return array();
 	}
@@ -90,6 +133,115 @@ function espire_filter_terms( $taxonomy, $category = null ) {
 	return array_values( array_filter( $terms, function ( $term ) use ( $used ) {
 		return isset( $used[ $term->term_id ] );
 	} ) );
+}
+
+/**
+ * A product's custom (typed-in, not global) attribute values for one
+ * filter group, e.g. Size → array( 'S', 'M', 'L' ). Read straight from the
+ * saved attribute list so it's quick for a whole category.
+ */
+function espire_local_attribute_values( $product_id, $label ) {
+	$attrs = get_post_meta( $product_id, '_product_attributes', true );
+	if ( ! is_array( $attrs ) ) {
+		return array();
+	}
+	$values = array();
+	foreach ( $attrs as $attr ) {
+		if ( ! empty( $attr['is_taxonomy'] ) || empty( $attr['name'] ) || empty( $attr['value'] ) ) {
+			continue;
+		}
+		if ( espire_filter_label_for( $attr['name'] ) === $label ) {
+			$values = array_merge( $values, array_map( 'trim', explode( '|', $attr['value'] ) ) );
+		}
+	}
+	return array_values( array_unique( array_filter( $values, 'strlen' ) ) );
+}
+
+/** Custom attribute values used by a category's products for one group, in first-seen order. */
+function espire_local_filter_values( $label, $category = null ) {
+	$values = array();
+	foreach ( espire_category_product_ids( $category ) as $id ) {
+		foreach ( espire_local_attribute_values( $id, $label ) as $value ) {
+			$values[ sanitize_title( $value ) ] = $value;
+		}
+	}
+	return $values; // slug => name
+}
+
+/**
+ * Filters by custom attributes (?f_size=m,l): WooCommerce only knows how
+ * to filter by global attributes, so the matching products are worked out
+ * here and the page's product list is limited to them.
+ */
+add_action( 'pre_get_posts', 'espire_local_filter_query' );
+function espire_local_filter_query( $query ) {
+	if ( is_admin() || ! $query->is_main_query() ) {
+		return;
+	}
+	if ( ! ( $query->is_post_type_archive( 'product' ) || $query->is_tax( array( 'product_cat', 'product_tag' ) ) ) ) {
+		return;
+	}
+	$wanted = array();
+	foreach ( array_keys( espire_filter_patterns() ) as $label ) {
+		$chosen = espire_filter_chosen( espire_local_filter_key( $label ) );
+		if ( $chosen ) {
+			$wanted[ $label ] = $chosen;
+		}
+	}
+	if ( ! $wanted ) {
+		return;
+	}
+	$category = $query->is_tax( 'product_cat' ) ? get_term_by( 'slug', $query->get( 'product_cat' ), 'product_cat' ) : null;
+	$matches  = array();
+	foreach ( espire_category_product_ids( $category ?: null ) as $id ) {
+		foreach ( $wanted as $label => $slugs ) {
+			$have = array_map( 'sanitize_title', espire_local_attribute_values( $id, $label ) );
+			if ( ! array_intersect( $slugs, $have ) ) {
+				continue 2;
+			}
+		}
+		$matches[] = $id;
+	}
+	$query->set( 'post__in', $matches ? $matches : array( 0 ) );
+}
+
+/**
+ * Every option for one filter group on this page, global attribute terms
+ * and custom values together, one per name:
+ *   array( 'name', 'key' => query key, 'slug', 'swatch' => array( colour, image ) )
+ */
+function espire_filter_options( $label, $category = null ) {
+	$options = array();
+	foreach ( espire_filter_attributes() as $attr ) {
+		if ( $attr[0] !== $label ) {
+			continue;
+		}
+		foreach ( espire_filter_terms( $attr[1], $category ) as $term ) {
+			$name = strtolower( $term->name );
+			$new  = array(
+				'name'   => $term->name,
+				'key'    => $attr[2],
+				'slug'   => $term->slug,
+				'swatch' => 'Colour' === $label ? espire_term_swatch( $attr[1], $term ) : array( 'colour' => '', 'image' => '' ),
+			);
+			// Same name in two attributes: keep the one with a real swatch.
+			if ( ! isset( $options[ $name ] ) || ( ! $options[ $name ]['swatch']['image'] && ! $options[ $name ]['swatch']['colour'] ) ) {
+				$options[ $name ] = $new;
+			}
+		}
+	}
+	foreach ( espire_local_filter_values( $label, $category ) as $slug => $value ) {
+		$name = strtolower( $value );
+		if ( ! isset( $options[ $name ] ) ) {
+			$options[ $name ] = array(
+				'name'   => $value,
+				'key'    => espire_local_filter_key( $label ),
+				'slug'   => $slug,
+				'swatch' => 'Colour' === $label ? espire_colour_swatch_from_name( $value ) : array( 'colour' => '', 'image' => '' ),
+			);
+		}
+	}
+	return array_values( $options );
 }
 
 /**
@@ -108,17 +260,21 @@ function espire_filter_bar( $args = array() ) {
 		'panel'       => '',
 		'panel_label' => '',
 	) );
-	$attrs    = espire_filter_attributes();
 	$category = $args['category'];
 	$action   = $args['action'] ?: ( $category ? get_term_link( $category ) : strtok( add_query_arg( array() ), '?' ) );
 
-	// No Fit attribute → the category's own sub-categories are the fits.
-	$has_fit_attr = (bool) array_filter( $attrs, function ( $a ) {
-		return 'Fit' === $a[0];
-	} );
+	$groups = array();
+	foreach ( array_keys( espire_filter_patterns() ) as $label ) {
+		$options = espire_filter_options( $label, $category );
+		if ( $options ) {
+			$groups[ $label ] = $options;
+		}
+	}
+
+	// No Fit attribute values → the category's own sub-categories are the fits.
 	$fit_terms = array();
 	$fit_base  = $category; // the category whose sub-categories are the fits
-	if ( ! $has_fit_attr && $category ) {
+	if ( empty( $groups['Fit'] ) && $category ) {
 		$fit_terms = get_terms( array( 'taxonomy' => 'product_cat', 'parent' => $category->term_id, 'hide_empty' => true ) );
 		$fit_terms = is_wp_error( $fit_terms ) ? array() : $fit_terms;
 		if ( ! $fit_terms && $category->parent ) {
@@ -129,15 +285,7 @@ function espire_filter_bar( $args = array() ) {
 		}
 	}
 
-	$selects = array();
-	foreach ( $attrs as $attr ) {
-		$terms = espire_filter_terms( $attr[1], $category );
-		if ( $terms ) {
-			$selects[] = array( $attr, $terms );
-		}
-	}
-
-	if ( ! $selects && ! $fit_terms && ! $args['panel'] ) {
+	if ( ! $groups && ! $fit_terms && ! $args['panel'] ) {
 		return;
 	}
 	$active = espire_filters_active();
@@ -145,7 +293,7 @@ function espire_filter_bar( $args = array() ) {
 	<div class="filter-bar">
 		<div class="filter-bar-inner">
 			<?php if ( $fit_terms ) : ?>
-				<div class="filter-group">
+				<div class="filter-group filter-fit">
 					<span class="filter-label">Fit</span>
 					<a href="<?php echo esc_url( get_term_link( $fit_base ) ); ?>" class="fit-pill<?php echo $fit_base->term_id === $category->term_id ? ' is-active' : ''; ?>">All</a>
 					<?php foreach ( $fit_terms as $fit ) : ?>
@@ -154,33 +302,23 @@ function espire_filter_bar( $args = array() ) {
 				</div>
 			<?php endif; ?>
 
-			<?php foreach ( $selects as $select ) : ?>
-				<?php
-				list( $attr, $terms ) = $select;
-				list( $label, $taxonomy, $key ) = $attr;
-				$chosen = espire_filter_chosen( $key );
-				?>
+			<?php foreach ( $groups as $label => $options ) : ?>
 				<div class="filter-group filter-<?php echo esc_attr( strtolower( $label ) ); ?>" role="group" aria-label="<?php echo esc_attr( $label ); ?>">
 					<span class="filter-label"><?php echo esc_html( $label ); ?></span>
-					<?php foreach ( $terms as $term ) : ?>
+					<?php foreach ( $options as $option ) : ?>
 						<?php
-						$on   = in_array( $term->slug, $chosen, true );
-						$href = espire_filter_toggle_url( $action, $key, $term->slug );
+						$on      = in_array( $option['slug'], espire_filter_chosen( $option['key'] ), true );
+						$href    = espire_filter_toggle_url( $action, $option['key'], $option['slug'] );
+						$current = $on ? ' aria-current="true"' : '';
+						$swatch  = $option['swatch'];
+						$style   = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : ( $swatch['colour'] ? 'background-color:' . $swatch['colour'] : '' );
 						?>
-						<?php if ( 'Colour' === $label ) : ?>
-							<?php
-							$swatch = espire_term_swatch( $taxonomy, $term );
-							$style  = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : ( $swatch['colour'] ? 'background-color:' . $swatch['colour'] : '' );
-							?>
-							<?php if ( $style ) : ?>
-								<a href="<?php echo esc_url( $href ); ?>" class="filter-swatch<?php echo $on ? ' is-active' : ''; ?>" style="<?php echo esc_attr( $style ); ?>" title="<?php echo esc_attr( $term->name ); ?>" aria-label="<?php echo esc_attr( $term->name ); ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>></a>
-							<?php else : ?>
-								<a href="<?php echo esc_url( $href ); ?>" class="fit-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a>
-							<?php endif; ?>
+						<?php if ( 'Colour' === $label && $style ) : ?>
+							<a href="<?php echo esc_url( $href ); ?>" class="filter-swatch<?php echo $on ? ' is-active' : ''; ?>" style="<?php echo esc_attr( $style ); ?>" title="<?php echo esc_attr( $option['name'] ); ?>" aria-label="<?php echo esc_attr( $option['name'] ); ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>></a>
 						<?php elseif ( 'Size' === $label ) : ?>
-							<a href="<?php echo esc_url( $href ); ?>" class="size-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a>
+							<a href="<?php echo esc_url( $href ); ?>" class="size-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php echo esc_html( $option['name'] ); ?></a>
 						<?php else : ?>
-							<a href="<?php echo esc_url( $href ); ?>" class="fit-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a>
+							<a href="<?php echo esc_url( $href ); ?>" class="fit-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php echo esc_html( $option['name'] ); ?></a>
 						<?php endif; ?>
 					<?php endforeach; ?>
 				</div>
@@ -212,13 +350,13 @@ function espire_filter_chosen( $key ) {
  */
 function espire_filter_toggle_url( $base, $key, $slug ) {
 	$params = array();
-	foreach ( espire_filter_attributes() as $attr ) {
-		$values = espire_filter_chosen( $attr[2] );
-		if ( $attr[2] === $key ) {
+	foreach ( array_unique( array_merge( espire_filter_keys(), array( $key ) ) ) as $k ) {
+		$values = espire_filter_chosen( $k );
+		if ( $k === $key ) {
 			$values = in_array( $slug, $values, true ) ? array_diff( $values, array( $slug ) ) : array_merge( $values, array( $slug ) );
 		}
 		if ( $values ) {
-			$params[ $attr[2] ] = implode( ',', $values );
+			$params[ $k ] = implode( ',', $values );
 		}
 	}
 	return $params ? add_query_arg( $params, $base ) : $base;
@@ -309,12 +447,16 @@ function espire_image_url( $value, $size = 'full' ) {
  * A colour/fabric swatch for an attribute term (e.g. Colour → Navy):
  * array( 'colour' => '#1f2a44', 'image' => url ), either may be empty.
  *
- * Reads the theme's Swatch fields first, then falls back to the colours
- * and images saved by the GetWooPlugins "Variation Swatches" plugin
- * (term meta product_attribute_color / product_attribute_image), so
- * swatches set up there keep working with that plugin switched off.
+ * First found:
+ *   1. the theme's Swatch fields (Products → Attributes → Colour → edit a colour)
+ *   2. the colour/image saved by the GetWooPlugins "Variation Swatches"
+ *      plugin (term meta product_attribute_color / product_attribute_image)
+ *   3. any hex colour another swatches plugin saved on the term
+ *   4. a colour matched from the name ("Dyed Navy" → navy), unless
+ *      $guess_from_name is false (for attributes that aren't colours)
+ * so swatches set up with a plugin keep working with it switched off.
  */
-function espire_term_swatch( $taxonomy, $term ) {
+function espire_term_swatch( $taxonomy, $term, $guess_from_name = true ) {
 	$colour = '';
 	$image  = '';
 	if ( function_exists( 'get_field' ) ) {
@@ -327,8 +469,105 @@ function espire_term_swatch( $taxonomy, $term ) {
 	if ( ! $image ) {
 		$image = espire_image_url( get_term_meta( $term->term_id, 'product_attribute_image', true ), 'thumbnail' );
 	}
+	if ( ! espire_hex( $colour ) && ! $image ) {
+		$colour = espire_find_hex( get_term_meta( $term->term_id ) );
+	}
+	if ( ! espire_hex( $colour ) && ! $image && $guess_from_name ) {
+		return espire_colour_swatch_from_name( $term->name );
+	}
 	return array(
-		'colour' => sanitize_hex_color( $colour ) ?: '',
+		'colour' => espire_hex( $colour ),
 		'image'  => $image,
 	);
+}
+
+/** "#1f2a44", "1f2a44" or "#fff" → "#1f2a44"/"#fff"; anything else → ''. */
+function espire_hex( $value ) {
+	$value = is_string( $value ) ? trim( $value ) : '';
+	if ( $value && '#' !== $value[0] ) {
+		$value = '#' . $value;
+	}
+	return sanitize_hex_color( $value ) ?: '';
+}
+
+/** First hex colour found anywhere in a term's saved settings (arrays and serialized values included). */
+function espire_find_hex( $value ) {
+	if ( is_array( $value ) ) {
+		foreach ( $value as $item ) {
+			$hex = espire_find_hex( $item );
+			if ( $hex ) {
+				return $hex;
+			}
+		}
+		return '';
+	}
+	if ( ! is_string( $value ) ) {
+		return '';
+	}
+	if ( is_serialized( $value ) ) {
+		return espire_find_hex( maybe_unserialize( $value ) );
+	}
+	return preg_match( '/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', trim( $value ) ) ? strtolower( trim( $value ) ) : '';
+}
+
+/**
+ * Last resort: a colour from the colour's name, so every colour gets a dot
+ * even before its swatch is set. "Dyed Navy" → the navy entry, "Grey
+ * Marle" → grey marle. Set a Swatch Colour on the attribute to override.
+ */
+function espire_colour_swatch_from_name( $name ) {
+	$map  = array(
+		'black'      => '#1b1b1b',
+		'white'      => '#ffffff',
+		'natural'    => '#efe7d6',
+		'cream'      => '#f1e8d2',
+		'ecru'       => '#e8dfc8',
+		'oatmeal'    => '#d8ccb4',
+		'sand'       => '#d6c3a0',
+		'stone'      => '#bfb6a4',
+		'caramel'    => '#b9763f',
+		'tan'        => '#b98b5e',
+		'brown'      => '#6b4a32',
+		'chocolate'  => '#4a3022',
+		'mocha'      => '#7a5a45',
+		'charcoal'   => '#3b3d3f',
+		'grey marle' => '#a9a9a6',
+		'grey'       => '#8e8e8e',
+		'gray'       => '#8e8e8e',
+		'light blue' => '#9fbfdc',
+		'sky'        => '#9fc6e6',
+		'navy'       => '#1f2a44',
+		'blue'       => '#2f5d9a',
+		'teal'       => '#2b7a78',
+		'sage'       => '#9caf88',
+		'olive'      => '#5f6b3a',
+		'forest'     => '#2f4a32',
+		'green'      => '#4b6b3c',
+		'mustard'    => '#d1a12e',
+		'yellow'     => '#e7c74a',
+		'orange'     => '#d9772b',
+		'rust'       => '#a4492b',
+		'rouge'      => '#a32638',
+		'red'        => '#b0272d',
+		'burgundy'   => '#6a1f2b',
+		'maroon'     => '#6b2230',
+		'pink'       => '#e7a6b4',
+		'purple'     => '#5e3f7a',
+		'lilac'      => '#b8a2cc',
+	);
+	$name = strtolower( trim( $name ) );
+	$hex  = '';
+	if ( isset( $map[ $name ] ) ) {
+		$hex = $map[ $name ];
+	} else {
+		// Longest colour word contained in the name: "Dyed Light Blue" → light blue.
+		$best = 0;
+		foreach ( $map as $word => $value ) {
+			if ( strlen( $word ) > $best && preg_match( '/\b' . preg_quote( $word, '/' ) . '\b/', $name ) ) {
+				$hex  = $value;
+				$best = strlen( $word );
+			}
+		}
+	}
+	return array( 'colour' => $hex, 'image' => '' );
 }

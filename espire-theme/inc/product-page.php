@@ -290,19 +290,22 @@ function espire_product_swatches( $product ) {
 	}
 	$swatches = array();
 	foreach ( $product->get_attributes() as $attribute ) {
-		if ( ! $attribute->is_taxonomy() ) {
-			continue;
-		}
-		$taxonomy = $attribute->get_name();
-		foreach ( $attribute->get_terms() as $term ) {
-			$swatch = espire_term_swatch( $taxonomy, $term );
-			$colour = $swatch['colour'];
-			$image  = $swatch['image'];
-			if ( $colour || $image ) {
-				$swatches[ 'attribute_' . $taxonomy ][ $term->slug ] = array(
-					'colour' => (string) $colour,
-					'image'  => (string) $image,
-				);
+		$name      = $attribute->get_name();
+		$is_colour = 'Colour' === ( espire_filter_label_for( wc_attribute_label( $name, $product ) ) ?: espire_filter_label_for( $name ) );
+		if ( $attribute->is_taxonomy() ) {
+			foreach ( $attribute->get_terms() as $term ) {
+				$swatch = espire_term_swatch( $name, $term, $is_colour );
+				if ( $swatch['colour'] || $swatch['image'] ) {
+					$swatches[ 'attribute_' . $name ][ $term->slug ] = $swatch;
+				}
+			}
+		} elseif ( $is_colour ) {
+			// Typed-in Colour attribute: colour from the name ("Navy" → navy).
+			foreach ( $attribute->get_options() as $option ) {
+				$swatch = espire_colour_swatch_from_name( $option );
+				if ( $swatch['colour'] ) {
+					$swatches[ 'attribute_' . sanitize_title( $name ) ][ $option ] = $swatch;
+				}
 			}
 		}
 	}

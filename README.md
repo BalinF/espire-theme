@@ -91,20 +91,30 @@ The templates fall back gracefully when these are empty, so fill them in as you 
 - Store / DIY / Shop page: that page's **Featured image** (right-hand sidebar
   when editing the page). The line under the title is the page's *Excerpt*.
 
-**Filter bar** — Fit / Size / Colour options across the top of every category
-page, the Store hub and the shop, built from Products → Attributes (any attribute
-named like "fit", "size" or "colour"/"color"): Fit buttons, round Size buttons and
-Colour swatches. Click to switch an option on, click again to switch it off;
-several can be combined. If there's no Fit attribute, a category's sub-categories
-are the Fit buttons. The green **Fit Guide** button opens the category's Fit Guide
-(or its parent category's). No plugin needed.
+**Filter bar**: Fit / Size / Colour options across the top of every category
+page, the Store hub and the shop. No plugin needed. Options come from the products'
+attributes, either kind:
+- global attributes (Products → Attributes) named like "fit", "size" or
+  "colour"/"color"; several can share a group (e.g. "Size" and "Kids Size")
+- attributes typed straight into a product (Product data → Attributes → custom
+  attribute) with those names
 
-**Swatch colours** come from Products → Attributes → Colour → edit a colour →
-*Swatch* — or, if left blank there, from what the old GetWooPlugins swatches
-plugin saved, so that plugin can stay switched off.
+A category page only offers the values its own products use. Click an option to
+switch it on and again to switch it off; several can be combined. If there's no Fit
+attribute, a category's sub-categories are the Fit buttons. Every category gets the
+green **Fit Guide** button: it opens the full Fit Guide when the category (or its
+parent) has fit details, otherwise the Sidebar Intro / Fits / Sourcing text, or a
+"contact us" note.
 
-**Product cards** — show colour swatches (or "4 Colours") and the size range
-from the same attributes, so a variation-swatches plugin isn't needed.
+**Swatch colours**, first found:
+1. Products → Attributes → Colour → edit a colour → *Swatch*
+2. whatever the old GetWooPlugins swatches plugin (or another swatches plugin) saved
+3. a colour guessed from the name ("Dyed Navy" → navy)
+
+Set a Swatch Colour to fix any colour that's guessed wrong.
+
+**Product cards** show colour dots (or "4 Colours") and a "Sizes S–XL · Classic
+fit" line from the same attributes, so a variation-swatches plugin isn't needed.
 
 **Homepage → From Seed To Store** (Products → Categories → edit → *Seed To
 Store Journey*) — upload a garment sketch and add its steps in order, one product
