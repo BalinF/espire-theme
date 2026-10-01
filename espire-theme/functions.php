@@ -27,6 +27,7 @@ require_once get_template_directory() . '/inc/home.php';
 require_once get_template_directory() . '/inc/shop-filters.php';
 require_once get_template_directory() . '/inc/product-cards.php';
 require_once get_template_directory() . '/inc/journey.php';
+require_once get_template_directory() . '/inc/menus.php';
 
 /**
  * Theme setup: declare support for various WordPress/WooCommerce features.
@@ -613,16 +614,7 @@ add_filter( 'body_class', function ( $classes ) {
 } );
 
 function espire_quicklinks_bar() {
-	$espire_quicklinks = array(
-		array( 'label' => 'Shirts', 'url' => home_url( '/product-category/shirts/' ) ),
-		array( 'label' => 'Hoodies', 'url' => home_url( '/product-category/hoodies/' ) ),
-		array( 'label' => 'Tees', 'url' => home_url( '/product-category/tees/' ) ),
-		array( 'label' => 'Leg Hoodies', 'url' => home_url( '/product-category/leg-hoodies/' ) ),
-		array( 'label' => 'Kids', 'url' => home_url( '/product-category/kids/' ) ),
-		array( 'label' => 'The Bad Batch', 'url' => home_url( '/product-category/the-bad-batch/' ) ),
-		array( 'label' => "Nanna's Threads", 'url' => home_url( '/product-category/nannas-threads/' ) ),
-		array( 'label' => 'Design Your Own', 'url' => home_url( '/diy/' ) ),
-	);
+	$espire_quicklinks = espire_category_bar_links(); // Appearance → Menus → "Category Bar" (inc/menus.php)
 	?>
 	<?php // Only the inner strip scrolls; the arrows sit outside it so they stay put at each end. ?>
 	<div class="espire-quicklinks">

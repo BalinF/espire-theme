@@ -120,48 +120,23 @@ endif;
 
 <?php
 /**
- * Fallback nav — used only until a real menu is assigned in Appearance >
- * Menus (once Balin does that in wp-admin, this is skipped automatically
- * — see the has_nav_menu() check above — and he can edit items himself,
- * including per-item icons via the menu screen, without touching code).
- *
- * Trimmed per Balin's feedback: Hoodies/Tees dropped (shoppable via the
- * homepage collection tiles and the Store hub instead — no need to
- * duplicate every category in the header), Contact Us moved to the
- * footer's "Get In Touch" column. Each item now carries a small inline
- * SVG icon (stroke="currentColor") so it inherits the link's own colour
- * automatically — swap any of these for a real icon later without
- * touching the CSS.
+ * Fallback nav — used only until a menu is assigned to "Primary Header
+ * Menu" in Appearance → Menus. After that the menu is edited there,
+ * including each item's icon (see inc/menus.php).
  */
 function espire_fallback_menu() {
 	$espire_nav_items = array(
-		array(
-			'label' => 'Design Your Own',
-			'url'   => home_url( '/diy/' ),
-			'icon'  => '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>',
-		),
-		array(
-			'label' => 'Store',
-			'url'   => home_url( '/store/' ),
-			'icon'  => '<path d="M3 9l1-5h16l1 5"/><path d="M4 9h16v11H4z"/><path d="M9 21v-6h6v6"/>',
-		),
-		array(
-			'label' => 'The Aussie Story',
-			'url'   => home_url( '/australian-made/' ),
-			'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 010 18"/><path d="M3 12h18"/>',
-		),
-		array(
-			'label' => 'F*ck Fast Fashion',
-			'url'   => home_url( '/sustainability/' ),
-			'icon'  => '<path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/>',
-		),
+		array( 'label' => 'Design Your Own', 'url' => home_url( '/diy/' ), 'icon' => 'pencil' ),
+		array( 'label' => 'Store', 'url' => home_url( '/store/' ), 'icon' => 'store' ),
+		array( 'label' => 'The Aussie Story', 'url' => home_url( '/australian-made/' ), 'icon' => 'globe' ),
+		array( 'label' => 'F*ck Fast Fashion', 'url' => home_url( '/sustainability/' ), 'icon' => 'leaf' ),
 	);
 	?>
 	<ul>
 		<?php foreach ( $espire_nav_items as $espire_item ) : ?>
 			<li>
 				<a href="<?php echo esc_url( $espire_item['url'] ); ?>">
-					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><?php echo $espire_item['icon']; // phpcs:ignore -- fixed, hand-written inline SVG paths, not user input ?></svg>
+					<?php echo espire_menu_icon_svg( $espire_item['icon'] ); // phpcs:ignore -- fixed built-in SVG (inc/menus.php) ?>
 					<?php echo esc_html( $espire_item['label'] ); ?>
 				</a>
 			</li>

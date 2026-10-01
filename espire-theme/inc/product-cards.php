@@ -1,17 +1,17 @@
 <?php
 /**
  * inc/product-cards.php — extra lines on the product cards in every grid
- * (category pages, shop, DIY, Goes Well With, symbol pages): the colours
- * a product comes in and a "Sizes S–XL · Slim fit" line, e.g.
- *   ● ● ● +2
- *   Sizes XS–XXL · Classic / Fitted
+ * (category pages, shop, DIY, Goes Well With, symbol pages): everything
+ * a product comes in, e.g.
+ *   ▬ ▬ ▬ ▬            (colours)
+ *   [S] [M] [L] [XL]   (sizes)
+ *   Fit Classic, Fitted
  *
  * FOR LEARNING: this replaces what a "variation swatches" plugin would add
- * to the cards. It reads the product's own Colour and Size attributes (the
- * same ones the filter bar uses — see espire_filter_attributes() in
- * inc/shop-filters.php). Colours with a swatch (theme Swatch fields, or
- * ones saved by the old swatches plugin — see espire_term_swatch()) show
- * as dots; otherwise the card just says "4 Colours".
+ * to the cards. It reads the product's own attributes (the same ones the
+ * filter bar uses — see inc/shop-filters.php): every colour as a small
+ * swatch, every size as a small box, the fit, then any other attribute
+ * shown on the product page (e.g. "Fabric Hemp, Cotton").
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,48 +59,60 @@ function espire_card_attributes() {
 		}
 	}
 
-	$swatches = '';
-	$meta     = array();
+	$html = '';
 
+	// Every colour as a small swatch (name only when there's no colour to show).
 	$colours = array_values( $values['Colour'] );
 	if ( $colours ) {
-		$dots = array();
+		$dots  = '';
+		$plain = array();
 		foreach ( $colours as $colour ) {
 			$swatch = $colour['swatch'];
 			if ( $swatch['colour'] || $swatch['image'] ) {
-				$style  = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : 'background-color:' . $swatch['colour'];
-				$dots[] = '<span class="card-swatch" style="' . esc_attr( $style ) . '" title="' . esc_attr( $colour['name'] ) . '"></span>';
+				$style = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : 'background-color:' . $swatch['colour'];
+				$dots .= '<span class="card-swatch" style="' . esc_attr( $style ) . '" title="' . esc_attr( $colour['name'] ) . '"></span>';
+			} else {
+				$plain[] = $colour['name'];
 			}
 		}
-		$count = count( $colours );
 		if ( $dots ) {
-			// Up to 6 dots, then "+N" for the rest.
-			$shown    = min( 6, count( $dots ) );
-			$swatches = '<span class="card-swatches" aria-label="' . esc_attr( $count . ( 1 === $count ? ' colour' : ' colours' ) ) . '">'
-				. implode( '', array_slice( $dots, 0, 6 ) )
-				. ( $count > $shown ? '<span class="card-more">+' . ( $count - $shown ) . '</span>' : '' )
-				. '</span>';
-		} else {
-			$meta[] = 1 === $count ? $colours[0]['name'] : $count . ' Colours';
+			$html .= '<span class="card-swatches" aria-label="' . esc_attr( 'Colours: ' . implode( ', ', wp_list_pluck( $colours, 'name' ) ) ) . '">' . $dots . '</span>';
+		}
+		if ( $plain ) {
+			$html .= '<span class="card-meta"><strong>Colour</strong> ' . esc_html( implode( ', ', $plain ) ) . '</span>';
 		}
 	}
 
-	$sizes = array_values( $values['Size'] );
-	if ( $sizes ) {
-		$first  = reset( $sizes );
-		$last   = end( $sizes );
-		$meta[] = 'Sizes ' . ( 1 === count( $sizes ) ? $first['name'] : $first['name'] . '–' . $last['name'] );
+	// Every size as a small box.
+	if ( $values['Size'] ) {
+		$html .= '<span class="card-sizes" aria-label="Sizes">';
+		foreach ( $values['Size'] as $size ) {
+			$html .= '<span class="card-size">' . esc_html( $size['name'] ) . '</span>';
+		}
+		$html .= '</span>';
 	}
 
-	$fits = array_values( $values['Fit'] );
-	if ( $fits ) {
-		$meta[] = 1 === count( $fits ) ? $fits[0]['name'] . ' fit' : implode( ' / ', wp_list_pluck( $fits, 'name' ) );
+	if ( $values['Fit'] ) {
+		$html .= '<span class="card-meta"><strong>Fit</strong> ' . esc_html( implode( ', ', wp_list_pluck( $values['Fit'], 'name' ) ) ) . '</span>';
 	}
 
-	if ( $swatches ) {
-		echo $swatches; // phpcs:ignore WordPress.Security.EscapeOutput -- built from escaped parts above
+	// Any other attribute shown on the product page (e.g. Fabric: Hemp, Cotton).
+	foreach ( $product->get_attributes() as $attribute ) {
+		if ( ! $attribute->get_visible() ) {
+			continue;
+		}
+		$name  = wc_attribute_label( $attribute->get_name(), $product );
+		$group = espire_filter_label_for( $name ) ?: espire_filter_label_for( $attribute->get_name() );
+		if ( $group ) {
+			continue; // Fit / Size / Colour are shown above
+		}
+		$list = $attribute->is_taxonomy()
+			? wp_list_pluck( espire_product_attribute_terms( $product->get_id(), $attribute->get_name() ), 'name' )
+			: $attribute->get_options();
+		if ( $list ) {
+			$html .= '<span class="card-meta"><strong>' . esc_html( $name ) . '</strong> ' . esc_html( implode( ', ', $list ) ) . '</span>';
+		}
 	}
-	if ( $meta ) {
-		echo '<span class="card-meta">' . esc_html( implode( ' · ', $meta ) ) . '</span>';
-	}
+
+	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- built from escaped parts above
 }
