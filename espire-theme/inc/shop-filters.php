@@ -61,6 +61,16 @@ function espire_filter_attributes() {
 	return array_merge( ...array_values( $found ) );
 }
 
+/**
+ * Two values picked in the same group mean "either": Navy + Black shows
+ * products in navy OR black (WooCommerce's default is "both"). Different
+ * groups still narrow each other: Navy + size M = navy products in M.
+ * Typed-in attributes work the same way (espire_local_filter_query()).
+ */
+add_filter( 'woocommerce_layered_nav_default_query_type', function () {
+	return 'or';
+} );
+
 /** Query key for a custom (typed-in) attribute group, e.g. Size → "f_size". */
 function espire_local_filter_key( $label ) {
 	return 'f_' . strtolower( $label );
