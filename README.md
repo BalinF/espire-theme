@@ -152,9 +152,17 @@ Any other page can use this layout via *Page Attributes → Template → Brand S
 add a *Symbol Page Banner*, optional *Journey Diagram* and *Certification Line*.
 Products carrying the tag are listed automatically.
 
-**Pages → DIY → Design Your Own** — pick the *Base Garment Category* (its
-sub-categories become the Base Fit buttons) and write the *Design Guide*. Banner
-photo = the page's featured image; banner line = its excerpt.
+**Design Your Own**: the DIY *product category* is the DIY page. Every "Design Your
+Own" link goes to /diy/, which opens that category's page: same banner, filters and
+cards as other categories, plus a "Start Designing" button on each card. Set it up
+under Pages → DIY → *Design Your Own* box:
+- **Base Garment Category**: which category is DIY. If left blank, a category with
+  the slug `diy` is used.
+- **Design Guide**: the text for the green *Design Guide* button.
+
+The banner photo and text come from the category's own Banner fields. If those are
+blank, the DIY page's featured image and excerpt are used. With no DIY category,
+/diy/ shows the old DIY page.
 
 **Pages → Contact** — the page body holds your contact form (e.g. its shortcode);
 the *Contact Details* box sets the heading, intro, hours, phone, email and
