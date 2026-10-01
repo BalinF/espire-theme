@@ -23,13 +23,13 @@
 
 <?php
 /**
- * The header is transparent and sits ON TOP of the hero video only on
- * the homepage (see style.css "is-solid" vs the default transparent
- * style). Everywhere else it's a normal solid black bar. is_front_page()
- * is a WordPress function that's true only when this is the page set
- * as "homepage" under Settings > Reading.
+ * The header is transparent and sits ON TOP of the hero/banner on pages
+ * with the category bar (homepage, category pages, shop, Store, DIY —
+ * see espire_page_has_quicklinks() in functions.php). Everywhere else
+ * (product pages, cart, info pages…) it's a solid near-black bar
+ * ("is-solid" in style.css).
  */
-$espire_header_class = is_front_page() ? 'site-header' : 'site-header is-solid';
+$espire_header_class = espire_page_has_quicklinks() ? 'site-header' : 'site-header is-solid';
 
 /**
  * Checkout gets a trimmed header — logo + "Secure Checkout", no menu —

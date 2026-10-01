@@ -41,8 +41,7 @@ function espire_card_attributes() {
 	$values = array_fill_keys( array_keys( espire_filter_patterns() ), array() );
 	foreach ( espire_filter_attributes() as $attr ) {
 		list( $label, $taxonomy ) = $attr;
-		$terms = wc_get_product_terms( $product->get_id(), $taxonomy, array( 'fields' => 'all' ) );
-		foreach ( is_wp_error( $terms ) ? array() : $terms as $term ) {
+		foreach ( espire_product_attribute_terms( $product->get_id(), $taxonomy ) as $term ) {
 			$values[ $label ][ strtolower( $term->name ) ] = array(
 				'name'   => $term->name,
 				'swatch' => 'Colour' === $label ? espire_term_swatch( $taxonomy, $term ) : null,

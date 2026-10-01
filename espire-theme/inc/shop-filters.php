@@ -85,60 +85,156 @@ function espire_filters_active() {
 	return false;
 }
 
-/** Published product IDs in a category (and its sub-categories), or in the whole shop. */
+/**
+ * Product IDs shown in a category (and its sub-categories), or in the
+ * whole shop: published, not hidden from the catalogue, and not out of
+ * stock when WooCommerce is set to hide out-of-stock items.
+ */
 function espire_category_product_ids( $category = null ) {
 	static $cache = array();
 	$id = $category ? $category->term_id : 0;
 	if ( ! isset( $cache[ $id ] ) ) {
-		$args = array(
+		$hidden = array( 'exclude-from-catalog' );
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+			$hidden[] = 'outofstock';
+		}
+		$tax_query = array(
+			array( 'taxonomy' => 'product_visibility', 'field' => 'name', 'terms' => $hidden, 'operator' => 'NOT IN' ),
+		);
+		if ( $category ) {
+			$tax_query[] = array( 'taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $category->term_id );
+		}
+		$cache[ $id ] = get_posts( array(
 			'post_type'      => 'product',
 			'post_status'    => 'publish',
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
-		);
-		if ( $category ) {
-			$args['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery
-				array( 'taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $category->term_id ),
-			);
-		}
-		$cache[ $id ] = get_posts( $args );
+			'tax_query'      => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery
+		) );
 		update_postmeta_cache( $cache[ $id ] ); // one query for every product's attributes
+		espire_prime_variations( $cache[ $id ] );
 	}
 	return $cache[ $id ];
 }
 
 /**
- * Terms of one attribute worth offering here: on a category page, only
- * the values its products actually use (so Hoodies doesn't offer shirt
- * sizes); elsewhere, every value that has products.
+ * Variation IDs per product, loaded in one go for a whole list of
+ * products (with their settings), so checking which colours/sizes are
+ * really for sale doesn't cost a query per product.
  */
-function espire_filter_terms( $taxonomy, $category = null ) {
-	$terms = get_terms( array(
-		'taxonomy'   => $taxonomy,
-		'hide_empty' => true,
-	) );
-	if ( is_wp_error( $terms ) || ! $terms ) {
+function espire_prime_variations( $product_ids ) {
+	global $wpdb, $espire_variations;
+	$espire_variations = is_array( $espire_variations ) ? $espire_variations : array();
+	$todo = array_values( array_diff( array_map( 'intval', (array) $product_ids ), array_keys( $espire_variations ) ) );
+	if ( ! $todo ) {
+		return;
+	}
+	foreach ( $todo as $pid ) {
+		$espire_variations[ $pid ] = array();
+	}
+	foreach ( array_chunk( $todo, 500 ) as $chunk ) {
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			"SELECT ID, post_parent FROM {$wpdb->posts} WHERE post_type = 'product_variation' AND post_status = 'publish' AND post_parent IN (" . implode( ',', $chunk ) . ')' // ints only
+		);
+		foreach ( $rows as $row ) {
+			if ( in_array( (int) $row->post_parent, $chunk, true ) ) {
+				$espire_variations[ (int) $row->post_parent ][] = (int) $row->ID;
+			}
+		}
+	}
+	$all = array_merge( ...array_values( array_intersect_key( $espire_variations, array_flip( $todo ) ) ) );
+	if ( $all ) {
+		update_postmeta_cache( $all );
+	}
+}
+
+/**
+ * The values a product's variations actually offer for one attribute
+ * (variation setting "attribute_pa_colour" etc.): e.g. a hoodie with the
+ * Colour attribute listing Navy, Teal and Black but variations only made
+ * for Navy and Black → array( 'navy', 'black' ).
+ *
+ * Returns null when every listed value counts: the product has no
+ * variations, none use this attribute, or one is set to "Any".
+ * Variations that are out of stock are skipped when WooCommerce hides
+ * out-of-stock items.
+ */
+function espire_variation_values( $product_id, $meta_key ) {
+	global $espire_variations;
+	espire_prime_variations( array( $product_id ) );
+	$ids = $espire_variations[ (int) $product_id ];
+	if ( ! $ids ) {
+		return null;
+	}
+	$hide_out = 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' );
+	$values   = array();
+	$seen     = false;
+	foreach ( $ids as $vid ) {
+		if ( ! metadata_exists( 'post', $vid, $meta_key ) ) {
+			continue;
+		}
+		$seen  = true;
+		$value = (string) get_post_meta( $vid, $meta_key, true );
+		if ( '' === $value ) {
+			return null; // "Any colour" — every listed value is for sale
+		}
+		if ( $hide_out && 'outofstock' === get_post_meta( $vid, '_stock_status', true ) ) {
+			continue;
+		}
+		$values[ strtolower( $value ) ] = $value;
+	}
+	return $seen ? array_values( $values ) : null;
+}
+
+/**
+ * A product's terms in one global attribute, keeping only the values its
+ * variations really offer (see espire_variation_values()).
+ */
+function espire_product_attribute_terms( $product_id, $taxonomy ) {
+	$terms = wc_get_product_terms( $product_id, $taxonomy, array( 'fields' => 'all' ) );
+	if ( ! $terms || is_wp_error( $terms ) ) {
 		return array();
 	}
-	if ( ! $category ) {
+	$offered = espire_variation_values( $product_id, 'attribute_' . $taxonomy );
+	if ( null === $offered ) {
 		return $terms;
 	}
-	$ids = espire_category_product_ids( $category );
-	if ( ! $ids ) {
-		return array();
-	}
-	$used = wp_get_object_terms( $ids, $taxonomy, array( 'fields' => 'ids' ) );
-	$used = is_wp_error( $used ) ? array() : array_flip( $used );
-	return array_values( array_filter( $terms, function ( $term ) use ( $used ) {
-		return isset( $used[ $term->term_id ] );
+	return array_values( array_filter( $terms, function ( $term ) use ( $offered ) {
+		return in_array( $term->slug, $offered, true );
 	} ) );
 }
 
 /**
+ * Terms of one attribute worth offering here: only values that products
+ * shown on this page really offer (a colour listed on a hoodie but with
+ * no variation made for it doesn't count), so Hoodies doesn't offer shirt
+ * sizes or a colour no hoodie comes in.
+ */
+function espire_filter_terms( $taxonomy, $category = null ) {
+	$used = array();
+	foreach ( espire_category_product_ids( $category ) as $product_id ) {
+		foreach ( espire_product_attribute_terms( $product_id, $taxonomy ) as $term ) {
+			$used[ $term->term_id ] = true;
+		}
+	}
+	if ( ! $used ) {
+		return array();
+	}
+	// All terms in their saved order (Products → Attributes → Configure terms), then keep the used ones.
+	$terms = get_terms( array(
+		'taxonomy'   => $taxonomy,
+		'hide_empty' => false,
+		'include'    => array_keys( $used ),
+	) );
+	return is_wp_error( $terms ) ? array() : $terms;
+}
+
+/**
  * A product's custom (typed-in, not global) attribute values for one
- * filter group, e.g. Size → array( 'S', 'M', 'L' ). Read straight from the
- * saved attribute list so it's quick for a whole category.
+ * filter group, e.g. Size → array( 'S', 'M', 'L' ), keeping only values
+ * its variations really offer. Read straight from the saved attribute
+ * list so it's quick for a whole category.
  */
 function espire_local_attribute_values( $product_id, $label ) {
 	$attrs = get_post_meta( $product_id, '_product_attributes', true );
@@ -151,7 +247,15 @@ function espire_local_attribute_values( $product_id, $label ) {
 			continue;
 		}
 		if ( espire_filter_label_for( $attr['name'] ) === $label ) {
-			$values = array_merge( $values, array_map( 'trim', explode( '|', $attr['value'] ) ) );
+			$listed  = array_map( 'trim', explode( '|', $attr['value'] ) );
+			$offered = espire_variation_values( $product_id, 'attribute_' . sanitize_title( $attr['name'] ) );
+			if ( null !== $offered ) {
+				$offered = array_map( 'strtolower', $offered );
+				$listed  = array_filter( $listed, function ( $value ) use ( $offered ) {
+					return in_array( strtolower( $value ), $offered, true );
+				} );
+			}
+			$values = array_merge( $values, $listed );
 		}
 	}
 	return array_values( array_unique( array_filter( $values, 'strlen' ) ) );

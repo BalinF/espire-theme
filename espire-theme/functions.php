@@ -586,6 +586,32 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
  * per site-inventory.md, this is meant to appear on category pages
  * too, not just the homepage.
  */
+/**
+ * Pages that show the category bar (homepage, category pages, the shop,
+ * Store, DIY). On these the header is see-through over the banner/hero;
+ * everywhere else (product pages, cart, info pages…) it's solid near-black.
+ */
+function espire_page_has_quicklinks() {
+	if ( is_front_page() || is_page( array( 'store', 'diy' ) ) ) {
+		return true;
+	}
+	if ( ! function_exists( 'is_shop' ) ) {
+		return false;
+	}
+	if ( is_shop() || is_product_category() ) {
+		return true;
+	}
+	// Plain tags use the category layout; symbol tags have their own page.
+	return is_product_tag() && function_exists( 'espire_symbol_from_tag' ) && ! espire_symbol_from_tag( get_queried_object() );
+}
+
+add_filter( 'body_class', function ( $classes ) {
+	if ( espire_page_has_quicklinks() ) {
+		$classes[] = 'header-over';
+	}
+	return $classes;
+} );
+
 function espire_quicklinks_bar() {
 	$espire_quicklinks = array(
 		array( 'label' => 'Shirts', 'url' => home_url( '/product-category/shirts/' ) ),
@@ -607,7 +633,6 @@ function espire_quicklinks_bar() {
 		<div class="espire-quicklinks-row">
 			<?php foreach ( $espire_quicklinks as $espire_ql ) : ?>
 				<a href="<?php echo esc_url( $espire_ql['url'] ); ?>">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
 					<?php echo esc_html( $espire_ql['label'] ); ?>
 				</a>
 			<?php endforeach; ?>
