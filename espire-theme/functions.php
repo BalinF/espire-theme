@@ -160,6 +160,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'type'          => 'image',
 					'return_format' => 'url',
 					'preview_size'  => 'medium',
+					'instructions'  => 'The wide photo filling the banner at the top of this category page (about 2000 × 600px). Not the emblem — that\'s the small badge below.',
 				),
 				array(
 					'key'          => 'field_espire_cat_banner_title',
@@ -183,7 +184,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'type'          => 'image',
 					'return_format' => 'url',
 					'preview_size'  => 'thumbnail',
-					'instructions'  => 'The collection\'s badge (e.g. the Shirts emblem). Shown next to the product name and description on every product in this category — sub-categories use their parent\'s if left blank.',
+					'instructions'  => 'The collection\'s small badge/logo (e.g. the Shirts emblem), ideally a PNG with a see-through background. Shown small in the middle of the banner, and next to the product name and description on every product in this category — sub-categories use their parent\'s if left blank.',
 				),
 				array(
 					'key'          => 'field_espire_cat_sidebar_intro',

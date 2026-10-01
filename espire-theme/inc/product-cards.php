@@ -36,45 +36,66 @@ function espire_card_attributes() {
 		return;
 	}
 
-	$swatches = '';
-	$meta     = array();
+	// Each group's values on this product: global attribute terms first,
+	// then typed-in ("custom product attribute") values, one per name.
+	$values = array_fill_keys( array_keys( espire_filter_patterns() ), array() );
 	foreach ( espire_filter_attributes() as $attr ) {
 		list( $label, $taxonomy ) = $attr;
 		$terms = wc_get_product_terms( $product->get_id(), $taxonomy, array( 'fields' => 'all' ) );
-		if ( ! $terms || is_wp_error( $terms ) ) {
-			continue;
+		foreach ( is_wp_error( $terms ) ? array() : $terms as $term ) {
+			$values[ $label ][ strtolower( $term->name ) ] = array(
+				'name'   => $term->name,
+				'swatch' => 'Colour' === $label ? espire_term_swatch( $taxonomy, $term ) : null,
+			);
 		}
-
-		if ( 'Colour' === $label ) {
-			$dots = array();
-			foreach ( $terms as $term ) {
-				$swatch = espire_term_swatch( $taxonomy, $term );
-				if ( $swatch['colour'] || $swatch['image'] ) {
-					$style  = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : 'background-color:' . $swatch['colour'];
-					$dots[] = '<span class="card-swatch" style="' . esc_attr( $style ) . '" title="' . esc_attr( $term->name ) . '"></span>';
-				}
-			}
-			$count = count( $terms );
-			if ( $dots ) {
-				// Up to 6 dots, then "+N" for the rest.
-				$swatches = '<span class="card-swatches" aria-label="' . esc_attr( $count . ( 1 === $count ? ' colour' : ' colours' ) ) . '">'
-					. implode( '', array_slice( $dots, 0, 6 ) )
-					. ( $count > min( 6, count( $dots ) ) ? '<span class="card-more">+' . ( $count - min( 6, count( $dots ) ) ) . '</span>' : '' )
-					. '</span>';
-			} else {
-				$meta[] = 1 === $count ? $terms[0]->name : $count . ' Colours';
+	}
+	foreach ( array_keys( $values ) as $label ) {
+		foreach ( espire_local_attribute_values( $product->get_id(), $label ) as $value ) {
+			if ( ! isset( $values[ $label ][ strtolower( $value ) ] ) ) {
+				$values[ $label ][ strtolower( $value ) ] = array(
+					'name'   => $value,
+					'swatch' => 'Colour' === $label ? espire_colour_swatch_from_name( $value ) : null,
+				);
 			}
 		}
+	}
 
-		if ( 'Size' === $label ) {
-			$first  = reset( $terms );
-			$last   = end( $terms );
-			$meta[] = 'Sizes ' . ( $first->term_id === $last->term_id ? $first->name : $first->name . '–' . $last->name );
-		}
+	$swatches = '';
+	$meta     = array();
 
-		if ( 'Fit' === $label ) {
-			$meta[] = 1 === count( $terms ) ? $terms[0]->name . ' fit' : implode( ' / ', wp_list_pluck( $terms, 'name' ) );
+	$colours = array_values( $values['Colour'] );
+	if ( $colours ) {
+		$dots = array();
+		foreach ( $colours as $colour ) {
+			$swatch = $colour['swatch'];
+			if ( $swatch['colour'] || $swatch['image'] ) {
+				$style  = $swatch['image'] ? 'background-image:url(' . esc_url( $swatch['image'] ) . ')' : 'background-color:' . $swatch['colour'];
+				$dots[] = '<span class="card-swatch" style="' . esc_attr( $style ) . '" title="' . esc_attr( $colour['name'] ) . '"></span>';
+			}
 		}
+		$count = count( $colours );
+		if ( $dots ) {
+			// Up to 6 dots, then "+N" for the rest.
+			$shown    = min( 6, count( $dots ) );
+			$swatches = '<span class="card-swatches" aria-label="' . esc_attr( $count . ( 1 === $count ? ' colour' : ' colours' ) ) . '">'
+				. implode( '', array_slice( $dots, 0, 6 ) )
+				. ( $count > $shown ? '<span class="card-more">+' . ( $count - $shown ) . '</span>' : '' )
+				. '</span>';
+		} else {
+			$meta[] = 1 === $count ? $colours[0]['name'] : $count . ' Colours';
+		}
+	}
+
+	$sizes = array_values( $values['Size'] );
+	if ( $sizes ) {
+		$first  = reset( $sizes );
+		$last   = end( $sizes );
+		$meta[] = 'Sizes ' . ( 1 === count( $sizes ) ? $first['name'] : $first['name'] . '–' . $last['name'] );
+	}
+
+	$fits = array_values( $values['Fit'] );
+	if ( $fits ) {
+		$meta[] = 1 === count( $fits ) ? $fits[0]['name'] . ' fit' : implode( ' / ', wp_list_pluck( $fits, 'name' ) );
 	}
 
 	if ( $swatches ) {

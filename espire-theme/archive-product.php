@@ -38,9 +38,22 @@ if ( is_product_category() ) {
 $espire_banner_image = espire_category_banner_image( $espire_term );
 $espire_banner_title = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_banner_title', $espire_term_id ) : '';
 $espire_banner_text  = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_banner_text', $espire_term_id ) : '';
-$espire_sidebar_intro    = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_sidebar_intro', $espire_term_id ) : '';
-$espire_sidebar_fits     = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_sidebar_fits', $espire_term_id ) : array();
-$espire_sidebar_sourcing = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_sidebar_sourcing', $espire_term_id ) : '';
+// Fit Guide panel text: this category's, else the nearest parent's that
+// has some (so "Fitted Tees" uses Tees').
+$espire_sidebar_intro    = '';
+$espire_sidebar_fits     = array();
+$espire_sidebar_sourcing = '';
+for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ) && function_exists( 'get_field' ); $espire_t = $espire_t->parent ? get_term( $espire_t->parent, 'product_cat' ) : null ) {
+	$espire_key              = 'product_cat_' . $espire_t->term_id;
+	$espire_sidebar_intro    = (string) get_field( 'category_sidebar_intro', $espire_key );
+	$espire_sidebar_fits     = array_values( array_filter( (array) get_field( 'category_sidebar_fits', $espire_key ), function ( $fit ) {
+		return is_array( $fit ) && ! empty( $fit['fit_name'] );
+	} ) );
+	$espire_sidebar_sourcing = (string) get_field( 'category_sidebar_sourcing', $espire_key );
+	if ( $espire_sidebar_intro || $espire_sidebar_fits || $espire_sidebar_sourcing ) {
+		break;
+	}
+}
 
 $espire_banner_title = $espire_banner_title ?: ( $espire_term ? $espire_term->name : 'Shop' );
 
@@ -83,7 +96,9 @@ espire_collection_banner( array(
 ob_start();
 $espire_has_fit_guide  = $espire_term ? espire_category_fit_guide_panel( $espire_term ) : false;
 $espire_fit_guide_html = ob_get_clean();
-$espire_panel          = $espire_has_fit_guide ? 'fit-guide' : ( $espire_has_sidebar_content ? 'category-sidebar' : '' );
+// Every category gets the button: the full Fit Guide when its fits have
+// guide details, otherwise the simpler panel below.
+$espire_panel          = $espire_has_fit_guide ? 'fit-guide' : ( $espire_term ? 'category-sidebar' : '' );
 
 espire_filter_bar( array(
 	'category'    => $espire_term,
@@ -122,7 +137,7 @@ echo '</div>';
 
 <?php echo $espire_fit_guide_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built ?>
 
-<?php if ( ! $espire_has_fit_guide && $espire_has_sidebar_content ) : ?>
+<?php if ( ! $espire_has_fit_guide && $espire_term ) : ?>
 <!-- Fallback "Fit Guide" slide-in for categories without full fit guide
      details yet (no measurements/size notes) — same right-anchored panel pattern
      as the mobile nav sidebar (see .mobile-sidebar in style.css and the
@@ -145,7 +160,7 @@ echo '</div>';
 			<?php foreach ( $espire_sidebar_fits as $espire_fit ) : ?>
 				<li>
 					<strong><?php echo esc_html( $espire_fit['fit_name'] ); ?></strong>
-					<span><?php echo esc_html( $espire_fit['fit_description'] ); ?></span>
+					<span><?php echo esc_html( $espire_fit['fit_description'] ?? '' ); ?></span>
 				</li>
 			<?php endforeach; ?>
 		</ul>
@@ -154,6 +169,10 @@ echo '</div>';
 	<?php if ( $espire_sidebar_sourcing ) : ?>
 		<h4>Where It's Made</h4>
 		<p><?php echo esc_html( $espire_sidebar_sourcing ); ?></p>
+	<?php endif; ?>
+
+	<?php if ( ! $espire_has_sidebar_content ) : ?>
+		<p class="panel-intro">We're still putting together the fit details for <?php echo esc_html( $espire_term->name ); ?>. Unsure on sizing? Get in touch and we'll help you pick the right fit.</p>
 	<?php endif; ?>
 
 	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
