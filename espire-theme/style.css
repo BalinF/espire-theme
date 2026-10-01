@@ -173,7 +173,6 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 }
 .espire-quicklinks-row a:last-child{ border-right:none; }
 .espire-quicklinks-row a:hover{ color:var(--rust); }
-.espire-quicklinks-row a svg{ width:18px; height:18px; stroke:currentColor; flex:none; }
 
 /* Same idea as the collection slider's arrows — on mobile the row is
    wider than the screen and just scrolls, which isn't obviously
@@ -513,8 +512,13 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
   font-size:clamp(1.8rem,4vw,2.6rem); margin:0; text-shadow:0 2px 8px rgba(0,0,0,.5);
 }
 .category-banner-inner p{ font-size:.9rem; line-height:1.5; margin:0; color:#F1EEE4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+/* Pages with the category bar: the see-through header sits over the
+   banner, so the banner is taller and its text starts below the header. */
+body.header-over .category-banner{ min-height:380px; padding-top:76px; box-sizing:border-box; }
 @media (max-width:760px){
   .category-banner{ min-height:240px; align-items:flex-end; }
+  body.header-over .category-banner{ min-height:320px; padding-top:70px; }
+  body.header-over .category-banner-emblem{ top:52%; }
   .category-banner-inner{ max-width:none; padding:30px 5% 24px; }
   .category-banner-emblem{ width:84px; height:90px; top:34%; }
 }

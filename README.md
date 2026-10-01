@@ -159,6 +159,23 @@ address. Hours and phone also feed the footer.
   `sustainability`, `faq`. A different slug means that page falls back to the
   plain page layout.
 
+## Going live checklist (copying staging → espireclothing.com.au)
+
+Staging has two temporary workarounds that must **not** carry over to live:
+
+1. **Re-enable QUIC.cloud Hotlink Protection.** my.quic.cloud → espireclothing.com.au
+   → CDN → Security → *Hotlink Protection* → **ON**. It's switched off only so
+   staging can show live's images.
+2. **Remove the staging image rule from `.htaccess`.** Delete the 7-line
+   `# Staging only: load missing images from the live site` block (above
+   `# BEGIN WordPress`) from the live copy of `.htaccess`. On live it would point
+   at itself.
+3. **Re-pick images uploaded only on staging.** Anything uploaded on staging for
+   testing isn't on live. Upload the final images on live and choose them again in
+   each place they're used: category *Banner Image* / *Category Emblem*, page
+   *Featured image*s (Store, DIY, Shop), symbol tag icons and banners, Seed To
+   Store sketches, Shop The Set photo, attribute *Swatch* images.
+
 ## Installing the theme by hand (no FTP needed)
 
 Every push builds an installable zip:
