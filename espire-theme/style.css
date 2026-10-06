@@ -633,7 +633,8 @@ button.btn-block{ border:none; }
 .info-top h1{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.01em; font-size:1.5rem; line-height:1.15; margin:0; }
 /* Category emblem beside the product name (doubled selector beats
    WooCommerce's ".woocommerce img { height:auto }"). */
-.product-page .info-top .product-emblem{ flex:none; width:64px; height:68px; max-width:none; object-fit:contain; }
+.product-page .info-top .product-emblem{ flex:none; width:110px; height:118px; max-width:none; object-fit:contain; }
+@media (max-width:640px){ .product-page .info-top .product-emblem{ width:84px; height:90px; } }
 /* Just the Add to Cart button — no quantity box (inc/product-page.php). */
 .product-page .product-info .quantity{ display:none; }
 .product-price{ font-size:1.15rem; font-weight:700; font-variant-numeric:tabular-nums; color:var(--rust); }
@@ -696,7 +697,8 @@ select.is-pill-source{ position:absolute !important; width:1px !important; heigh
 .desc-box h2{ font-size:1rem; margin-bottom:10px; }
 .desc-body{ font-size:.86rem; line-height:1.7; color:var(--ink-soft); }
 .desc-body p{ margin:0 0 12px; }
-.desc-emblem{ flex:none; width:96px; height:102px; object-fit:contain; }
+.product-page .desc-box .desc-emblem{ flex:none; width:150px; height:160px; max-width:none; object-fit:contain; }
+@media (max-width:640px){ .product-page .desc-box .desc-emblem{ width:110px; height:118px; } }
 .facts{ margin:0; font-size:.82rem; line-height:1.9; color:var(--ink-soft); }
 .facts dt{ display:inline; color:var(--ink); font-weight:700; }
 .facts dt::after{ content:" —"; }
@@ -1180,6 +1182,13 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .card-meta{ display:block; padding:5px 16px 0; font-size:.78rem; line-height:1.4; color:var(--ink-soft); }
 .card-meta strong{ font-weight:700; color:var(--ink); }
 .card-attr{ align-items:center; }
+/* Attribute values with an icon image (e.g. Fit, Sleeve) — cards and filter bar */
+.card-icon{ display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; padding:2px; border:1px solid var(--line); border-radius:3px; background:var(--white); }
+.card-attr .card-icon img{ width:24px; height:24px; max-width:none; object-fit:contain; }
+.filter-icon{ display:inline-flex; align-items:center; justify-content:center; width:38px; height:34px; padding:3px; border:1px solid var(--ink); border-radius:4px; background:var(--white); transition:border-color .15s ease, box-shadow .15s ease; }
+.filter-bar .filter-icon img{ width:26px; height:26px; max-width:none; object-fit:contain; }
+.filter-icon:hover{ border-color:var(--rust); }
+.filter-icon.is-active{ border-color:var(--redrock); box-shadow:0 0 0 1px var(--redrock); }
 .card-attr-label{ font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-right:2px; }
 .woocommerce ul.products li.product .price{ display:block; padding:6px 16px 18px; font-size:.9rem; font-variant-numeric:tabular-nums; }
 /* Category pages: three to a row, as in the design */

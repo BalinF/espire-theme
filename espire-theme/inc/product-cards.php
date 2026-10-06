@@ -44,7 +44,9 @@ function espire_card_attributes() {
 		foreach ( espire_product_attribute_terms( $product->get_id(), $taxonomy ) as $term ) {
 			$values[ $label ][ strtolower( $term->name ) ] = array(
 				'name'   => $term->name,
-				'swatch' => 'Colour' === $label ? espire_term_swatch( $taxonomy, $term ) : null,
+				// Colours: swatch colour/image. Fit etc.: an icon image if the
+				// attribute term has one (theme Swatch Image or the old swatches plugin's).
+				'swatch' => espire_term_swatch( $taxonomy, $term, 'Colour' === $label ),
 			);
 		}
 	}
@@ -93,7 +95,7 @@ function espire_card_attributes() {
 	}
 
 	if ( $values['Fit'] ) {
-		$html .= espire_card_boxes( 'Fit', wp_list_pluck( $values['Fit'], 'name' ) );
+		$html .= espire_card_boxes( 'Fit', $values['Fit'] );
 	}
 
 	// Any other attribute shown on the product page (e.g. Fabric: Hemp, Cotton).
@@ -106,9 +108,14 @@ function espire_card_attributes() {
 		if ( $group ) {
 			continue; // Fit / Size / Colour are shown above
 		}
-		$list = $attribute->is_taxonomy()
-			? wp_list_pluck( espire_product_attribute_terms( $product->get_id(), $attribute->get_name() ), 'name' )
-			: $attribute->get_options();
+		if ( $attribute->is_taxonomy() ) {
+			$list = array();
+			foreach ( espire_product_attribute_terms( $product->get_id(), $attribute->get_name() ) as $term ) {
+				$list[] = array( 'name' => $term->name, 'swatch' => espire_term_swatch( $attribute->get_name(), $term, false ) );
+			}
+		} else {
+			$list = $attribute->get_options();
+		}
 		if ( $list ) {
 			$html .= espire_card_boxes( $name, $list );
 		}
@@ -117,11 +124,22 @@ function espire_card_attributes() {
 	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- built from escaped parts above
 }
 
-/** A labelled row of small boxes on a card, e.g. "Fit [Classic] [Slim]". */
+/**
+ * A labelled row of small boxes on a card, e.g. "Fit [Classic] [Slim]".
+ * Each value is a name, or array( 'name', 'swatch' ) — values whose
+ * attribute term has an icon image (Products → Attributes → edit a term →
+ * Swatch Image, or the old swatches plugin's image) show the icon instead.
+ */
 function espire_card_boxes( $label, $values ) {
 	$html = '<span class="card-sizes card-attr"><span class="card-attr-label">' . esc_html( $label ) . '</span>';
 	foreach ( $values as $value ) {
-		$html .= '<span class="card-size">' . esc_html( $value ) . '</span>';
+		$name  = is_array( $value ) ? $value['name'] : $value;
+		$image = ( is_array( $value ) && ! empty( $value['swatch']['image'] ) ) ? $value['swatch']['image'] : '';
+		if ( $image ) {
+			$html .= '<span class="card-icon" title="' . esc_attr( $name ) . '"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $name ) . '" loading="lazy"></span>';
+		} else {
+			$html .= '<span class="card-size">' . esc_html( $name ) . '</span>';
+		}
 	}
 	return $html . '</span>';
 }
