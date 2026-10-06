@@ -322,3 +322,38 @@ add_action( 'wp_enqueue_scripts', function () {
 		wp_add_inline_script( 'espire-theme-main', 'window.espireSwatches = ' . wp_json_encode( $swatches ) . ';', 'before' );
 	}
 }, 20 );
+
+/**
+ * Product pages: just the Add to Cart button, no quantity box. With the
+ * least and most both 1, WooCommerce prints a hidden quantity field
+ * instead of the number box (more can still be added from the cart).
+ */
+add_filter( 'woocommerce_quantity_input_args', function ( $args, $product ) {
+	if ( function_exists( 'is_product' ) && is_product() && ! is_cart() && ! wp_doing_ajax() ) {
+		$args['min_value']   = 1;
+		$args['max_value']   = 1;
+		$args['input_value'] = 1;
+	}
+	return $args;
+}, 10, 2 );
+
+/**
+ * The emblem beside a product's name: its category's Category Emblem,
+ * else that category's WooCommerce Thumbnail (nearest category first).
+ */
+function espire_product_emblem( $product_id ) {
+	list( $emblem ) = espire_product_category_field( $product_id, 'category_emblem' );
+	if ( $emblem ) {
+		return espire_image_url( $emblem, 'medium' );
+	}
+	$terms = get_the_terms( $product_id, 'product_cat' );
+	foreach ( ( $terms && ! is_wp_error( $terms ) ) ? $terms : array() as $term ) {
+		for ( $t = $term; $t && ! is_wp_error( $t ); $t = $t->parent ? get_term( $t->parent, 'product_cat' ) : null ) {
+			$thumb = get_term_meta( $t->term_id, 'thumbnail_id', true );
+			if ( $thumb ) {
+				return (string) wp_get_attachment_image_url( $thumb, 'medium' );
+			}
+		}
+	}
+	return '';
+}
