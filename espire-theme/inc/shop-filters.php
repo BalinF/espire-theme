@@ -403,9 +403,22 @@ function espire_filter_bar( $args = array() ) {
 		return;
 	}
 	$active = espire_filters_active();
+	$picked = 0; // values switched on right now, shown on the phone "Filters" button
+	foreach ( espire_filter_keys() as $key ) {
+		$picked += count( espire_filter_chosen( $key ) );
+	}
 	?>
 	<div class="filter-bar">
 		<div class="filter-bar-inner">
+			<?php if ( $groups || $fit_terms ) : ?>
+				<?php // Phones only: the options fold away behind this button (main.js). ?>
+				<button type="button" class="filter-toggle" aria-expanded="false" aria-controls="filter-groups">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+					Filters<?php echo $picked ? ' (' . (int) $picked . ')' : ''; ?>
+					<svg class="filter-toggle-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+				</button>
+			<?php endif; ?>
+			<div class="filter-groups" id="filter-groups">
 			<?php if ( $fit_terms ) : ?>
 				<div class="filter-group filter-fit">
 					<span class="filter-label">Fit</span>
@@ -441,6 +454,7 @@ function espire_filter_bar( $args = array() ) {
 			<?php if ( $active ) : ?>
 				<a class="filter-clear" href="<?php echo esc_url( $action ); ?>">Clear filters</a>
 			<?php endif; ?>
+			</div>
 
 			<?php if ( $args['panel'] ) : ?>
 				<button type="button" class="btn olive btn-sm filter-panel-btn" data-panel-open="<?php echo esc_attr( $args['panel'] ); ?>"><?php echo esc_html( $args['panel_label'] ); ?></button>
