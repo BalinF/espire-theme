@@ -11,6 +11,10 @@
  * that symbol's own mark and links to its symbol page.
  *
  * Until any category has a journey, the original Tees journey shows.
+ *
+ * Product pages show the same section for that product (see
+ * espire_product_journey()): its category's steps that the product is
+ * tagged with, plus any other symbol tags it carries, beside its sketch.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,12 +60,7 @@ function espire_category_journey( $term ) {
 		if ( ! $tag instanceof WP_Term ) {
 			continue;
 		}
-		$link    = get_term_link( $tag );
-		$steps[] = array(
-			'label'  => ! empty( $row['step_label'] ) ? $row['step_label'] : $tag->name,
-			'url'    => is_wp_error( $link ) ? '' : $link,
-			'symbol' => espire_symbol_from_tag( $tag ),
-		);
+		$steps[] = espire_journey_step( $tag, ! empty( $row['step_label'] ) ? $row['step_label'] : '' );
 	}
 	if ( ! $steps ) {
 		return null;
@@ -71,6 +70,131 @@ function espire_category_journey( $term ) {
 		'sketch' => get_field( 'journey_sketch', $key ) ?: '',
 		'steps'  => $steps,
 	);
+}
+
+/** One journey step from a product tag: array( label, url, symbol, tag_id ). */
+function espire_journey_step( $tag, $label = '' ) {
+	$link = get_term_link( $tag );
+	return array(
+		'label'  => $label ? $label : $tag->name,
+		'url'    => is_wp_error( $link ) ? '' : $link,
+		'symbol' => espire_symbol_from_tag( $tag ),
+		'tag_id' => (int) $tag->term_id,
+	);
+}
+
+/**
+ * A product's own journey for its product page, or null if it has no
+ * steps. Steps: the product's category journey (Products → Categories →
+ * "Seed To Store Journey", nearest category with steps), keeping only the
+ * tags this product has, in that order; then any other symbol tags the
+ * product carries. Sketch: the product's own "Journey Sketch", else its
+ * category's sketch, else the built-in tee drawing.
+ */
+function espire_product_journey( $product_id ) {
+	$tags = get_the_terms( $product_id, 'product_tag' );
+	if ( ! $tags || is_wp_error( $tags ) ) {
+		return null;
+	}
+	$by_id = array();
+	foreach ( $tags as $tag ) {
+		$by_id[ (int) $tag->term_id ] = $tag;
+	}
+
+	list( , $term ) = espire_product_category_field( $product_id, 'journey_steps' );
+	$category       = $term ? espire_category_journey( $term ) : null;
+
+	$steps = array();
+	$used  = array();
+	foreach ( $category ? $category['steps'] : array() as $step ) {
+		if ( isset( $by_id[ $step['tag_id'] ] ) && ! isset( $used[ $step['tag_id'] ] ) ) {
+			$steps[]                  = $step;
+			$used[ $step['tag_id'] ] = true;
+		}
+	}
+	// Symbol tags not in the category's list, in badge order.
+	$symbol_tags = array();
+	foreach ( $by_id as $id => $tag ) {
+		$symbol = espire_symbol_from_tag( $tag );
+		if ( $symbol && ! isset( $used[ $id ] ) ) {
+			$symbol_tags[ $symbol['slug'] ] = $tag;
+		}
+	}
+	foreach ( espire_product_symbols( $product_id ) as $symbol ) {
+		if ( isset( $symbol_tags[ $symbol['slug'] ] ) ) {
+			$steps[] = espire_journey_step( $symbol_tags[ $symbol['slug'] ] );
+		}
+	}
+	if ( ! $steps ) {
+		return null;
+	}
+
+	$sketch = function_exists( 'get_field' ) ? (string) get_field( 'product_journey_sketch', $product_id ) : '';
+	if ( ! $sketch ) {
+		list( $sketch ) = espire_product_category_field( $product_id, 'journey_sketch' );
+	}
+	return array(
+		'title'  => 'From Seed To Store',
+		'sketch' => $sketch ? $sketch : get_template_directory_uri() . '/assets/seed-to-store-tee-line.png',
+		'steps'  => $steps,
+	);
+}
+
+/**
+ * Prints a "From Seed To Store" section: sketch on the left, the steps in
+ * a row on the right (homepage and product pages). With 'panels' on,
+ * symbol steps open that symbol's slide-in panel (printed by the page)
+ * instead of going to its page.
+ */
+function espire_journey_section( $journey, $args = array() ) {
+	$args  = wp_parse_args( $args, array( 'id' => 'seed-to-store', 'panels' => false, 'class' => '' ) );
+	$steps = $journey['steps'];
+	?>
+	<div class="section-wrap seed-section <?php echo esc_attr( $args['class'] ); ?>">
+		<?php if ( $journey['sketch'] ) : ?>
+			<img class="seed-tee" src="<?php echo esc_url( $journey['sketch'] ); ?>" alt="">
+		<?php endif; ?>
+		<div class="seed-body">
+			<div class="section-head">
+				<h2><?php echo esc_html( $journey['title'] ); ?></h2>
+			</div>
+			<div class="d-slider">
+				<?php // Arrows show on mobile only, where the row is wider than the screen. ?>
+				<button type="button" class="d-arrow d-prev" aria-label="Scroll left" data-slide-prev="<?php echo esc_attr( $args['id'] ); ?>" data-slide-amount="container">
+					<?php espire_arrow_icon( 'prev' ); ?>
+				</button>
+				<div class="d-row" id="<?php echo esc_attr( $args['id'] ); ?>">
+					<?php foreach ( $steps as $i => $step ) : ?>
+						<div class="d-step">
+							<?php
+							$mark = function () use ( $step ) {
+								if ( $step['symbol'] && ! empty( $step['symbol']['icon'] ) ) {
+									espire_symbol_icon( $step['symbol'] );
+								} else {
+									// Plain leaf mark for steps that aren't symbols.
+									echo '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>';
+								}
+							};
+							?>
+							<?php if ( $args['panels'] && $step['symbol'] ) : ?>
+								<button type="button" class="ic" data-panel-open="symbol-<?php echo esc_attr( $step['symbol']['slug'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></button>
+							<?php else : ?>
+								<a class="ic" href="<?php echo esc_url( $step['url'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></a>
+							<?php endif; ?>
+							<span class="lb"><?php echo esc_html( $step['label'] ); ?></span>
+						</div>
+						<?php if ( $i < count( $steps ) - 1 ) : ?>
+							<div class="d-connector"></div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="<?php echo esc_attr( $args['id'] ); ?>" data-slide-amount="container">
+					<?php espire_arrow_icon( 'next' ); ?>
+				</button>
+			</div>
+		</div>
+	</div>
+	<?php
 }
 
 /** The original Tees journey, shown until a category has one set up. */
@@ -165,5 +289,27 @@ add_action( 'acf/init', function () {
 				array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'product_cat' ),
 			),
 		),
+	) );
+
+	acf_add_local_field_group( array(
+		'key'      => 'group_espire_product_journey',
+		'title'    => 'Seed To Store',
+		'fields'   => array(
+			array(
+				'key'           => 'field_espire_product_journey_sketch',
+				'label'         => 'Journey Sketch',
+				'name'          => 'product_journey_sketch',
+				'type'          => 'image',
+				'return_format' => 'url',
+				'preview_size'  => 'thumbnail',
+				'instructions'  => 'Optional line drawing for this product\'s "From Seed To Store" section (transparent PNG/SVG). Blank = its category\'s sketch. The steps come from this product\'s tags.',
+			),
+		),
+		'location' => array(
+			array(
+				array( 'param' => 'post_type', 'operator' => '==', 'value' => 'product' ),
+			),
+		),
+		'position' => 'side',
 	) );
 } );
