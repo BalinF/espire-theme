@@ -631,7 +631,11 @@ button.btn-block{ border:none; }
 .product-info{ display:flex; flex-direction:column; gap:16px; }
 .info-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
 .info-top h1{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.01em; font-size:1.5rem; line-height:1.15; margin:0; }
-.product-emblem{ flex:none; width:64px; height:68px; object-fit:contain; }
+/* Category emblem beside the product name (doubled selector beats
+   WooCommerce's ".woocommerce img { height:auto }"). */
+.product-page .info-top .product-emblem{ flex:none; width:64px; height:68px; max-width:none; object-fit:contain; }
+/* Just the Add to Cart button — no quantity box (inc/product-page.php). */
+.product-page .product-info .quantity{ display:none; }
 .product-price{ font-size:1.15rem; font-weight:700; font-variant-numeric:tabular-nums; color:var(--rust); }
 .product-price del{ color:var(--ink-soft); font-weight:400; opacity:.7; margin-right:6px; }
 

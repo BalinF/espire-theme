@@ -26,7 +26,7 @@ while ( have_posts() ) :
 	}
 
 	$espire_id = $product->get_id();
-	list( $espire_emblem ) = espire_product_category_field( $espire_id, 'category_emblem' );
+	$espire_emblem  = espire_product_emblem( $espire_id ); // inc/product-page.php
 	$espire_symbols = espire_product_symbols( $espire_id );
 
 	// "Facts" lines under the description (ACF, per product — all optional).
@@ -125,7 +125,18 @@ while ( have_posts() ) :
 			<div class="desc-box">
 				<div class="desc-text">
 					<h2>About The <?php the_title(); ?></h2>
-					<div class="desc-body"><?php the_content(); ?></div>
+					<?php
+					// The product's Short Description (Products → edit → "Product short
+					// description" box); the main description if that's empty.
+					$espire_short = $product->get_short_description();
+					?>
+					<div class="desc-body">
+						<?php if ( $espire_short ) : ?>
+							<?php echo apply_filters( 'woocommerce_short_description', $espire_short ); // phpcs:ignore WordPress.Security.EscapeOutput -- WooCommerce's own filter (wpautop, shortcodes) ?>
+						<?php else : ?>
+							<?php the_content(); ?>
+						<?php endif; ?>
+					</div>
 
 					<?php if ( $espire_facts ) : ?>
 						<dl class="facts">

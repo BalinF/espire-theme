@@ -71,6 +71,13 @@ The templates fall back gracefully when these are empty, so fill them in as you 
   Points, Story button, Shop button* — anything left blank uses the built-in
   copy. The Shop button links to the tag's own page (all products with it).
 
+**Products → edit a product → Product short description**: the text in the
+product page's "About The [Product]" box. If it's empty, the main description is used.
+
+**Category emblem beside the product name**: the product's category *Category Emblem*
+(a sub-category uses its parent's). If that's blank, the category's WooCommerce
+*Thumbnail* is used.
+
 **Products → edit a product → Product Page Extras**
 - *Raw Materials / Fabric / Stitched / Care* — the fact lines under the description.
 - **Linked Products → Cross-sells** (in WooCommerce's Product data box) — the
