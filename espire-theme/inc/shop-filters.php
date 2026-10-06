@@ -336,7 +336,8 @@ function espire_filter_options( $label, $category = null ) {
 				'name'   => $term->name,
 				'key'    => $attr[2],
 				'slug'   => $term->slug,
-				'swatch' => 'Colour' === $label ? espire_term_swatch( $attr[1], $term ) : array( 'colour' => '', 'image' => '' ),
+				// Fit / Size: only an icon image counts (a term's Swatch Image).
+				'swatch' => 'Colour' === $label ? espire_term_swatch( $attr[1], $term ) : array( 'colour' => '', 'image' => espire_term_swatch( $attr[1], $term, false )['image'] ),
 			);
 			// Same name in two attributes: keep the one with a real swatch.
 			if ( ! isset( $options[ $name ] ) || ( ! $options[ $name ]['swatch']['image'] && ! $options[ $name ]['swatch']['colour'] ) ) {
@@ -442,6 +443,8 @@ function espire_filter_bar( $args = array() ) {
 						?>
 						<?php if ( 'Colour' === $label && $style ) : ?>
 							<a href="<?php echo esc_url( $href ); ?>" class="filter-swatch<?php echo $on ? ' is-active' : ''; ?>" style="<?php echo esc_attr( $style ); ?>" title="<?php echo esc_attr( $option['name'] ); ?>" aria-label="<?php echo esc_attr( $option['name'] ); ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>></a>
+						<?php elseif ( 'Colour' !== $label && $swatch['image'] ) : ?>
+							<a href="<?php echo esc_url( $href ); ?>" class="filter-icon<?php echo $on ? ' is-active' : ''; ?>" title="<?php echo esc_attr( $option['name'] ); ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>><img src="<?php echo esc_url( $swatch['image'] ); ?>" alt="<?php echo esc_attr( $option['name'] ); ?>"></a>
 						<?php elseif ( 'Size' === $label ) : ?>
 							<a href="<?php echo esc_url( $href ); ?>" class="size-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php echo esc_html( $option['name'] ); ?></a>
 						<?php else : ?>

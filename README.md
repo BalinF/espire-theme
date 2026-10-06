@@ -120,6 +120,11 @@ parent) has fit details, otherwise the Sidebar Intro / Fits / Sourcing text, or 
 
 Set a Swatch Colour to fix any colour that's guessed wrong.
 
+**Icon attributes** (e.g. Fit, Sleeve): give an attribute's values an image in
+Products → Attributes → (attribute) → Configure terms → edit → *Swatch Image* (images
+the old swatches plugin saved also count). Those values then show as small icons
+instead of text, on product cards and in the filter bar.
+
 **Product cards** show colour dots (or "4 Colours") and a "Sizes S–XL · Classic
 fit" line from the same attributes, so a variation-swatches plugin isn't needed.
 

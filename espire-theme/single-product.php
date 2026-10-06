@@ -100,7 +100,7 @@ while ( have_posts() ) :
 				<div class="product-price"><?php echo wp_kses_post( $product->get_price_html() ); ?></div>
 
 				<div class="avail-bar">
-					<span><?php echo $product->is_in_stock() ? 'Available sizes in stock' : 'Currently out of stock'; ?></span>
+					<span><?php echo $product->is_in_stock() ? 'Have it made for you' : 'Currently out of stock'; ?></span>
 					<?php if ( $espire_has_fit_guide ) : ?>
 						<button type="button" class="avail-link" data-panel-open="fit-guide">
 							Fit Guide
