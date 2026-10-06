@@ -457,3 +457,23 @@
 		window.jQuery( document.body ).on( 'updated_wc_div updated_cart_totals', enhanceAll );
 	}
 } )();
+
+/**
+ * Phone "Filters" button on collection pages (espire_filter_bar() in
+ * inc/shop-filters.php): shows/hides the Fit / Size / Colour options.
+ */
+( function () {
+	'use strict';
+
+	document.querySelectorAll( '.filter-toggle' ).forEach( function ( btn ) {
+		var groups = document.getElementById( btn.getAttribute( 'aria-controls' ) );
+		if ( ! groups ) {
+			return;
+		}
+		btn.addEventListener( 'click', function () {
+			var open = btn.getAttribute( 'aria-expanded' ) !== 'true';
+			btn.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+			groups.classList.toggle( 'is-open', open );
+		} );
+	} );
+} )();

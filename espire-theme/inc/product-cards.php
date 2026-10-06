@@ -5,13 +5,13 @@
  * a product comes in, e.g.
  *   ▬ ▬ ▬ ▬            (colours)
  *   [S] [M] [L] [XL]   (sizes)
- *   Fit Classic, Fitted
+ *   Fit [Classic] [Fitted]  (fit, then any other attribute, as boxes)
  *
  * FOR LEARNING: this replaces what a "variation swatches" plugin would add
  * to the cards. It reads the product's own attributes (the same ones the
  * filter bar uses — see inc/shop-filters.php): every colour as a small
- * swatch, every size as a small box, the fit, then any other attribute
- * shown on the product page (e.g. "Fabric Hemp, Cotton").
+ * swatch, every size as a small box, then the fit and any other attribute
+ * shown on the product page as labelled boxes (e.g. "Print [Brown Check]").
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -93,7 +93,7 @@ function espire_card_attributes() {
 	}
 
 	if ( $values['Fit'] ) {
-		$html .= '<span class="card-meta"><strong>Fit</strong> ' . esc_html( implode( ', ', wp_list_pluck( $values['Fit'], 'name' ) ) ) . '</span>';
+		$html .= espire_card_boxes( 'Fit', wp_list_pluck( $values['Fit'], 'name' ) );
 	}
 
 	// Any other attribute shown on the product page (e.g. Fabric: Hemp, Cotton).
@@ -110,9 +110,18 @@ function espire_card_attributes() {
 			? wp_list_pluck( espire_product_attribute_terms( $product->get_id(), $attribute->get_name() ), 'name' )
 			: $attribute->get_options();
 		if ( $list ) {
-			$html .= '<span class="card-meta"><strong>' . esc_html( $name ) . '</strong> ' . esc_html( implode( ', ', $list ) ) . '</span>';
+			$html .= espire_card_boxes( $name, $list );
 		}
 	}
 
 	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- built from escaped parts above
+}
+
+/** A labelled row of small boxes on a card, e.g. "Fit [Classic] [Slim]". */
+function espire_card_boxes( $label, $values ) {
+	$html = '<span class="card-sizes card-attr"><span class="card-attr-label">' . esc_html( $label ) . '</span>';
+	foreach ( $values as $value ) {
+		$html .= '<span class="card-size">' . esc_html( $value ) . '</span>';
+	}
+	return $html . '</span>';
 }
