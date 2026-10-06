@@ -132,6 +132,12 @@ tag per step (drag to reorder; optional custom label). Symbol tags show their ow
 mark and link to their symbol page. The homepage shows a random category that has
 steps on each visit; with none set up, the original Tees journey shows.
 
+**Product pages → From Seed To Store**: built from the product's own tags. It uses the
+category's journey steps that the product is tagged with, in that order, then any other
+symbol tags the product carries. Symbol steps open that symbol's slide-in panel. The
+sketch is the product's *Journey Sketch* (edit a product, right-hand sidebar) or, if
+that's blank, its category's sketch.
+
 **Homepage → Shop The Set** (Pages → the homepage → *Shop The Set* box) — pick
 2–4 products, a photo and a title; photos, prices and the total fill in.
 

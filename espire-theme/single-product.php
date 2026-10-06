@@ -5,8 +5,9 @@
  * archive-product.php takes over the category pages.
  *
  * Layout follows the Site Map's SingleProduct artboard, top to bottom:
- * breadcrumb → gallery + buy box → "About The [Product]" card → The
- * Symbols → store banner → Goes Well With.
+ * breadcrumb → gallery + buy box → "About The [Product]" card → From
+ * Seed To Store (the product's tags as a journey, same as the homepage)
+ * → full-width store banner → Goes Well With.
  *
  * The buy box's options/Add to Cart are WooCommerce's own variation form
  * (so stock, prices and the cart all work natively); main.js turns its
@@ -49,6 +50,26 @@ while ( have_posts() ) :
 	ob_start();
 	$espire_has_fit_guide = espire_fit_guide_panel( $espire_id );
 	$espire_fit_guide_html = ob_get_clean();
+	if ( ! $espire_has_fit_guide ) {
+		// No fit details for this category yet: the button still opens a short note.
+		ob_start();
+		?>
+		<div class="panel-overlay" data-panel-close="fit-guide"></div>
+		<aside class="info-panel fit-guide-panel" id="fit-guide-panel" aria-label="Fit Guide">
+			<button type="button" class="panel-close" aria-label="Close" data-panel-close="fit-guide">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+			</button>
+			<h3>Fit Guide</h3>
+			<p class="panel-intro">We're still putting together the fit details for this piece. Unsure on sizing? Get in touch and we'll help you pick the right fit.</p>
+			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
+		</aside>
+		<?php
+		$espire_fit_guide_html = ob_get_clean();
+		$espire_has_fit_guide  = true;
+	}
+
+	// "From Seed To Store" for this product: its tags + sketch (inc/journey.php).
+	$espire_journey = espire_product_journey( $espire_id );
 	?>
 
 	<div class="product-page">
@@ -135,28 +156,24 @@ while ( have_posts() ) :
 			</div>
 		</section>
 
-		<?php if ( $espire_symbols ) : ?>
-			<section class="product-section">
-				<div class="symbols-box">
-					<h2 class="symbols-title">The Symbols</h2>
-					<div class="badge-row">
-						<?php foreach ( $espire_symbols as $espire_symbol ) : ?>
-							<?php espire_symbol_badge( $espire_symbol ); ?>
-						<?php endforeach; ?>
-					</div>
-				</div>
+		<?php if ( $espire_journey ) : ?>
+			<section class="product-section product-journey">
+				<?php espire_journey_section( $espire_journey, array( 'id' => 'product-journey', 'panels' => true ) ); ?>
 			</section>
 		<?php endif; ?>
 
-		<div class="lifestyle-banner">
-			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/store-banner.jpg' ); ?>" alt="Espire hangtags and pattern pieces on the workroom rack, Bright VIC" loading="lazy">
-			<div class="overlay"></div>
-			<div class="banner-text">
-				<h2>More From The Store</h2>
-				<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>">Browse All Collections</a>
-			</div>
-		</div>
+	</div><?php // .product-page — the banner below runs edge to edge ?>
 
+	<div class="lifestyle-banner">
+		<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/store-banner.jpg' ); ?>" alt="Espire hangtags and pattern pieces on the workroom rack, Bright VIC" loading="lazy">
+		<div class="overlay"></div>
+		<div class="banner-text">
+			<h2>More From The Store</h2>
+			<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>">Browse All Collections</a>
+		</div>
+	</div>
+
+	<div class="product-page">
 		<?php $espire_pairs = espire_goes_well_with_ids( $product ); ?>
 		<?php if ( $espire_pairs ) : ?>
 			<section class="product-section related-products">

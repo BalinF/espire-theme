@@ -173,44 +173,7 @@ $espire_set = espire_shop_the_set();
  * shows its symbol's mark and links to that symbol's page.
  */
 $espire_journey = espire_homepage_journey();
-$espire_steps   = $espire_journey['steps'];
+espire_journey_section( $espire_journey ); // inc/journey.php
 ?>
-<div class="section-wrap seed-section">
-	<?php if ( $espire_journey['sketch'] ) : ?>
-		<img class="seed-tee" src="<?php echo esc_url( $espire_journey['sketch'] ); ?>" alt="">
-	<?php endif; ?>
-	<div class="seed-body">
-		<div class="section-head">
-			<h2><?php echo esc_html( $espire_journey['title'] ); ?></h2>
-		</div>
-		<div class="d-slider">
-			<?php // Arrows show on mobile only, where the row is wider than the screen. ?>
-			<button type="button" class="d-arrow d-prev" aria-label="Scroll left" data-slide-prev="seed-to-store" data-slide-amount="container">
-				<?php espire_arrow_icon( 'prev' ); ?>
-			</button>
-			<div class="d-row" id="seed-to-store">
-				<?php foreach ( $espire_steps as $espire_i => $espire_step ) : ?>
-					<div class="d-step">
-						<a class="ic" href="<?php echo esc_url( $espire_step['url'] ); ?>" aria-label="<?php echo esc_attr( $espire_step['label'] ); ?>">
-							<?php if ( $espire_step['symbol'] && ! empty( $espire_step['symbol']['icon'] ) ) : ?>
-								<?php espire_symbol_icon( $espire_step['symbol'] ); ?>
-							<?php else : ?>
-								<?php // Plain leaf mark for steps that aren't symbols. ?>
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
-							<?php endif; ?>
-						</a>
-						<span class="lb"><?php echo esc_html( $espire_step['label'] ); ?></span>
-					</div>
-					<?php if ( $espire_i < count( $espire_steps ) - 1 ) : ?>
-						<div class="d-connector"></div>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			</div>
-			<button type="button" class="d-arrow d-next" aria-label="Scroll right" data-slide-next="seed-to-store" data-slide-amount="container">
-				<?php espire_arrow_icon( 'next' ); ?>
-			</button>
-		</div>
-	</div>
-</div>
 
 <?php get_footer(); // Loads footer.php ?>
