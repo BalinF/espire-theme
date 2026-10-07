@@ -1,7 +1,8 @@
 <?php
 /**
- * inc/home.php — homepage "Shop The Set" (front-page.php): the fields
- * to pick it in wp-admin and the data the template prints.
+ * inc/home.php — the homepage's editable boxes (front-page.php): the
+ * hero video/tagline and "Shop The Set", their fields in wp-admin and
+ * the data the template prints.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,6 +26,25 @@ function espire_home_page_id() {
 		}
 	}
 	return 0;
+}
+
+/**
+ * The hero at the top of the homepage: background video, its still
+ * poster, the tagline and the two buttons. Set on the homepage in
+ * wp-admin (Pages → Home → "Homepage Hero"); defaults until then.
+ */
+function espire_home_hero() {
+	$home  = espire_home_page_id();
+	$field = function ( $name ) use ( $home ) {
+		return ( $home && function_exists( 'get_field' ) ) ? get_field( $name, $home ) : null;
+	};
+	return array(
+		'video'   => $field( 'hero_video' ) ?: '',
+		'poster'  => $field( 'hero_poster' ) ?: '',
+		'tagline' => $field( 'hero_tagline' ) ?: 'We believe in producing locally, sustainably and ethically',
+		'btn1'    => array( 'label' => $field( 'hero_btn1_label' ) ?: 'Shop The Store', 'url' => $field( 'hero_btn1_link' ) ?: home_url( '/store/' ) ),
+		'btn2'    => array( 'label' => $field( 'hero_btn2_label' ) ?: 'Design Your Own', 'url' => $field( 'hero_btn2_link' ) ?: home_url( '/diy/' ) ),
+	);
 }
 
 /**
@@ -58,6 +78,7 @@ function espire_shop_the_set() {
 			}
 			$cats = wc_get_product_category_list( $product->get_id(), ', ' );
 			$set['items'][] = array(
+				'id'         => $product->get_id(),
 				'name'       => $product->get_name(),
 				'meta'       => $cats ? wp_strip_all_tags( $cats ) : '',
 				'url'        => $product->get_permalink(),
@@ -83,6 +104,13 @@ function espire_shop_the_set() {
 	}
 
 	$set['total_html'] = ( $from ? 'from ' : '' ) . wc_price( $total );
+
+	// "Shop This Set" steps through each piece in turn (inc/shop-the-set.php),
+	// unless a link was set by hand.
+	if ( ! $field( 'set_link' ) && count( $set['items'] ) > 1 ) {
+		$ids            = wp_list_pluck( $set['items'], 'id' );
+		$set['cta_url'] = espire_set_piece_url( $ids[0], $ids );
+	}
 	return $set;
 }
 
@@ -95,7 +123,33 @@ add_action( 'acf/init', function () {
 		return array( 'key' => 'field_espire_' . $name, 'label' => $label, 'name' => $name, 'type' => $type, 'instructions' => $instructions );
 	};
 	acf_add_local_field_group( array(
-		'key'      => 'group_espire_shop_the_set',
+		'key'        => 'group_espire_home_hero',
+		'title'      => 'Homepage Hero',
+		'menu_order' => 0,
+		'fields'     => array(
+			array(
+				'key'           => 'field_espire_hero_video',
+				'label'         => 'Background Video',
+				'name'          => 'hero_video',
+				'type'          => 'file',
+				'return_format' => 'url',
+				'mime_types'    => 'mp4,webm',
+				'instructions'  => 'A short muted loop (10–20 seconds, MP4, 1920×1080 or 1280×720, ideally under 8 MB). No sound plays. Empty: a plain dark background.',
+			),
+			array( 'key' => 'field_espire_hero_poster', 'label' => 'Video Still', 'name' => 'hero_poster', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'medium', 'instructions' => 'Shows while the video loads (and if it can\'t play). Use a frame from the video.' ),
+			$text( 'hero_tagline', 'Tagline', 'Default: "We believe in producing locally, sustainably and ethically"', 'textarea' ),
+			$text( 'hero_btn1_label', 'Button 1 Text', 'Default: "Shop The Store"' ),
+			$text( 'hero_btn1_link', 'Button 1 Link', 'Default: /store/' ),
+			$text( 'hero_btn2_label', 'Button 2 Text', 'Default: "Design Your Own"' ),
+			$text( 'hero_btn2_link', 'Button 2 Link', 'Default: /diy/' ),
+		),
+		'location'   => array( array( array( 'param' => 'page', 'operator' => '==', 'value' => (string) $home ) ) ),
+		'position'   => 'acf_after_title',
+	) );
+
+	acf_add_local_field_group( array(
+		'key'        => 'group_espire_shop_the_set',
+		'menu_order' => 1,
 		'title'    => 'Shop The Set',
 		'fields'   => array(
 			array(
@@ -114,7 +168,7 @@ add_action( 'acf/init', function () {
 			$text( 'set_kicker', 'Small Label', 'Default: "This Week\'s Set"' ),
 			$text( 'set_title', 'Title', 'Default: "The Weekend Layer"' ),
 			$text( 'set_text', 'Intro', '', 'textarea' ),
-			$text( 'set_link', '"Shop This Set" Link', 'Default: /store/. Full address or /path/.', 'text' ),
+			$text( 'set_link', '"Shop This Set" Link', 'Leave empty so the button steps the shopper through each piece in turn (pick a size/colour, add to cart, on to the next). Only fill this in to send it somewhere else instead.', 'text' ),
 		),
 		'location' => array( array( array( 'param' => 'page', 'operator' => '==', 'value' => (string) $home ) ) ),
 		'position' => 'acf_after_title',

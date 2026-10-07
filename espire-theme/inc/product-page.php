@@ -10,8 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/** Free shipping threshold shown on the product page (AUD). */
-define( 'ESPIRE_FREE_SHIPPING_OVER', 350 );
+/**
+ * Free shipping threshold shown on the product page, homepage set and
+ * cart (AUD). Keep in step with WooCommerce → Settings → Shipping →
+ * Free shipping "Minimum order amount", which is what actually applies it.
+ */
+define( 'ESPIRE_FREE_SHIPPING_OVER', 300 );
 
 /**
  * WooCommerce's default product summary prints title, rating, price,

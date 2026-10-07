@@ -82,6 +82,9 @@ while ( have_posts() ) :
 			'wrap_before' => '<nav class="product-crumb" aria-label="Breadcrumb">',
 			'wrap_after'  => '</nav>',
 		) );
+
+		// "Piece X of N" when arriving from the homepage's Shop This Set (inc/shop-the-set.php).
+		espire_set_step_bar( $espire_id );
 		?>
 
 		<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'product-main', $product ); ?>>

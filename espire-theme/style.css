@@ -316,6 +316,7 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 @media (max-width:520px){ .look-items{ gap:10px; padding:16px; } .look-item .li-name{ font-size:.74rem; } }
 .look-cta{ padding:16px 26px; display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
 .look-cta .total{ font-size:.86rem; font-weight:700; }
+.look-cta .set-ship{ flex-basis:100%; display:flex; align-items:center; gap:8px; margin:0; font-size:.74rem; color:var(--ink-soft); }
 
 /* ---------- From Seed To Store ---------- */
 .d-slider{ position:relative; }
@@ -593,6 +594,29 @@ button.btn-block{ border:none; }
 .product-page .woocommerce-notices-wrapper{ padding:14px 5% 0; }
 .product-crumb{ padding:14px 5% 0; font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-soft); }
 .product-crumb a:hover{ color:var(--rust); }
+
+/* "Shop The Set" step-through bar (inc/shop-the-set.php) */
+.set-steps{ margin:14px 5% 0; padding:14px 18px; background:var(--card); border:1px solid var(--line); border-radius:6px; display:flex; flex-wrap:wrap; align-items:center; gap:12px 24px; }
+.set-steps-head{ display:flex; flex-direction:column; gap:2px; }
+.set-steps-head .kicker{ font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; }
+.set-steps-head strong{ font-size:.95rem; }
+.set-steps-list{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:10px; flex:1; }
+.set-step a{ display:flex; align-items:center; gap:8px; padding:5px 10px 5px 5px; border:1px solid var(--line); border-radius:6px; background:var(--white); font-size:.76rem; font-weight:600; color:var(--ink); }
+.set-step a:hover{ border-color:var(--ink); }
+.set-step-shot{ width:36px; height:36px; border-radius:4px; overflow:hidden; background:var(--paper-alt); flex-shrink:0; }
+.set-step-shot img{ width:100%; height:100% !important; object-fit:cover; display:block; }
+.set-step-num{ display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; margin-right:6px; border-radius:50%; background:var(--line); font-size:.66rem; }
+.set-step.is-current a{ border-color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink); }
+.set-step.is-current .set-step-num{ background:var(--ink); color:var(--white); }
+.set-step.is-done .set-step-num{ background:var(--olive); color:var(--white); font-size:0; }
+.set-step.is-done .set-step-num::after{ content:"\2713"; font-size:.66rem; }
+.set-skip{ font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); white-space:nowrap; }
+.set-skip:hover{ color:var(--rust); }
+@media (max-width:700px){
+  .set-steps{ padding:12px; }
+  .set-steps-list{ flex-basis:100%; }
+  .set-step-name{ max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+}
 
 .product-main{ display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:28px; padding:18px 5% 8px; align-items:start; }
 @media (max-width:900px){ .product-main{ grid-template-columns:1fr; } }
