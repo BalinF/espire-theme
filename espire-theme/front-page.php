@@ -14,22 +14,27 @@
 get_header(); // Loads header.php
 ?>
 
+<?php
+// Video, tagline and buttons: Pages → Home → "Homepage Hero" (inc/home.php).
+$espire_hero = espire_home_hero();
+?>
 <div class="hero">
-	<!-- TODO: replace this fallback gradient with the real background
-	     video once it's re-exported as a muted/looping mp4 or webm
-	     (source: youtube.com/watch?v=MEc4x80AWl0 — a YouTube embed
-	     can't be used as a background loop, it needs to be an actual
-	     video file). Swap the <div class="video-fallback"> below for:
-	     <video autoplay muted loop playsinline><source src="..."></video>
-	-->
-	<div class="video-fallback"></div>
+	<?php if ( $espire_hero['video'] ) : ?>
+		<video autoplay muted loop playsinline preload="auto"<?php echo $espire_hero['poster'] ? ' poster="' . esc_url( $espire_hero['poster'] ) . '"' : ''; ?>>
+			<source src="<?php echo esc_url( $espire_hero['video'] ); ?>" type="video/<?php echo esc_attr( 'webm' === strtolower( pathinfo( wp_parse_url( $espire_hero['video'], PHP_URL_PATH ), PATHINFO_EXTENSION ) ) ? 'webm' : 'mp4' ); ?>">
+		</video>
+	<?php elseif ( $espire_hero['poster'] ) : ?>
+		<img class="video-fallback" src="<?php echo esc_url( $espire_hero['poster'] ); ?>" alt="">
+	<?php else : ?>
+		<div class="video-fallback"></div>
+	<?php endif; ?>
 	<div class="overlay">
 		<div class="hero-content">
 			<svg class="hero-mark" viewBox="0 0 64 40" fill="none" stroke="#F1EEE4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34h40M8 34v-4a3 3 0 013-3h6"/><path d="M17 27h20c5 0 9-3 9-7 0-3-2-5-5-5H23l-6 6"/><circle cx="34" cy="10" r="3.4"/><path d="M34 6.6V4M31 8l-2-2M37 8l2-2"/><path d="M17 27l-3 7"/><path d="M23 27l7 7"/><circle cx="12" cy="30" r="1.1" fill="#F1EEE4" stroke="none"/></svg>
-			<h1 class="tagline">We believe in producing locally, sustainably and ethically</h1>
+			<h1 class="tagline"><?php echo esc_html( $espire_hero['tagline'] ); ?></h1>
 			<div class="cta-row">
-				<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="btn solid">Shop The Store</a>
-				<a href="<?php echo esc_url( home_url( '/diy/' ) ); ?>" class="btn outline">Design Your Own</a>
+				<a href="<?php echo esc_url( $espire_hero['btn1']['url'] ); ?>" class="btn solid"><?php echo esc_html( $espire_hero['btn1']['label'] ); ?></a>
+				<a href="<?php echo esc_url( $espire_hero['btn2']['url'] ); ?>" class="btn outline"><?php echo esc_html( $espire_hero['btn2']['label'] ); ?></a>
 			</div>
 		</div>
 	</div>
@@ -146,6 +151,10 @@ $espire_set = espire_shop_the_set();
 			<div class="look-cta">
 				<span class="total"><?php echo esc_html( count( $espire_set['items'] ) ); ?> pieces &middot; <?php echo wp_kses_post( $espire_set['total_html'] ); ?> together</span>
 				<a href="<?php echo esc_url( $espire_set['cta_url'] ); ?>" class="btn olive">Shop This Set</a>
+				<p class="set-ship">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 3H1v13h15M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+					Free shipping on orders over $<?php echo esc_html( ESPIRE_FREE_SHIPPING_OVER ); ?>
+				</p>
 			</div>
 		</div>
 	</div>

@@ -153,7 +153,21 @@ that's blank, its category's sketch.
 **Homepage → Shop The Set**: Pages → the page chosen in Settings → Reading → *Your
 homepage displays → A static page*, or a page with the slug `home`. Then use the *Shop
 The Set* box — pick
-2–4 products, a photo and a title; photos, prices and the total fill in.
+2–4 products, a photo and a title; photos, prices and the total fill in. *Shop This
+Set* steps through the pieces one at a time: it opens the first product with a
+"Piece 1 of 3" bar, and *Add & Next Piece* adds it and moves on, ending at the cart.
+Leave the box's *"Shop This Set" Link* empty to keep that; fill it in only to send the
+button somewhere else.
+
+**Homepage → hero (video + tagline)**: same page, *Homepage Hero* box — background
+video (upload an MP4), a still from it to show while it loads, the tagline and both
+buttons' text and links. Blank fields keep the current wording. Best video: a 10–20
+second muted loop, 1080p or 720p, under ~8 MB.
+
+**Free shipping threshold** ($300): the theme's wording lives in
+`ESPIRE_FREE_SHIPPING_OVER` (`inc/product-page.php`); the actual free shipping is
+WooCommerce → Settings → Shipping → each zone → *Free shipping* → *Minimum order
+amount*. Change both together.
 
 **Store / Shop (`/store/`)**: lists every product, with the filter bar. `/store/`
 opens WooCommerce's Shop page. To make `/store/` the shop itself, set WooCommerce →
@@ -209,7 +223,8 @@ Staging has two temporary workarounds that must **not** carry over to live:
    testing isn't on live. Upload the final images on live and choose them again in
    each place they're used: category *Banner Image* / *Category Emblem*, page
    *Featured image*s (Store, DIY, Shop), symbol tag icons and banners, Seed To
-   Store sketches, Shop The Set photo, attribute *Swatch* images.
+   Store sketches, Shop The Set photo, Homepage Hero video and still, attribute
+   *Swatch* images.
 
 ## Installing the theme by hand (no FTP needed)
 
