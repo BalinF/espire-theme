@@ -75,19 +75,29 @@ if ( $espire_diy_page ) {
 }
 
 /**
- * The main shop page (WooCommerce → Settings → Products → Shop page):
- * banner photo = that page's featured image, title = its title. With no
- * filter picked it shows the collection tiles (same as the Store hub);
- * once a filter is picked it lists the matching products.
+ * The main shop page (WooCommerce → Settings → Products → Shop page, and
+ * /store/ — see inc/collections.php): every product, with the filter bar.
+ * Banner photo / title / line = the Shop page's featured image, title and
+ * excerpt, else the Store page's.
  */
 $espire_is_shop = function_exists( 'is_shop' ) && is_shop();
 if ( $espire_is_shop ) {
-	$espire_shop_id      = wc_get_page_id( 'shop' );
-	$espire_banner_image = $espire_shop_id > 0 ? get_the_post_thumbnail_url( $espire_shop_id, 'full' ) : '';
+	$espire_shop_id  = wc_get_page_id( 'shop' );
+	$espire_store    = get_page_by_path( 'store' );
+	$espire_store_id = $espire_store ? $espire_store->ID : 0;
+	$espire_banner_image = '';
+	$espire_banner_text  = '';
+	foreach ( array_filter( array( $espire_shop_id > 0 ? $espire_shop_id : 0, $espire_store_id ) ) as $espire_pid ) {
+		if ( ! $espire_banner_image && has_post_thumbnail( $espire_pid ) ) {
+			$espire_banner_image = get_the_post_thumbnail_url( $espire_pid, 'full' );
+		}
+		if ( ! $espire_banner_text && has_excerpt( $espire_pid ) ) {
+			$espire_banner_text = get_the_excerpt( $espire_pid );
+		}
+	}
 	$espire_banner_title = $espire_shop_id > 0 ? get_the_title( $espire_shop_id ) : 'Shop';
-	$espire_banner_text  = $espire_shop_id > 0 && has_excerpt( $espire_shop_id ) ? get_the_excerpt( $espire_shop_id ) : '';
 }
-$espire_show_tiles = $espire_is_shop && ! espire_filters_active() && ! is_search() && ! is_paged();
+$espire_show_tiles = false; // the shop lists every product (collection tiles live on the homepage)
 $espire_has_sidebar_content = $espire_sidebar_intro || ! empty( $espire_sidebar_fits ) || $espire_sidebar_sourcing;
 
 ?>

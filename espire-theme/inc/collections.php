@@ -119,3 +119,28 @@ function espire_store_tiles_grid() {
 	</div>
 	<?php
 }
+
+/**
+ * The shop lists every product. WooCommerce's "Shop page display" setting
+ * (Appearance → Customize → WooCommerce → Product Catalog) could swap
+ * them for category tiles, so that's switched off here.
+ */
+add_filter( 'option_woocommerce_shop_page_display', function () {
+	return '';
+} );
+
+/**
+ * /store/ (the Store page every "Store" link points to) opens the shop —
+ * every product with the Fit / Size / Colour filters. To skip this hop,
+ * set WooCommerce → Settings → Products → Shop page to "Store".
+ */
+add_action( 'template_redirect', function () {
+	if ( ! function_exists( 'wc_get_page_id' ) || ! is_page( 'store' ) || is_customize_preview() ) {
+		return;
+	}
+	$shop = wc_get_page_id( 'shop' );
+	if ( $shop > 0 && (int) get_queried_object_id() !== $shop ) {
+		wp_safe_redirect( get_permalink( $shop ), 302 );
+		exit;
+	}
+} );

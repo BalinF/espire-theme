@@ -9,12 +9,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * The page that holds the homepage's editable boxes (Shop The Set): the
+ * page set as the homepage in Settings → Reading, else a page with the
+ * slug "home" or "homepage". 0 if there's none.
+ */
+function espire_home_page_id() {
+	$id = (int) get_option( 'page_on_front' );
+	if ( $id ) {
+		return $id;
+	}
+	foreach ( array( 'home', 'homepage' ) as $slug ) {
+		$page = get_page_by_path( $slug );
+		if ( $page ) {
+			return (int) $page->ID;
+		}
+	}
+	return 0;
+}
+
+/**
  * The set to show: products picked on the homepage in wp-admin, or the
  * placeholder set (theme photos, sample prices) until some are picked.
  */
 function espire_shop_the_set() {
 	$uri   = get_template_directory_uri() . '/assets/';
-	$home  = (int) get_option( 'page_on_front' );
+	$home  = espire_home_page_id();
 	$field = function ( $name ) use ( $home ) {
 		return ( $home && function_exists( 'get_field' ) ) ? get_field( $name, $home ) : null;
 	};
@@ -68,7 +87,7 @@ function espire_shop_the_set() {
 }
 
 add_action( 'acf/init', function () {
-	$home = (int) get_option( 'page_on_front' );
+	$home = espire_home_page_id();
 	if ( ! $home || ! function_exists( 'acf_add_local_field_group' ) ) {
 		return;
 	}
@@ -98,5 +117,6 @@ add_action( 'acf/init', function () {
 			$text( 'set_link', '"Shop This Set" Link', 'Default: /store/. Full address or /path/.', 'text' ),
 		),
 		'location' => array( array( array( 'param' => 'page', 'operator' => '==', 'value' => (string) $home ) ) ),
+		'position' => 'acf_after_title',
 	) );
 } );

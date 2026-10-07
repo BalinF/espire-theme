@@ -150,16 +150,15 @@ symbol tags the product carries. Symbol steps open that symbol's slide-in panel.
 sketch is the product's *Journey Sketch* (edit a product, right-hand sidebar) or, if
 that's blank, its category's sketch.
 
-**Homepage → Shop The Set** (Pages → the homepage → *Shop The Set* box) — pick
+**Homepage → Shop The Set**: Pages → the page chosen in Settings → Reading → *Your
+homepage displays → A static page*, or a page with the slug `home`. Then use the *Shop
+The Set* box — pick
 2–4 products, a photo and a title; photos, prices and the total fill in.
 
-**Store hub (`/store/`)** — one tile per top-level product category, in the
-order you drag them into under Products → Categories. Tile photo: the
-category's *Banner Image*, else its WooCommerce thumbnail, else the homepage
-photo. Tile text: the category *Description*, else the homepage copy. The intro
-line under the banner is the Store page's *Excerpt*; anything typed into the
-page body shows above the tiles. The Design Your Own tile uses the DIY page's
-featured image.
+**Store / Shop (`/store/`)**: lists every product, with the filter bar. `/store/`
+opens WooCommerce's Shop page. To make `/store/` the shop itself, set WooCommerce →
+Settings → Products → *Shop page* to "Store". The banner photo and line come from the
+Shop page's featured image and excerpt, or the Store page's if those are blank.
 
 **Australian Made / F\*ck Fast Fashion (Pages → edit → Brand Story box)** — hero,
 pillar cards (each linking to its longer post), stat strip, shop feature,
