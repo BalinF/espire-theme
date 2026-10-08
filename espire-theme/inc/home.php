@@ -40,6 +40,7 @@ function espire_home_hero() {
 	};
 	return array(
 		'video'   => $field( 'hero_video' ) ?: '',
+		'mobile'  => $field( 'hero_video_mobile' ) ?: '',
 		'poster'  => $field( 'hero_poster' ) ?: '',
 		'tagline' => $field( 'hero_tagline' ) ?: 'We believe in producing locally, sustainably and ethically',
 		'btn1'    => array( 'label' => $field( 'hero_btn1_label' ) ?: 'Shop The Store', 'url' => $field( 'hero_btn1_link' ) ?: home_url( '/store/' ) ),
@@ -142,6 +143,15 @@ add_action( 'acf/init', function () {
 				'return_format' => 'url',
 				'mime_types'    => 'mp4,webm',
 				'instructions'  => 'A short muted loop (10–20 seconds, MP4, 1920×1080 or 1280×720, ideally under 8 MB). No sound plays. Empty: a plain dark background.',
+			),
+			array(
+				'key'           => 'field_espire_hero_video_mobile',
+				'label'         => 'Phone Video (optional)',
+				'name'          => 'hero_video_mobile',
+				'type'          => 'file',
+				'return_format' => 'url',
+				'mime_types'    => 'mp4,webm',
+				'instructions'  => 'A lighter cut for phones: about 10 seconds, portrait 540×960 (or 720×1280), ideally under 2 MB. Empty: phones get the main video.',
 			),
 			array( 'key' => 'field_espire_hero_poster', 'label' => 'Video Still', 'name' => 'hero_poster', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'medium', 'instructions' => 'Shows while the video loads (and if it can\'t play). Use a frame from the video.' ),
 			$text( 'hero_tagline', 'Tagline', 'Default: "We believe in producing locally, sustainably and ethically"', 'textarea' ),
