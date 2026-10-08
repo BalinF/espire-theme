@@ -588,17 +588,18 @@ function espire_image_url( $value, $size = 'full' ) {
  * so swatches set up with a plugin keep working with it switched off.
  */
 function espire_term_swatch( $taxonomy, $term, $guess_from_name = true ) {
+	// 'medium' keeps the image's shape (WordPress's 'thumbnail' is cropped square).
 	$colour = '';
 	$image  = '';
 	if ( function_exists( 'get_field' ) ) {
 		$colour = (string) get_field( 'swatch_colour', $taxonomy . '_' . $term->term_id );
-		$image  = espire_image_url( get_field( 'swatch_image', $taxonomy . '_' . $term->term_id ), 'thumbnail' );
+		$image  = espire_image_url( get_field( 'swatch_image', $taxonomy . '_' . $term->term_id ), 'medium' );
 	}
 	if ( ! $colour ) {
 		$colour = (string) get_term_meta( $term->term_id, 'product_attribute_color', true );
 	}
 	if ( ! $image ) {
-		$image = espire_image_url( get_term_meta( $term->term_id, 'product_attribute_image', true ), 'thumbnail' );
+		$image = espire_image_url( get_term_meta( $term->term_id, 'product_attribute_image', true ), 'medium' );
 	}
 	if ( ! espire_hex( $colour ) && ! $image ) {
 		$colour = espire_find_hex( get_term_meta( $term->term_id ) );
