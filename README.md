@@ -165,7 +165,8 @@ full sets). The homepage shows the was/now total. 0 turns it off.
 **Homepage → hero (video + tagline)**: same page, *Homepage Hero* box — background
 video (upload an MP4), a still from it to show while it loads, the tagline and both
 buttons' text and links. Blank fields keep the current wording. Best video: a 10–20
-second muted loop, 1080p or 720p, under ~8 MB.
+second muted loop, 1080p or 720p, 3–5 MB. *Phone Video (optional)*: a lighter cut that
+phones (up to 767px wide) get instead — about 10 seconds, portrait 540×960, under 2 MB.
 
 **Free shipping threshold** ($300): the theme's wording lives in
 `ESPIRE_FREE_SHIPPING_OVER` (`inc/product-page.php`); the actual free shipping is
@@ -226,7 +227,7 @@ Staging has two temporary workarounds that must **not** carry over to live:
    testing isn't on live. Upload the final images on live and choose them again in
    each place they're used: category *Banner Image* / *Category Emblem*, page
    *Featured image*s (Store, DIY, Shop), symbol tag icons and banners, Seed To
-   Store sketches, Shop The Set photo, Homepage Hero video and still, attribute
+   Store sketches, Shop The Set photo, Homepage Hero videos and still, attribute
    *Swatch* images.
 
 ## Installing the theme by hand (no FTP needed)

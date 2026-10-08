@@ -20,9 +20,19 @@ $espire_hero = espire_home_hero();
 ?>
 <div class="hero">
 	<?php if ( $espire_hero['video'] ) : ?>
-		<video autoplay muted loop playsinline preload="auto"<?php echo $espire_hero['poster'] ? ' poster="' . esc_url( $espire_hero['poster'] ) . '"' : ''; ?>>
-			<source src="<?php echo esc_url( $espire_hero['video'] ); ?>" type="video/<?php echo esc_attr( 'webm' === strtolower( pathinfo( wp_parse_url( $espire_hero['video'], PHP_URL_PATH ), PATHINFO_EXTENSION ) ) ? 'webm' : 'mp4' ); ?>">
-		</video>
+		<?php if ( $espire_hero['mobile'] ) : ?>
+			<?php // Phones (up to 767px wide) get the lighter Phone Video; the script picks before anything downloads. ?>
+			<video id="hero-video" autoplay muted loop playsinline preload="auto"<?php echo $espire_hero['poster'] ? ' poster="' . esc_url( $espire_hero['poster'] ) . '"' : ''; ?>></video>
+			<script>
+				( function ( v ) {
+					v.src = window.matchMedia( '(max-width: 767px)' ).matches ? <?php echo wp_json_encode( esc_url_raw( $espire_hero['mobile'] ) ); ?> : <?php echo wp_json_encode( esc_url_raw( $espire_hero['video'] ) ); ?>;
+				} )( document.getElementById( 'hero-video' ) );
+			</script>
+		<?php else : ?>
+			<video autoplay muted loop playsinline preload="auto"<?php echo $espire_hero['poster'] ? ' poster="' . esc_url( $espire_hero['poster'] ) . '"' : ''; ?>>
+				<source src="<?php echo esc_url( $espire_hero['video'] ); ?>" type="video/<?php echo esc_attr( 'webm' === strtolower( pathinfo( wp_parse_url( $espire_hero['video'], PHP_URL_PATH ), PATHINFO_EXTENSION ) ) ? 'webm' : 'mp4' ); ?>">
+			</video>
+		<?php endif; ?>
 	<?php elseif ( $espire_hero['poster'] ) : ?>
 		<img class="video-fallback" src="<?php echo esc_url( $espire_hero['poster'] ); ?>" alt="">
 	<?php else : ?>
