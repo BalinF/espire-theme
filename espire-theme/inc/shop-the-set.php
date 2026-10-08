@@ -4,6 +4,7 @@
  * button opens the set's first product with ?espire_set=ID,ID,ID; each
  * product page in that set shows a "Piece X of N" bar, and adding to
  * cart moves on to the next piece (then the cart after the last one).
+ * With every piece in the cart, the set saving comes off as a cart line.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12,6 +13,64 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /** Max pieces in a set (matches the homepage relationship field). */
 define( 'ESPIRE_SET_MAX', 4 );
+
+/** Set saving until one is entered on the homepage (AUD). */
+define( 'ESPIRE_SET_DISCOUNT_DEFAULT', 15 );
+
+/** The set saving from the homepage's "Set Saving ($)" field; 0 for none. */
+function espire_set_discount() {
+	$home = espire_home_page_id();
+	if ( ! $home || ! function_exists( 'get_field' ) ) {
+		return 0;
+	}
+	$value = get_field( 'set_discount', $home );
+	if ( null === $value ) {
+		return (float) ESPIRE_SET_DISCOUNT_DEFAULT; // never saved yet
+	}
+	return max( 0, (float) $value );
+}
+
+/** "15" for 15.00, "12.50" otherwise. */
+function espire_money( $amount ) {
+	return floor( $amount ) == $amount ? number_format( $amount ) : number_format( $amount, 2 );
+}
+
+/** The product IDs picked for the homepage set. */
+function espire_home_set_ids() {
+	$home = espire_home_page_id();
+	if ( ! $home || ! function_exists( 'get_field' ) ) {
+		return array();
+	}
+	$ids = array();
+	foreach ( (array) get_field( 'set_products', $home ) as $post ) {
+		$ids[] = (int) ( is_object( $post ) ? $post->ID : $post );
+	}
+	return array_values( array_filter( $ids ) );
+}
+
+/**
+ * Cart: the set saving, once per complete set (every piece in the cart;
+ * any size or colour). Shown as a "Shop The Set saving" line.
+ */
+add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
+	$save = espire_set_discount();
+	$ids  = espire_home_set_ids();
+	if ( $save <= 0 || count( $ids ) < 2 ) {
+		return;
+	}
+	$qty = array();
+	foreach ( $cart->get_cart() as $item ) {
+		$id         = (int) $item['product_id'];
+		$qty[ $id ] = ( isset( $qty[ $id ] ) ? $qty[ $id ] : 0 ) + (int) $item['quantity'];
+	}
+	$sets = PHP_INT_MAX;
+	foreach ( $ids as $id ) {
+		$sets = min( $sets, isset( $qty[ $id ] ) ? $qty[ $id ] : 0 );
+	}
+	if ( $sets > 0 ) {
+		$cart->add_fee( 'Shop The Set saving', -1 * $save * $sets, false );
+	}
+} );
 
 /** Product IDs from a "12,34,56" string: positive, unique, at most ESPIRE_SET_MAX. */
 function espire_set_parse( $raw ) {
@@ -68,11 +127,15 @@ function espire_set_step_bar( $product_id ) {
 	$in_cart = espire_cart_product_ids();
 	$step    = array_search( (int) $product_id, $ids, true ) + 1;
 	$next    = espire_set_next( $product_id, $ids );
+	$save    = espire_set_discount();
 	?>
 	<div class="set-steps">
 		<div class="set-steps-head">
 			<span class="kicker">Shop The Set</span>
 			<strong>Piece <?php echo esc_html( $step ); ?> of <?php echo esc_html( count( $ids ) ); ?></strong>
+			<?php if ( $save && ! array_diff( $ids, espire_home_set_ids() ) ) : ?>
+				<span class="set-steps-save">Add all <?php echo esc_html( count( $ids ) ); ?> to save $<?php echo esc_html( espire_money( $save ) ); ?></span>
+			<?php endif; ?>
 		</div>
 		<ol class="set-steps-list">
 			<?php
