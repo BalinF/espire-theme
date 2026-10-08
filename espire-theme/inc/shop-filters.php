@@ -543,7 +543,11 @@ function espire_collection_banner( $args ) {
 	<section class="category-banner">
 		<img class="category-banner-img" src="<?php echo esc_url( $args['image'] ?: get_template_directory_uri() . '/assets/store-banner.jpg' ); ?>" alt="">
 		<?php if ( $args['emblem'] ) : ?>
-			<img class="category-banner-emblem" src="<?php echo esc_url( $args['emblem'] ); ?>" alt="">
+			<?php
+			// SVG emblems (black line art) are flipped to white on the dark photo; PNG/JPG show as uploaded.
+			$espire_emblem_svg = 'svg' === strtolower( pathinfo( (string) wp_parse_url( $args['emblem'], PHP_URL_PATH ), PATHINFO_EXTENSION ) );
+			?>
+			<img class="category-banner-emblem<?php echo $espire_emblem_svg ? ' is-svg' : ''; ?>" src="<?php echo esc_url( $args['emblem'] ); ?>" alt="">
 		<?php endif; ?>
 		<div class="category-banner-inner">
 			<?php if ( $args['crumb'] ) : ?>
