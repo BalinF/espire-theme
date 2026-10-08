@@ -158,6 +158,9 @@ Set* steps through the pieces one at a time: it opens the first product with a
 "Piece 1 of 3" bar, and *Add & Next Piece* adds it and moves on, ending at the cart.
 Leave the box's *"Shop This Set" Link* empty to keep that; fill it in only to send the
 button somewhere else.
+*Set Saving ($)* (default $15) comes off in the cart as a "Shop The Set saving" line
+once every piece of the current set is in it, in any size or colour (twice for two
+full sets). The homepage shows the was/now total. 0 turns it off.
 
 **Homepage → hero (video + tagline)**: same page, *Homepage Hero* box — background
 video (upload an MP4), a still from it to show while it loads, the tagline and both

@@ -99,11 +99,18 @@ function espire_shop_the_set() {
 			array( 'name' => 'Classic Hoodie', 'meta' => 'Hoodies', 'url' => home_url( '/product-category/hoodies/' ), 'image' => $uri . 'homepage-hoodies.jpg', 'price_html' => '$109.00' ),
 			array( 'name' => 'Merino Joggers', 'meta' => 'Leg Hoodies', 'url' => home_url( '/product-category/leg-hoodies/' ), 'image' => $uri . 'leg-hoods-popup-05-mu4smsn5-205h.webp', 'price_html' => '$99.00' ),
 		);
-		$set['total_html'] = '$297.00';
+		$save              = espire_set_discount();
+		$set['save']       = $save;
+		$set['was_html']   = $save ? '$297.00' : '';
+		$set['total_html'] = '$' . number_format( 297 - $save, 2 );
 		return $set;
 	}
 
-	$set['total_html'] = ( $from ? 'from ' : '' ) . wc_price( $total );
+	// Bundle saving, taken off in the cart once every piece is in it (inc/shop-the-set.php).
+	$save              = count( $set['items'] ) > 1 ? min( espire_set_discount(), $total ) : 0;
+	$set['save']       = $save;
+	$set['was_html']   = $save ? wc_price( $total ) : '';
+	$set['total_html'] = ( $from ? 'from ' : '' ) . wc_price( $total - $save );
 
 	// "Shop This Set" steps through each piece in turn (inc/shop-the-set.php),
 	// unless a link was set by hand.
@@ -165,6 +172,17 @@ add_action( 'acf/init', function () {
 				'instructions'  => 'Pick 2–4 pieces that go together. Their photos, names and prices show automatically, with the total underneath.',
 			),
 			array( 'key' => 'field_espire_set_image', 'label' => 'Set Photo', 'name' => 'set_image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'medium', 'instructions' => 'The outfit worn together.' ),
+			array(
+				'key'           => 'field_espire_set_discount',
+				'label'         => 'Set Saving ($)',
+				'name'          => 'set_discount',
+				'type'          => 'number',
+				'min'           => 0,
+				'step'          => 1,
+				'default_value' => ESPIRE_SET_DISCOUNT_DEFAULT,
+				'prepend'       => '$',
+				'instructions'  => 'Taken off in the cart when someone has every piece of the set in it (once per full set). 0 for no saving.',
+			),
 			$text( 'set_kicker', 'Small Label', 'Default: "This Week\'s Set"' ),
 			$text( 'set_title', 'Title', 'Default: "The Weekend Layer"' ),
 			$text( 'set_text', 'Intro', '', 'textarea' ),

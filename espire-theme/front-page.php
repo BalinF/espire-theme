@@ -149,7 +149,12 @@ $espire_set = espire_shop_the_set();
 				<?php endforeach; ?>
 			</div>
 			<div class="look-cta">
-				<span class="total"><?php echo esc_html( count( $espire_set['items'] ) ); ?> pieces &middot; <?php echo wp_kses_post( $espire_set['total_html'] ); ?> together</span>
+				<span class="total">
+					<?php echo esc_html( count( $espire_set['items'] ) ); ?> pieces &middot;
+					<?php if ( $espire_set['was_html'] ) : ?><del><?php echo wp_kses_post( $espire_set['was_html'] ); ?></del><?php endif; ?>
+					<?php echo wp_kses_post( $espire_set['total_html'] ); ?> together
+					<?php if ( $espire_set['save'] ) : ?><span class="set-save">Save $<?php echo esc_html( espire_money( $espire_set['save'] ) ); ?></span><?php endif; ?>
+				</span>
 				<a href="<?php echo esc_url( $espire_set['cta_url'] ); ?>" class="btn olive">Shop This Set</a>
 				<p class="set-ship">
 					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 3H1v13h15M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
