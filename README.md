@@ -43,8 +43,18 @@ Until the FTP secrets below exist, the deploy step is skipped with a warning.
 
 ## Plugins the theme expects
 
-WooCommerce, Advanced Custom Fields (category banner/sidebar fields are defined
-in `functions.php`, so their structure is version-controlled here).
+WooCommerce, Advanced Custom Fields — the free version is enough (all the theme's
+fields are defined in code, so nothing needs setting up under ACF → Field Groups,
+and their structure is version-controlled here). Keep it active on live too.
+
+Lists you fill in row by row — Seed To Store *Steps*, *Available Fits* and their
+*Size Notes*, FAQ *Quick Answers*, Brand Story *Pillar Cards* — show as a fixed set
+of numbered boxes (Step 1–6, Fit 1–4…) rather than ACF Pro's add-a-row buttons;
+fill in as many as you need and leave the rest empty (`inc/acf-rows.php`).
+
+Seed To Store step icons: a symbol tag with an uploaded icon shows that image as
+it is (no ring), so upload the full circular badge. Tags without one get the
+plain ringed leaf mark.
 
 ## Filling in content (wp-admin)
 

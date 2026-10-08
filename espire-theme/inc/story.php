@@ -164,7 +164,7 @@ add_action( 'acf/init', function () {
 		}
 	}
 
-	acf_add_local_field_group( array(
+	acf_add_local_field_group( espire_acf_rows( array(
 		'key'      => 'group_espire_story',
 		'title'    => 'Brand Story',
 		'fields'   => array(
@@ -181,6 +181,7 @@ add_action( 'acf/init', function () {
 				'label'        => 'Pillar Cards',
 				'name'         => 'story_pillars',
 				'type'         => 'repeater',
+				'max'          => 4,
 				'layout'       => 'block',
 				'button_label' => 'Add Pillar',
 				'instructions' => 'Usually three. Each links to its own longer post. Leave the link empty to hide the button.',
@@ -214,5 +215,5 @@ add_action( 'acf/init', function () {
 		),
 		'location' => $locations,
 		'position' => 'acf_after_title',
-	) );
+	) ) );
 } );

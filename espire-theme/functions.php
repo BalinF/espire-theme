@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Bigger features live in their own files under /inc to keep this one short.
+require_once get_template_directory() . '/inc/acf-rows.php';
 require_once get_template_directory() . '/inc/symbols.php';
 require_once get_template_directory() . '/inc/product-page.php';
 require_once get_template_directory() . '/inc/cart-checkout.php';
@@ -151,7 +152,7 @@ add_action( 'woocommerce_before_shop_loop', function () {
  */
 if ( function_exists( 'acf_add_local_field_group' ) ) {
 	add_action( 'acf/init', function () {
-		acf_add_local_field_group( array(
+		acf_add_local_field_group( espire_acf_rows( array(
 			'key'      => 'group_espire_category_archive',
 			'title'    => 'Category Archive Content',
 			'fields'   => array(
@@ -200,6 +201,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'label'        => 'Available Fits',
 					'name'         => 'category_sidebar_fits',
 					'type'         => 'repeater',
+					'max'          => 4,
 					'layout'       => 'block',
 					'button_label' => 'Add Fit',
 					'sub_fields'   => array(
@@ -246,6 +248,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'label'        => 'Size Notes',
 							'name'         => 'fit_size_notes',
 							'type'         => 'repeater',
+							'max'          => 6,
 							'layout'       => 'table',
 							'button_label' => 'Add Size',
 							'sub_fields'   => array(
@@ -290,7 +293,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					),
 				),
 			),
-		) );
+		) ) );
 
 		/**
 		 * Product page extras (Products > edit a product): the short
@@ -538,7 +541,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 		 */
 		$espire_faq_page = get_page_by_path( 'faq' );
 		if ( $espire_faq_page ) {
-			acf_add_local_field_group( array(
+			acf_add_local_field_group( espire_acf_rows( array(
 				'key'      => 'group_espire_faq_quick',
 				'title'    => 'Product Page Quick Answers',
 				'fields'   => array(
@@ -547,6 +550,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 						'label'        => 'Quick Answers',
 						'name'         => 'faq_quick_answers',
 						'type'         => 'repeater',
+						'max'          => 5,
 						'layout'       => 'block',
 						'button_label' => 'Add Question',
 						'instructions' => 'Shown in the "Shipping & Returns" panel on product pages — keep it to the 3–4 questions people ask before buying.',
@@ -576,7 +580,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 						),
 					),
 				),
-			) );
+			) ) );
 		}
 	} );
 }
