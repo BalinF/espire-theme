@@ -52,6 +52,11 @@ Lists you fill in row by row — Seed To Store *Steps*, *Available Fits* and the
 of numbered boxes (Step 1–6, Fit 1–4…) rather than ACF Pro's add-a-row buttons;
 fill in as many as you need and leave the rest empty (`inc/acf-rows.php`).
 
+Attributes on store/category cards and in the filter bar: on a product with
+variations, only attributes ticked *Used for variations* show (a detail like
+"Sleeve Trim" that isn't an option to pick stays off). Products without variations
+show their attributes as usual.
+
 Seed To Store step icons: a symbol tag with an uploaded icon shows that image as
 it is (no ring), so upload the full circular badge. Tags without one get the
 plain ringed leaf mark.

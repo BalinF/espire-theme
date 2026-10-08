@@ -98,10 +98,10 @@ function espire_card_attributes() {
 		$html .= espire_card_boxes( 'Fit', $values['Fit'] );
 	}
 
-	// Any other attribute shown on the product page (e.g. Fabric: Hemp, Cotton).
+	// Any other attribute shown on the product page and offered as an option (e.g. Fabric: Hemp, Cotton).
 	foreach ( $product->get_attributes() as $attribute ) {
-		if ( ! $attribute->get_visible() ) {
-			continue;
+		if ( ! $attribute->get_visible() || ! espire_attribute_is_offered( $product->get_id(), $attribute->get_name() ) ) {
+			continue; // hidden, or a detail rather than an option to pick
 		}
 		$name  = wc_attribute_label( $attribute->get_name(), $product );
 		$group = espire_filter_label_for( $name ) ?: espire_filter_label_for( $attribute->get_name() );
