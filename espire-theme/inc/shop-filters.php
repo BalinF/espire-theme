@@ -201,7 +201,42 @@ function espire_variation_values( $product_id, $meta_key ) {
  * A product's terms in one global attribute, keeping only the values its
  * variations really offer (see espire_variation_values()).
  */
+/**
+ * Whether a product's attribute counts on cards and in the filter bar.
+ * On a product with variations, only attributes ticked "Used for
+ * variations" do (e.g. a tee's "Sleeve Trim" detail that isn't an option
+ * to pick is left out); products without variations keep all theirs.
+ * $key is the taxonomy (pa_sleeve) or the typed-in attribute's name.
+ */
+function espire_attribute_is_offered( $product_id, $key ) {
+	$attrs = get_post_meta( $product_id, '_product_attributes', true );
+	if ( ! is_array( $attrs ) ) {
+		return true;
+	}
+	$has_variations = false;
+	foreach ( $attrs as $attr ) {
+		if ( ! empty( $attr['is_variation'] ) ) {
+			$has_variations = true;
+			break;
+		}
+	}
+	if ( ! $has_variations ) {
+		return true;
+	}
+	$slug = sanitize_title( $key );
+	foreach ( $attrs as $index => $attr ) {
+		$name = isset( $attr['name'] ) ? $attr['name'] : $index;
+		if ( $name === $key || sanitize_title( $name ) === $slug || $index === $slug ) {
+			return ! empty( $attr['is_variation'] );
+		}
+	}
+	return false;
+}
+
 function espire_product_attribute_terms( $product_id, $taxonomy ) {
+	if ( ! espire_attribute_is_offered( $product_id, $taxonomy ) ) {
+		return array();
+	}
 	$terms = wc_get_product_terms( $product_id, $taxonomy, array( 'fields' => 'all' ) );
 	if ( ! $terms || is_wp_error( $terms ) ) {
 		return array();
@@ -254,6 +289,9 @@ function espire_local_attribute_values( $product_id, $label ) {
 	$values = array();
 	foreach ( $attrs as $attr ) {
 		if ( ! empty( $attr['is_taxonomy'] ) || empty( $attr['name'] ) || empty( $attr['value'] ) ) {
+			continue;
+		}
+		if ( ! espire_attribute_is_offered( $product_id, $attr['name'] ) ) {
 			continue;
 		}
 		if ( espire_filter_label_for( $attr['name'] ) === $label ) {
