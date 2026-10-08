@@ -26,12 +26,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * each step array( 'label', 'url', 'symbol' (for the mark, may be null) ).
  */
 function espire_homepage_journey() {
+	// Every category; those without steps are skipped below.
 	$terms = get_terms( array(
 		'taxonomy'   => 'product_cat',
 		'hide_empty' => false,
-		'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery -- a handful of categories
-			array( 'key' => 'journey_steps', 'value' => 0, 'compare' => '>', 'type' => 'NUMERIC' ),
-		),
 	) );
 
 	if ( $terms && ! is_wp_error( $terms ) && function_exists( 'get_field' ) ) {
@@ -175,11 +173,13 @@ function espire_journey_section( $journey, $args = array() ) {
 									echo '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>';
 								}
 							};
+							// Uploaded icons (circular, with their own text) show as-is, without the ring.
+							$ic = ( $step['symbol'] && 0 === strpos( (string) $step['symbol']['icon'], 'url:' ) ) ? 'ic has-image' : 'ic';
 							?>
 							<?php if ( $args['panels'] && $step['symbol'] ) : ?>
-								<button type="button" class="ic" data-panel-open="symbol-<?php echo esc_attr( $step['symbol']['slug'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></button>
+								<button type="button" class="<?php echo esc_attr( $ic ); ?>" data-panel-open="symbol-<?php echo esc_attr( $step['symbol']['slug'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></button>
 							<?php else : ?>
-								<a class="ic" href="<?php echo esc_url( $step['url'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></a>
+								<a class="<?php echo esc_attr( $ic ); ?>" href="<?php echo esc_url( $step['url'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></a>
 							<?php endif; ?>
 							<span class="lb"><?php echo esc_html( $step['label'] ); ?></span>
 						</div>
@@ -225,7 +225,7 @@ add_action( 'acf/init', function () {
 	if ( ! function_exists( 'acf_add_local_field_group' ) ) {
 		return;
 	}
-	acf_add_local_field_group( array(
+	acf_add_local_field_group( espire_acf_rows( array(
 		'key'      => 'group_espire_journey',
 		'title'    => 'Seed To Store Journey',
 		'fields'   => array(
@@ -257,9 +257,10 @@ add_action( 'acf/init', function () {
 				'label'        => 'Steps (in order)',
 				'name'         => 'journey_steps',
 				'type'         => 'repeater',
+				'max'          => 6,
 				'layout'       => 'table',
 				'button_label' => 'Add Step',
-				'instructions' => 'Pick a product tag for each step, first to last — drag the rows to reorder. Symbol tags show their own mark and link to their symbol page.',
+				'instructions' => 'Pick a product tag for each step, first to last. Symbol tags show their own icon and link to their symbol page.',
 				'sub_fields'   => array(
 					array(
 						'key'           => 'field_espire_journey_step_tag',
@@ -269,7 +270,7 @@ add_action( 'acf/init', function () {
 						'taxonomy'      => 'product_tag',
 						'field_type'    => 'select',
 						'return_format' => 'object',
-						'allow_null'    => 0,
+						'allow_null'    => 1, // so unused steps stay empty
 						'add_term'      => 0,
 						'save_terms'    => 0,
 						'load_terms'    => 0,
@@ -289,7 +290,7 @@ add_action( 'acf/init', function () {
 				array( 'param' => 'taxonomy', 'operator' => '==', 'value' => 'product_cat' ),
 			),
 		),
-	) );
+	) ) );
 
 	acf_add_local_field_group( array(
 		'key'      => 'group_espire_product_journey',
