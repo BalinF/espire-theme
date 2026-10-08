@@ -85,13 +85,9 @@ function espire_card_attributes() {
 		}
 	}
 
-	// Every size as a small box.
+	// Every size as a small box, or its icon image when the size term has one.
 	if ( $values['Size'] ) {
-		$html .= '<span class="card-sizes" aria-label="Sizes">';
-		foreach ( $values['Size'] as $size ) {
-			$html .= '<span class="card-size">' . esc_html( $size['name'] ) . '</span>';
-		}
-		$html .= '</span>';
+		$html .= espire_card_boxes( 'Sizes', $values['Size'] );
 	}
 
 	if ( $values['Fit'] ) {
