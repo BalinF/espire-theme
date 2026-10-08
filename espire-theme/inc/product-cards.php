@@ -81,7 +81,7 @@ function espire_card_attributes() {
 			$html .= '<span class="card-swatches" aria-label="' . esc_attr( 'Colours: ' . implode( ', ', wp_list_pluck( $colours, 'name' ) ) ) . '">' . $dots . '</span>';
 		}
 		if ( $plain ) {
-			$html .= '<span class="card-meta"><strong>Colour</strong> ' . esc_html( implode( ', ', $plain ) ) . '</span>';
+			$html .= '<span class="card-meta" aria-label="Colours">' . esc_html( implode( ', ', $plain ) ) . '</span>';
 		}
 	}
 
@@ -125,13 +125,15 @@ function espire_card_attributes() {
 }
 
 /**
- * A labelled row of small boxes on a card, e.g. "Fit [Classic] [Slim]".
+ * A row of small boxes on a card, e.g. [Classic] [Slim] for Fit. The
+ * attribute's name isn't printed (the values speak for themselves); it's
+ * kept for screen readers.
  * Each value is a name, or array( 'name', 'swatch' ) — values whose
  * attribute term has an icon image (Products → Attributes → edit a term →
  * Swatch Image, or the old swatches plugin's image) show the icon instead.
  */
 function espire_card_boxes( $label, $values ) {
-	$html = '<span class="card-sizes card-attr"><span class="card-attr-label">' . esc_html( $label ) . '</span>';
+	$html = '<span class="card-sizes card-attr" aria-label="' . esc_attr( $label ) . '">';
 	foreach ( $values as $value ) {
 		$name  = is_array( $value ) ? $value['name'] : $value;
 		$image = ( is_array( $value ) && ! empty( $value['swatch']['image'] ) ) ? $value['swatch']['image'] : '';
