@@ -93,7 +93,7 @@
 
 /**
  * Auto-advance — "Shop By Collection" slider on the homepage.
- * Moves one slide roughly every 2 seconds, looping back to the start
+ * Moves one slide roughly every 3 seconds, looping back to the start
  * once it reaches the end. Pauses while a visitor's mouse or finger is
  * actually on the slider (hover, touch, or click-dragging) so it never
  * fights someone trying to browse manually, and resumes a moment after
@@ -107,7 +107,7 @@
 		return;
 	}
 
-	var AUTO_DELAY = 2000; // ms between auto-advances
+	var AUTO_DELAY = 3000; // ms between auto-advances
 	var timer = null;
 
 	function slideWidth() {
