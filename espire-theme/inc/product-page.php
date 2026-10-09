@@ -299,6 +299,9 @@ function espire_product_swatches( $product ) {
 		if ( $attribute->is_taxonomy() ) {
 			foreach ( $attribute->get_terms() as $term ) {
 				$swatch = espire_term_swatch( $name, $term, $is_colour );
+				// Non-colour attributes (Size, Fit, Sleeve…): the image is an icon,
+				// shown whole inside a box like on the category cards.
+				$swatch['icon'] = ! $is_colour && $swatch['image'];
 				if ( $swatch['colour'] || $swatch['image'] ) {
 					$swatches[ 'attribute_' . $name ][ $term->slug ] = $swatch;
 				}
