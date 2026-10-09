@@ -219,7 +219,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 						),
 						// Everything below feeds the Fit Guide panel on product
 						// pages (see espire_fit_guide_panel() in inc/product-page.php).
-						// A fit with none of these filled in just doesn't show there.
+						// A fit with only a name (nothing else filled in) doesn't show there.
 						array(
 							'key'           => 'field_espire_fit_image',
 							'label'         => 'Fit Guide Photo',

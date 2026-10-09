@@ -132,7 +132,16 @@ function espire_category_fit_guide_panel( $term ) {
 /** Just the fits that have Fit Guide content (not only a name). */
 function espire_fits_with_guide( $fits ) {
 	return is_array( $fits ) ? array_values( array_filter( $fits, function ( $fit ) {
-		return ! empty( $fit['fit_name'] ) && ( ! empty( $fit['fit_measurements'] ) || ! empty( $fit['fit_size_notes'] ) || ! empty( $fit['fit_intro'] ) );
+		if ( empty( $fit['fit_name'] ) ) {
+			return false;
+		}
+		// Anything beyond the name is enough to show it: a photo, a line of text, size notes or measurements.
+		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_size_notes', 'fit_measurements' ) as $key ) {
+			if ( ! empty( $fit[ $key ] ) ) {
+				return true;
+			}
+		}
+		return false;
 	} ) ) : array();
 }
 
