@@ -779,6 +779,10 @@ button.trust-link:hover{ color:var(--rust); }
 .panel-mark img, .panel-mark svg{ width:100%; height:100%; object-fit:contain; }
 .panel-mark img{ filter:brightness(0); }
 .info-panel .panel-close svg{ width:22px; height:22px; display:block; }
+/* The X stays pinned at the top while a long panel (Fit Guide with photos
+   and a size table) scrolls. Panels with a dark title bar keep theirs in the bar. */
+.info-panel > .panel-close{ position:sticky; top:-14px; z-index:3; display:flex; align-items:center; justify-content:center; width:38px; height:38px; margin:-8px 0 8px -8px; padding:0; border-radius:50%; background:var(--paper); box-shadow:0 1px 4px rgba(0,0,0,.12); }
+.info-panel > .panel-close:hover{ color:var(--rust); }
 .panel-points{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:12px; }
 .panel-points li{ position:relative; padding-left:18px; font-size:.84rem; line-height:1.55; }
 .panel-points li::before{ content:""; position:absolute; left:0; top:.55em; width:7px; height:7px; background:var(--rust); border-radius:50%; }

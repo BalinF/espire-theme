@@ -192,7 +192,7 @@ echo '</div>';
 <div class="panel-overlay" data-panel-close="category-sidebar"></div>
 <div class="info-panel" id="category-sidebar-panel">
 	<button type="button" class="panel-close" aria-label="Close" data-panel-close="category-sidebar">
-		<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 	</button>
 	<h3>Fit Guide &mdash; <?php echo esc_html( $espire_term ? $espire_term->name : '' ); ?></h3>
 	<?php if ( $espire_sidebar_intro ) : ?>
