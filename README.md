@@ -183,6 +183,14 @@ buttons' text and links. Blank fields keep the current wording. Best video: a 10
 second muted loop, 1080p or 720p, 3–5 MB. *Phone Video (optional)*: a lighter cut that
 phones (up to 767px wide) get instead — about 10 seconds, portrait 540×960, under 2 MB.
 
+**Homepage → icon above the tagline**: same page, *Homepage Hero* box → *Icon Above
+The Tagline* (a light/white PNG or SVG). Empty keeps the sewing-machine mark.
+
+**Homepage → photo banners** ("Design Your Own" and "Our Mission Is Circular"): same
+page, *Homepage Banners* box, one tab each — photo, title, text, button text and
+link. Empty fields keep the current wording. (In code: `espire_home_banner()` in
+`inc/home.php` holds the defaults.)
+
 **Free shipping threshold** ($300): the theme's wording lives in
 `ESPIRE_FREE_SHIPPING_OVER` (`inc/product-page.php`); the actual free shipping is
 WooCommerce → Settings → Shipping → each zone → *Free shipping* → *Minimum order

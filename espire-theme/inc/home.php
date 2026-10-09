@@ -41,11 +41,49 @@ function espire_home_hero() {
 	return array(
 		'video'   => $field( 'hero_video' ) ?: '',
 		'mobile'  => $field( 'hero_video_mobile' ) ?: '',
+		'icon'    => $field( 'hero_icon' ) ?: '',
 		'poster'  => $field( 'hero_poster' ) ?: '',
 		'tagline' => $field( 'hero_tagline' ) ?: 'We believe in producing locally, sustainably and ethically',
 		'btn1'    => array( 'label' => $field( 'hero_btn1_label' ) ?: 'Shop The Store', 'url' => $field( 'hero_btn1_link' ) ?: home_url( '/store/' ) ),
 		'btn2'    => array( 'label' => $field( 'hero_btn2_label' ) ?: 'Design Your Own', 'url' => $field( 'hero_btn2_link' ) ?: home_url( '/diy/' ) ),
 	);
+}
+
+/**
+ * The two full-width photo banners on the homepage, editable on the
+ * homepage in wp-admin ("Homepage Banners" box); defaults until then.
+ * $n is 1 (Design Your Own, under Shop By Collection) or 2 (Our Mission
+ * Is Circular, under Shop The Set).
+ */
+function espire_home_banner( $n ) {
+	$uri      = get_template_directory_uri() . '/assets/';
+	$defaults = array(
+		1 => array(
+			'image'  => $uri . 'story-sewing-repair.jpg',
+			'title'  => 'Design Your Own',
+			'text'   => 'Pick a base hoodie or tee and customise fabric, colour and print in the live designer — cut and sewn here in Bright.',
+			'button' => 'Create Now',
+			'link'   => home_url( '/diy/' ),
+		),
+		2 => array(
+			'image'  => $uri . 'story-bright-aerial.jpg',
+			'title'  => 'Our Mission Is Circular',
+			'text'   => 'What goes around comes back around — from Good Earth Cotton through to the Respired program, every piece is designed to be repaired, returned or remade rather than landfilled.',
+			'button' => 'See The Respired Program',
+			'link'   => home_url( '/store/' ),
+		),
+	);
+	$banner = $defaults[ $n ];
+	$home   = espire_home_page_id();
+	if ( $home && function_exists( 'get_field' ) ) {
+		foreach ( array_keys( $banner ) as $key ) {
+			$value = get_field( 'banner' . $n . '_' . $key, $home );
+			if ( $value ) {
+				$banner[ $key ] = $value;
+			}
+		}
+	}
+	return $banner;
 }
 
 /**
@@ -154,6 +192,7 @@ add_action( 'acf/init', function () {
 				'instructions'  => 'A lighter cut for phones: about 10 seconds, portrait 540×960 (or 720×1280), ideally under 2 MB. Empty: phones get the main video.',
 			),
 			array( 'key' => 'field_espire_hero_poster', 'label' => 'Video Still', 'name' => 'hero_poster', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'medium', 'instructions' => 'Shows while the video loads (and if it can\'t play). Use a frame from the video.' ),
+			array( 'key' => 'field_espire_hero_icon', 'label' => 'Icon Above The Tagline', 'name' => 'hero_icon', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail', 'instructions' => 'A light (white) logo or mark, PNG or SVG with a transparent background. Empty: the built-in sewing machine mark.' ),
 			$text( 'hero_tagline', 'Tagline', 'Default: "We believe in producing locally, sustainably and ethically"', 'textarea' ),
 			$text( 'hero_btn1_label', 'Button 1 Text', 'Default: "Shop The Store"' ),
 			$text( 'hero_btn1_link', 'Button 1 Link', 'Default: /store/' ),
@@ -200,5 +239,23 @@ add_action( 'acf/init', function () {
 		),
 		'location' => array( array( array( 'param' => 'page', 'operator' => '==', 'value' => (string) $home ) ) ),
 		'position' => 'acf_after_title',
+	) );
+	$banner_fields = array();
+	foreach ( array( 1 => 'Design Your Own banner', 2 => 'Our Mission Is Circular banner' ) as $n => $label ) {
+		$banner_fields[] = array( 'key' => 'field_espire_banner' . $n . '_tab', 'label' => 'Banner ' . $n, 'name' => '', 'type' => 'tab' );
+		$banner_fields[] = array( 'key' => 'field_espire_banner' . $n . '_note', 'label' => '', 'name' => '', 'type' => 'message', 'message' => 'The ' . $label . '. Anything left empty keeps the current photo/wording.' );
+		$banner_fields[] = array( 'key' => 'field_espire_banner' . $n . '_image', 'label' => 'Photo', 'name' => 'banner' . $n . '_image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'medium', 'instructions' => 'Wide landscape photo, at least 1600px across.' );
+		$banner_fields[] = $text( 'banner' . $n . '_title', 'Title' );
+		$banner_fields[] = $text( 'banner' . $n . '_text', 'Text', '', 'textarea' );
+		$banner_fields[] = $text( 'banner' . $n . '_button', 'Button Text' );
+		$banner_fields[] = $text( 'banner' . $n . '_link', 'Button Link', 'Full address or /path/.' );
+	}
+	acf_add_local_field_group( array(
+		'key'        => 'group_espire_home_banners',
+		'menu_order' => 2,
+		'title'      => 'Homepage Banners',
+		'fields'     => $banner_fields,
+		'location'   => array( array( array( 'param' => 'page', 'operator' => '==', 'value' => (string) $home ) ) ),
+		'position'   => 'acf_after_title',
 	) );
 } );

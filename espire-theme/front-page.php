@@ -40,7 +40,11 @@ $espire_hero = espire_home_hero();
 	<?php endif; ?>
 	<div class="overlay">
 		<div class="hero-content">
-			<svg class="hero-mark" viewBox="0 0 64 40" fill="none" stroke="#F1EEE4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34h40M8 34v-4a3 3 0 013-3h6"/><path d="M17 27h20c5 0 9-3 9-7 0-3-2-5-5-5H23l-6 6"/><circle cx="34" cy="10" r="3.4"/><path d="M34 6.6V4M31 8l-2-2M37 8l2-2"/><path d="M17 27l-3 7"/><path d="M23 27l7 7"/><circle cx="12" cy="30" r="1.1" fill="#F1EEE4" stroke="none"/></svg>
+			<?php if ( $espire_hero['icon'] ) : ?>
+				<img class="hero-mark" src="<?php echo esc_url( $espire_hero['icon'] ); ?>" alt="">
+			<?php else : ?>
+				<svg class="hero-mark" viewBox="0 0 64 40" fill="none" stroke="#F1EEE4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34h40M8 34v-4a3 3 0 013-3h6"/><path d="M17 27h20c5 0 9-3 9-7 0-3-2-5-5-5H23l-6 6"/><circle cx="34" cy="10" r="3.4"/><path d="M34 6.6V4M31 8l-2-2M37 8l2-2"/><path d="M17 27l-3 7"/><path d="M23 27l7 7"/><circle cx="12" cy="30" r="1.1" fill="#F1EEE4" stroke="none"/></svg>
+			<?php endif; ?>
 			<h1 class="tagline"><?php echo esc_html( $espire_hero['tagline'] ); ?></h1>
 			<div class="cta-row">
 				<a href="<?php echo esc_url( $espire_hero['btn1']['url'] ); ?>" class="btn solid"><?php echo esc_html( $espire_hero['btn1']['label'] ); ?></a>
@@ -110,13 +114,14 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 	</div>
 </div>
 
+<?php $espire_banner = espire_home_banner( 1 ); // Pages → Home → "Homepage Banners" (inc/home.php) ?>
 <div class="banner-strip">
-	<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/story-sewing-repair.jpg' ); ?>" alt="Hand-repairing a garment on a sewing machine">
+	<img src="<?php echo esc_url( $espire_banner['image'] ); ?>" alt="">
 	<div class="overlay"></div>
 	<div class="content">
-		<h2>Design Your Own</h2>
-		<p>Pick a base hoodie or tee and customise fabric, colour and print in the live designer — cut and sewn here in Bright.</p>
-		<a href="<?php echo esc_url( home_url( '/diy/' ) ); ?>" class="btn solid">Create Now &rarr;</a>
+		<h2><?php echo esc_html( $espire_banner['title'] ); ?></h2>
+		<p><?php echo esc_html( $espire_banner['text'] ); ?></p>
+		<a href="<?php echo esc_url( $espire_banner['link'] ); ?>" class="btn solid"><?php echo esc_html( $espire_banner['button'] ); ?> &rarr;</a>
 	</div>
 </div>
 
@@ -175,17 +180,14 @@ $espire_set = espire_shop_the_set();
 	</div>
 </div>
 
+<?php $espire_banner = espire_home_banner( 2 ); // Pages → Home → "Homepage Banners" (inc/home.php) ?>
 <div class="banner-strip">
-	<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/story-bright-aerial.jpg' ); ?>" alt="Aerial view of Bright, Victoria">
+	<img src="<?php echo esc_url( $espire_banner['image'] ); ?>" alt="">
 	<div class="overlay"></div>
 	<div class="content">
-		<h2>Our Mission Is Circular</h2>
-		<p>What goes around comes back around — from Good Earth Cotton through to the Respired program, every piece is designed to be repaired, returned or remade rather than landfilled.</p>
-		<!-- TODO: this button should open the Respired slide-in overlay
-		     panel (same shared overlay component as Fit Guide / category
-		     sidebars) once that component is built — links to the store
-		     for now so it's never a dead click. -->
-		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="btn solid">See The Respired Program &rarr;</a>
+		<h2><?php echo esc_html( $espire_banner['title'] ); ?></h2>
+		<p><?php echo esc_html( $espire_banner['text'] ); ?></p>
+		<a href="<?php echo esc_url( $espire_banner['link'] ); ?>" class="btn solid"><?php echo esc_html( $espire_banner['button'] ); ?> &rarr;</a>
 	</div>
 </div>
 
