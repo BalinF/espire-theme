@@ -337,7 +337,17 @@
 			// Colour/fabric swatch set on the attribute term in wp-admin
 			// (passed in as window.espireSwatches by inc/product-page.php).
 			var swatch = swatchesFor( select )[ option.value ];
-			if ( swatch ) {
+			if ( swatch && swatch.icon ) {
+				// Icon image (Size, Fit, Sleeve…): the whole icon in a box.
+				btn.classList.add( 'is-icon' );
+				btn.title = option.textContent;
+				btn.setAttribute( 'aria-label', option.textContent );
+				btn.textContent = '';
+				var img = document.createElement( 'img' );
+				img.src = swatch.image;
+				img.alt = '';
+				btn.appendChild( img );
+			} else if ( swatch ) {
 				btn.classList.add( 'is-swatch' );
 				btn.title = option.textContent;
 				btn.setAttribute( 'aria-label', option.textContent );

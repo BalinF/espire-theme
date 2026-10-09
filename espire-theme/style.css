@@ -809,6 +809,12 @@ button.trust-link:hover{ color:var(--rust); }
 .option-pill.is-swatch:hover{ outline:1.5px solid var(--rust); outline-offset:2px; }
 .option-pill.is-swatch.is-active{ outline:1.5px solid var(--redrock); outline-offset:2px; border-color:var(--line); }
 .option-pill.is-swatch.is-unavailable{ opacity:.3; }
+/* Icon version (Size, Fit, Sleeve… with an icon image): the icon whole, in a box like the category cards */
+.option-pill.is-icon, .option-pills.is-size .option-pill.is-icon{ display:inline-flex; align-items:center; justify-content:center; min-width:46px; height:44px; padding:4px 8px; border:1px solid var(--line); border-radius:4px; background:var(--white); }
+.option-pill.is-icon img{ display:block; width:auto; height:34px; max-width:96px; object-fit:contain; }
+.option-pill.is-icon:hover{ border-color:var(--rust); }
+.option-pill.is-icon.is-active, .option-pills.is-size .option-pill.is-icon.is-active{ background:var(--white); border-color:var(--redrock); outline:1.5px solid var(--redrock); outline-offset:1px; }
+.option-pill.is-icon.is-unavailable{ opacity:.3; text-decoration:none; }
 
 /* ============================================================
    CART, CHECKOUT, MY ACCOUNT — shared page shell (page.php)
