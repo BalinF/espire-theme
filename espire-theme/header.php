@@ -116,6 +116,21 @@ endif;
 		}
 		?>
 	</nav>
+	<?php
+	// The Category Bar's links (Appearance → Menus → "Category Bar", or the
+	// built-in list until that's set), so phones can jump straight to a category.
+	$espire_mobile_cats = espire_category_bar_links();
+	if ( $espire_mobile_cats ) :
+		?>
+		<nav class="mobile-cats" aria-label="Shop by category">
+			<p class="mobile-sidebar-heading">Shop By Category</p>
+			<ul>
+				<?php foreach ( $espire_mobile_cats as $espire_cat ) : ?>
+					<li><a href="<?php echo esc_url( $espire_cat['url'] ); ?>"><?php echo esc_html( $espire_cat['label'] ); ?></a></li>
+				<?php endforeach; ?>
+			</ul>
+		</nav>
+	<?php endif; ?>
 </div>
 
 <?php

@@ -138,6 +138,11 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .mobile-sidebar nav a{ display:flex; align-items:center; gap:12px; padding:13px 4px; font-size:.9rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#fff; border-bottom:1px solid rgba(255,255,255,.12); }
 .mobile-sidebar nav a:hover{ color:var(--rust); }
 .mobile-sidebar nav a svg{ width:17px; height:17px; flex:none; stroke:currentColor; }
+/* "Shop By Category" list under the main links */
+.mobile-sidebar .mobile-cats{ margin-top:26px; }
+.mobile-sidebar-heading{ margin:0 0 4px 4px; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.12em; color:rgba(255,255,255,.55); }
+.mobile-sidebar .mobile-cats ul{ gap:0; }
+.mobile-sidebar .mobile-cats a{ padding:10px 4px; font-size:.8rem; font-weight:600; letter-spacing:.05em; }
 
 @media (max-width:860px){
   nav.primary-nav{ display:none; }
