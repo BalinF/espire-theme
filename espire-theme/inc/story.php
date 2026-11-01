@@ -109,7 +109,7 @@ function espire_story_link( $url ) {
  * in, else the starting copy.
  */
 function espire_story_content( $post ) {
-	$c   = espire_story_defaults( $post->post_name );
+	$c   = espire_story_defaults( espire_story_page_slug( $post ) ?: $post->post_name );
 	$get = function ( $name ) use ( $post ) {
 		return function_exists( 'get_field' ) ? get_field( $name, $post->ID ) : null;
 	};
@@ -139,6 +139,38 @@ function espire_story_content( $post ) {
 	return $c;
 }
 
+/**
+ * Which brand story a page is ('australian-made' or 'sustainability'),
+ * or '' if it isn't one. Matches the usual slugs and close variants
+ * (e.g. "fck-fast-fashion"), so a page whose address differs still gets
+ * the Brand Story layout and starting copy.
+ */
+function espire_story_page_slug( $post ) {
+	if ( ! $post || 'page' !== $post->post_type ) {
+		return '';
+	}
+	$slug = $post->post_name;
+	if ( preg_match( '/fast-fashion|sustainab/', $slug ) ) {
+		return 'sustainability';
+	}
+	if ( preg_match( '/australian-made|aussie-story/', $slug ) ) {
+		return 'australian-made';
+	}
+	return '';
+}
+
+/**
+ * Always use the Brand Story layout for those two pages — even if the page
+ * still has an old Elementor template picked (Page Attributes → Template),
+ * which would otherwise take over the page and show its old sections.
+ */
+add_filter( 'template_include', function ( $template ) {
+	if ( is_page() && espire_story_page_slug( get_queried_object() ) ) {
+		return get_template_directory() . '/template-story.php';
+	}
+	return $template;
+}, 999 );
+
 /** ACF fields for story pages ("Brand Story" box). */
 add_action( 'acf/init', function () {
 	if ( ! function_exists( 'acf_add_local_field_group' ) ) {
@@ -157,9 +189,11 @@ add_action( 'acf/init', function () {
 	$locations = array(
 		array( array( 'param' => 'page_template', 'operator' => '==', 'value' => 'template-story.php' ) ),
 	);
-	foreach ( array( 'australian-made', 'sustainability' ) as $slug ) {
-		$page = get_page_by_path( $slug );
-		if ( $page ) {
+	// The two story pages, whatever their exact slug (see espire_story_page_slug()).
+	// Only needed for the edit screens, so skipped on the public site.
+	$story_pages = is_admin() ? get_posts( array( 'post_type' => 'page', 'post_status' => 'any', 'numberposts' => -1 ) ) : array();
+	foreach ( $story_pages as $page ) {
+		if ( espire_story_page_slug( $page ) ) {
 			$locations[] = array( array( 'param' => 'page', 'operator' => '==', 'value' => (string) $page->ID ) );
 		}
 	}
