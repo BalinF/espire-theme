@@ -43,7 +43,7 @@ $espire_hero = espire_home_hero();
 			<?php if ( $espire_hero['icon'] ) : ?>
 				<img class="hero-mark" src="<?php echo esc_url( $espire_hero['icon'] ); ?>" alt="">
 			<?php else : ?>
-				<svg class="hero-mark" viewBox="0 0 64 40" fill="none" stroke="#F4F4F4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34h40M8 34v-4a3 3 0 013-3h6"/><path d="M17 27h20c5 0 9-3 9-7 0-3-2-5-5-5H23l-6 6"/><circle cx="34" cy="10" r="3.4"/><path d="M34 6.6V4M31 8l-2-2M37 8l2-2"/><path d="M17 27l-3 7"/><path d="M23 27l7 7"/><circle cx="12" cy="30" r="1.1" fill="#F4F4F4" stroke="none"/></svg>
+				<svg class="hero-mark" viewBox="0 0 64 40" fill="none" stroke="#F1EEE4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 34h40M8 34v-4a3 3 0 013-3h6"/><path d="M17 27h20c5 0 9-3 9-7 0-3-2-5-5-5H23l-6 6"/><circle cx="34" cy="10" r="3.4"/><path d="M34 6.6V4M31 8l-2-2M37 8l2-2"/><path d="M17 27l-3 7"/><path d="M23 27l7 7"/><circle cx="12" cy="30" r="1.1" fill="#F1EEE4" stroke="none"/></svg>
 			<?php endif; ?>
 			<h1 class="tagline"><?php echo esc_html( $espire_hero['tagline'] ); ?></h1>
 			<div class="cta-row">

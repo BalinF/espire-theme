@@ -18,9 +18,9 @@ Text Domain: espire
    ============================================================ */
 
 :root{
-  /* Brand tokens (Espire_Clothing_Brand_Guide.pdf), with the cream backgrounds swapped for white/neutral greys */
-  --paper:#FFFFFF;      /* page background: plain white (was cream #FDFAF4) */
-  --paper-alt:#F2F2F2;  /* light grey panels (was #F1E8D6) */
+  /* Real brand tokens, from Espire_Clothing_Brand_Guide.pdf */
+  --paper:#FDFAF4;
+  --paper-alt:#F1E8D6;
   --ink:#1E1E1E;       /* near-black — brand guide says never pure #000 */
   --ink-soft:#565E4F;
   --olive:#565E4F;
@@ -28,9 +28,9 @@ Text Domain: espire
   --rust:#C37602;
   --redrock:#A92626;
   --silver:#C0C0C0;
-  --line:#E2E2E2;       /* neutral grey lines (was #E0D7C7) */
-  --card:#F5F5F5;       /* light grey cards (was #F6F0E5) */
-  --white:#FFFFFF;
+  --line:#E0D7C7;
+  --card:#F6F0E5;
+  --white:#FFFDF7;
 }
 
 *{ box-sizing:border-box; }
@@ -102,7 +102,7 @@ body.admin-bar header.site-header:not(.is-solid){ top:32px; }
 }
 .logo-block{ display:flex; flex-direction:column; align-items:flex-start; line-height:1; }
 .logo-block .top{ font-family:"Cambria",Georgia,serif; font-size:1.05rem; font-weight:700; letter-spacing:.24em; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.4); }
-.logo-block .bottom{ font-family:"Cambria",Georgia,serif; font-size:.56rem; font-weight:500; letter-spacing:.32em; color:#E6E6E6; margin-top:3px; text-shadow:0 1px 6px rgba(0,0,0,.4); }
+.logo-block .bottom{ font-family:"Cambria",Georgia,serif; font-size:.56rem; font-weight:500; letter-spacing:.32em; color:#E7E3D2; margin-top:3px; text-shadow:0 1px 6px rgba(0,0,0,.4); }
 
 nav.primary-nav{ display:flex; gap:26px; flex-wrap:wrap; font-size:.72rem; font-weight:700; letter-spacing:.04em; }
 nav.primary-nav ul{ list-style:none; display:flex; gap:26px; flex-wrap:wrap; margin:0; padding:0; }
@@ -295,7 +295,7 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 .banner-strip .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.46); }
 .banner-strip .content{ position:relative; z-index:2; padding:0 6%; display:flex; flex-direction:column; align-items:center; gap:16px; max-width:680px; }
 .banner-strip h2{ font-size:clamp(2.2rem,5vw,3.6rem); text-shadow:0 3px 14px rgba(0,0,0,.5); }
-.banner-strip p{ margin:0; font-size:1rem; line-height:1.55; color:#F4F4F4; text-shadow:0 1px 6px rgba(0,0,0,.4); }
+.banner-strip p{ margin:0; font-size:1rem; line-height:1.55; color:#F1EEE4; text-shadow:0 1px 6px rgba(0,0,0,.4); }
 
 /* ---------- Shop The Set ---------- */
 .look{ display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr); gap:0; border:1.5px solid var(--ink); background:var(--white); }
@@ -528,7 +528,7 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
   font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase;
   font-size:clamp(1.8rem,4vw,2.6rem); margin:0; text-shadow:0 2px 8px rgba(0,0,0,.5);
 }
-.category-banner-inner p{ font-size:.9rem; line-height:1.5; margin:0; color:#F4F4F4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.category-banner-inner p{ font-size:.9rem; line-height:1.5; margin:0; color:#F1EEE4; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 /* Pages with the category bar: the see-through header sits over the
    banner, so the banner is taller and its text starts below the header. */
 body.header-over .category-banner{ min-height:380px; padding-top:76px; box-sizing:border-box; }
@@ -779,7 +779,7 @@ button.trust-link:hover{ color:var(--rust); }
 .symbol-panel{ padding-top:0; }
 .panel-titlebar{ display:flex; align-items:center; gap:12px; background:var(--ink); color:#fff; margin:0 -24px 18px; padding:18px 24px; }
 .panel-titlebar h3{ color:#fff; margin:0; font-size:1.1rem; }
-.panel-titlebar p{ margin:2px 0 0; font-size:.78rem; color:#E6E6E6; }
+.panel-titlebar p{ margin:2px 0 0; font-size:.78rem; color:#E7E3D2; }
 .panel-titlebar .panel-close{ margin:0 0 0 auto; color:#fff; }
 .panel-mark{ flex:none; width:40px; height:40px; border-radius:50%; background:var(--white); color:var(--ink); display:flex; align-items:center; justify-content:center; padding:9px; }
 .panel-mark img, .panel-mark svg{ width:100%; height:100%; object-fit:contain; }
@@ -1030,13 +1030,13 @@ body .woo-page #payment #place_order:hover{ background:#000; }
    F*ck Fast Fashion): hero, pillar cards, stat strip, shop
    feature, definition, closing banner
    ============================================================ */
-.story-label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:#E4E4E4; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.story-label{ display:block; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:#E6E0C9; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 .story-hero{ position:relative; min-height:340px; overflow:hidden; color:var(--white); background:var(--ink); display:flex; align-items:center; }
 .story-hero > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .story-hero .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.46); }
 .story-hero .content{ position:relative; z-index:2; padding:48px 6%; max-width:820px; display:flex; flex-direction:column; gap:10px; }
 .story-hero h1{ font-size:clamp(1.9rem,3.8vw,2.8rem); letter-spacing:.07em; line-height:1.1; text-shadow:0 2px 8px rgba(0,0,0,.5); text-wrap:balance; }
-.story-hero p{ margin:0; font-size:.95rem; line-height:1.55; color:#F4F4F4; max-width:600px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.story-hero p{ margin:0; font-size:.95rem; line-height:1.55; color:#F1EEE4; max-width:600px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 
 .story-pillars{ max-width:1400px; margin:0 auto; padding:44px 5% 0; }
 .story-eyebrow{ text-align:center; font-family:"Heebo",sans-serif; font-size:.7rem; letter-spacing:.1em; color:var(--ink-soft); font-weight:700; margin:0 0 26px; }
@@ -1053,7 +1053,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 
 .stat-strip{ display:flex; align-items:center; gap:26px; margin-top:44px; padding:26px 5%; background:var(--ink); color:#fff; }
 .stat-strip .stat-num{ font-family:"League Spartan","Arial Black",sans-serif; font-size:2.4rem; font-weight:800; flex:none; }
-.stat-strip .stat-text{ margin:0; font-size:.88rem; color:#D6D6D6; line-height:1.5; max-width:760px; }
+.stat-strip .stat-text{ margin:0; font-size:.88rem; color:#D8D4C0; line-height:1.5; max-width:760px; }
 .stat-strip .stat-text b{ color:#fff; }
 
 .story-feature{ display:flex; align-items:stretch; gap:32px; max-width:calc(1400px - 10%); margin:44px auto 0; width:90%; background:var(--white); border:1.5px solid var(--ink); }
@@ -1077,7 +1077,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .story-closing .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.6); z-index:1; }
 .story-closing .c-text{ position:relative; z-index:2; max-width:560px; display:flex; flex-direction:column; gap:10px; }
 .story-closing h2{ font-size:1.15rem; color:#fff; }
-.story-closing p{ margin:0; font-size:.9rem; color:#E2E2E2; line-height:1.6; }
+.story-closing p{ margin:0; font-size:.9rem; color:#E4E0CF; line-height:1.6; }
 .story-closing .btn{ position:relative; z-index:2; background:#fff; color:var(--ink); flex:none; }
 .story-closing .btn:hover{ background:var(--rust); color:#fff; }
 /* Tall "feature" version: left-weighted gradient, button under the text */
@@ -1110,12 +1110,12 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 @media (max-width:820px){ .contact-wrap{ grid-template-columns:1fr; } }
 .contact-wrap .kicker{ font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; font-weight:700; }
 .contact-left{ padding:56px 6% 56px 5%; display:flex; flex-direction:column; gap:18px; background:var(--ink); color:var(--white); }
-.contact-left .kicker{ color:#D6D6D6; }
+.contact-left .kicker{ color:#D8D4C0; }
 .contact-left h1{ font-size:clamp(1.9rem,3vw,2.5rem); color:#fff; letter-spacing:.04em; text-wrap:balance; }
-.contact-left .lead{ margin:0; font-size:.9rem; color:#D6D6D6; line-height:1.6; max-width:400px; }
+.contact-left .lead{ margin:0; font-size:.9rem; color:#D8D4C0; line-height:1.6; max-width:400px; }
 .contact-details{ list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:14px; }
 .contact-details li{ display:flex; align-items:center; gap:12px; font-size:.9rem; }
-.contact-details svg{ width:18px; height:18px; flex:none; color:#D6D6D6; }
+.contact-details svg{ width:18px; height:18px; flex:none; color:#D8D4C0; }
 .contact-details a:hover{ color:var(--rust); }
 .contact-right{ padding:56px 5% 56px 6%; display:flex; flex-direction:column; gap:16px; justify-content:center; }
 .contact-right .kicker{ color:var(--ink-soft); }
@@ -1142,9 +1142,9 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .symbol-hero > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .symbol-hero .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.5); }
 .symbol-hero .content{ position:relative; z-index:2; padding:48px 6%; max-width:760px; display:flex; flex-direction:column; gap:8px; }
-.symbol-script{ font-family:"Caveat",cursive; font-size:1.7rem; line-height:1; color:#F2F2F2; text-shadow:0 1px 6px rgba(0,0,0,.5); }
+.symbol-script{ font-family:"Caveat",cursive; font-size:1.7rem; line-height:1; color:#F1E8D6; text-shadow:0 1px 6px rgba(0,0,0,.5); }
 .symbol-hero h1{ font-size:clamp(2rem,4vw,2.9rem); letter-spacing:.07em; text-shadow:0 2px 8px rgba(0,0,0,.5); }
-.symbol-hero p{ margin:0; font-size:.95rem; line-height:1.55; color:#F4F4F4; max-width:600px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
+.symbol-hero p{ margin:0; font-size:.95rem; line-height:1.55; color:#F1EEE4; max-width:600px; text-shadow:0 1px 4px rgba(0,0,0,.5); }
 .symbol-hero-mark{ position:absolute; right:6%; bottom:36px; z-index:2; width:84px; height:84px; border-radius:50%; background:var(--white); color:var(--ink); padding:18px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,.35); }
 .symbol-hero-mark img, .symbol-hero-mark svg{ width:100%; height:100%; object-fit:contain; }
 .symbol-hero-mark img{ filter:brightness(0); }
