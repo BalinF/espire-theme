@@ -487,6 +487,10 @@ div.woocommerce{ max-width:1400px; margin:0 auto; padding:36px 5% 70px; }
   background:var(--card); border-left:4px solid var(--olive); padding:14px 18px; font-size:.85rem; list-style:none; margin:0 0 20px;
 }
 .woocommerce-error{ border-left-color:var(--redrock); }
+/* WooCommerce's own notice style adds a coloured top border (blue/green/red)
+   and an icon-font glyph that shows as a box — both removed. */
+body .woocommerce-message, body .woocommerce-info, body .woocommerce-error{ border-top:0 !important; border-right:0; border-bottom:0; padding:14px 18px !important; color:var(--ink); }
+body .woocommerce-message::before, body .woocommerce-info::before, body .woocommerce-error::before{ display:none !important; content:none !important; }
 
 /* Category/shop archive title */
 .woocommerce-products-header{ margin-bottom:26px; }
