@@ -405,7 +405,8 @@ footer.site-footer{ background:var(--ink); border-top:1px solid rgba(255,255,255
 .notfound-search{ display:flex; gap:8px; max-width:380px; margin:0 auto 30px; }
 .notfound-search input{ flex:1; padding:11px 14px; border:1px solid var(--line); border-radius:3px; font-size:.85rem; }
 .notfound-links{ display:flex; gap:10px 18px; flex-wrap:wrap; justify-content:center; font-size:.78rem; }
-.notfound-links a{ text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+.notfound-links a{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; color:var(--ink); }
+.notfound-links a:hover{ color:var(--rust); }
 
 /* ============================================================
    WOOCOMMERCE — baseline theming pass
@@ -592,7 +593,9 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .panel-overlay.is-open{ opacity:1; pointer-events:auto; }
 .info-panel.is-open{ transform:translateX(0); }
 .info-panel{ width:min(440px,92vw); }
-.panel-textlink{ display:block; text-align:center; margin-top:14px; font-size:.78rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+.panel-textlink{ display:block; text-align:center; margin-top:14px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; color:var(--ink); }
+.panel-textlink::after{ content:" \2192"; }
+.panel-textlink:hover{ color:var(--rust); }
 button.btn-block{ border:none; }
 
 /* ============================================================
@@ -689,7 +692,8 @@ button.btn-block{ border:none; }
 .product-info table.variations th, .product-info table.variations td{ padding:0; text-align:left; }
 .product-info table.variations th label{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
 .product-info table.variations select{ width:100%; padding:10px 12px; border:1px solid var(--ink); background:var(--white); font:inherit; font-size:.85rem; }
-.product-info .reset_variations{ display:inline-block; margin-top:8px; font-size:.72rem; text-decoration:underline; color:var(--ink-soft); }
+.product-info .reset_variations{ display:inline-block; margin-top:8px; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; color:var(--ink-soft); }
+.product-info .reset_variations:hover{ color:var(--rust); }
 .product-info .woocommerce-variation-price{ font-weight:700; color:var(--rust); }
 .product-info .woocommerce-variation-availability .stock{ font-size:.8rem; color:var(--ink-soft); margin:4px 0 0; }
 .product-info .woocommerce-variation-add-to-cart,
@@ -743,8 +747,11 @@ select.is-pill-source{ position:absolute !important; width:1px !important; heigh
 .trust-item{ flex:1; min-width:200px; display:flex; gap:10px; align-items:flex-start; font-size:.78rem; color:var(--ink-soft); text-align:left; }
 .trust-item svg{ flex:none; width:18px; height:18px; margin-top:1px; color:var(--ink); }
 button.trust-link{ background:none; border:none; padding:0; font:inherit; font-size:.78rem; cursor:pointer; }
-button.trust-link span{ text-decoration:underline; text-underline-offset:2px; }
-button.trust-link:hover{ color:var(--rust); }
+
+/* Links in the trust row: the site's usual text-link style (bold caps + arrow, rust on hover) */
+.trust-item a, button.trust-link span{ font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; line-height:1.5; color:var(--ink); text-decoration:none; transition:color .15s ease; }
+.trust-item a::after, button.trust-link span::after{ content:" \2192"; }
+.trust-item a:hover, button.trust-link:hover span{ color:var(--rust); }
 @media (max-width:640px){
   .desc-box{ flex-direction:column-reverse; padding:22px 18px; }
   .symbols-box{ padding:22px 14px; }
@@ -869,7 +876,7 @@ button.trust-link:hover{ color:var(--rust); }
 .woocommerce-cart table.cart .product-subtotal{ font-weight:700; }
 /* Remove "×" becomes a small "Remove" text link */
 .woocommerce-cart table.cart a.remove{ font-size:0 !important; width:auto; height:auto; background:none !important; color:var(--ink-soft) !important; border-radius:0; }
-.woocommerce-cart table.cart a.remove::after{ content:"Remove"; font-size:.72rem; text-decoration:underline; text-underline-offset:2px; font-weight:400; }
+.woocommerce-cart table.cart a.remove::after{ content:"Remove"; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; }
 .woocommerce-cart table.cart a.remove:hover::after{ color:var(--redrock); }
 
 /* Desktop: each row is a grid so columns read Product · Qty · Price · Subtotal · Remove */
@@ -898,7 +905,7 @@ button.trust-link:hover{ color:var(--rust); }
 .woocommerce-cart table.cart td.actions .coupon .button{ background:var(--ink); padding:9px 14px; font-size:.72rem; }
 /* The cart updates itself when a quantity changes (main.js), so the
    "Update cart" button is only a quiet fallback. */
-.woocommerce-cart table.cart td.actions button[name="update_cart"]{ background:none; color:var(--ink-soft); text-decoration:underline; padding:9px 0; font-size:.72rem; }
+.woocommerce-cart table.cart td.actions button[name="update_cart"]{ background:none; color:var(--ink-soft); padding:9px 0; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; }
 .woocommerce-cart table.cart td.actions button[name="update_cart"]:disabled{ visibility:hidden; }
 
 /* Totals card */
@@ -1189,7 +1196,8 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-bar .fit-pill{ border:1px solid var(--ink); border-radius:4px; color:var(--ink); background:var(--white); }
 .filter-bar .fit-pill:hover{ border-color:var(--rust); color:var(--rust); }
 .filter-bar .fit-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
-.filter-clear{ font-size:.72rem; text-decoration:underline; text-underline-offset:2px; color:var(--ink-soft); }
+.filter-clear{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; color:var(--ink-soft); }
+.filter-clear:hover{ color:var(--rust); }
 .filter-clear:hover{ color:var(--rust); }
 .filter-panel-btn{ margin-left:auto; border:none; }
 /* Desktop: the option groups sit straight in the bar's row. */
@@ -1241,8 +1249,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .shop-grid ul.products{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
 @media (max-width:900px){ .shop-grid ul.products{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
 @media (max-width:480px){ .shop-grid ul.products{ grid-template-columns:1fr; } }
-.trust-item a{ text-decoration:underline; text-underline-offset:2px; }
-.trust-item a:hover{ color:var(--rust); }
+
 
 /* Seed to Store: big tee drawing on the left, heading + journey row on the right */
 .seed-section{ display:flex; align-items:center; gap:34px; }
