@@ -191,10 +191,14 @@ page, *Homepage Banners* box, one tab each — photo, title, text, button text a
 link. Empty fields keep the current wording. (In code: `espire_home_banner()` in
 `inc/home.php` holds the defaults.)
 
-**Free shipping threshold** ($300): the theme's wording lives in
-`ESPIRE_FREE_SHIPPING_OVER` (`inc/product-page.php`); the actual free shipping is
-WooCommerce → Settings → Shipping → each zone → *Free shipping* → *Minimum order
-amount*. Change both together.
+**Shipping prices** (`inc/shipping.php`): Australian orders are priced by parcel
+weight from the MyPost Business rates — up to 500 g $9.31, up to 1 kg $12.45, up to
+3 kg (and heavier) $15.87 — and are free from $250 (`ESPIRE_FREE_SHIPPING_OVER` in
+`inc/product-page.php`). The theme sets the price of the Australian *Flat rate*
+method in WooCommerce → Settings → Shipping, so keep that method (its own cost is
+ignored); Local pickup is untouched. Each product needs a weight (Product data →
+Shipping); one without counts as 0.5 kg. Update the prices in `espire_shipping_bands()`
+when Australia Post changes them.
 
 **Store / Shop (`/store/`)**: lists every product, with the filter bar. `/store/`
 opens WooCommerce's Shop page. To make `/store/` the shop itself, set WooCommerce →

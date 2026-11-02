@@ -21,6 +21,7 @@ require_once get_template_directory() . '/inc/acf-rows.php';
 require_once get_template_directory() . '/inc/symbols.php';
 require_once get_template_directory() . '/inc/product-page.php';
 require_once get_template_directory() . '/inc/cart-checkout.php';
+require_once get_template_directory() . '/inc/shipping.php';
 require_once get_template_directory() . '/inc/collections.php';
 require_once get_template_directory() . '/inc/story.php';
 require_once get_template_directory() . '/inc/pages.php';
