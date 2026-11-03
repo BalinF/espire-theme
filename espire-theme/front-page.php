@@ -199,7 +199,7 @@ $espire_set = espire_shop_the_set();
  * shows its symbol's mark and links to that symbol's page.
  */
 $espire_journey = espire_homepage_journey();
-espire_journey_section( $espire_journey ); // inc/journey.php
+espire_journey_section( $espire_journey, array( 'panels' => true ) ); // inc/journey.php — symbol icons open their slide-in panel
 ?>
 
 <?php get_footer(); // Loads footer.php ?>

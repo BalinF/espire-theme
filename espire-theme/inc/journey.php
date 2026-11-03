@@ -176,7 +176,7 @@ function espire_journey_section( $journey, $args = array() ) {
 							// Uploaded icons (circular, with their own text) show as-is, without the ring.
 							$ic = ( $step['symbol'] && 0 === strpos( (string) $step['symbol']['icon'], 'url:' ) ) ? 'ic has-image' : 'ic';
 							?>
-							<?php if ( $args['panels'] && $step['symbol'] ) : ?>
+							<?php if ( $args['panels'] && ! empty( $step['symbol']['slug'] ) ) : ?>
 								<button type="button" class="<?php echo esc_attr( $ic ); ?>" data-panel-open="symbol-<?php echo esc_attr( $step['symbol']['slug'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></button>
 							<?php else : ?>
 								<a class="<?php echo esc_attr( $ic ); ?>" href="<?php echo esc_url( $step['url'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></a>
@@ -195,6 +195,14 @@ function espire_journey_section( $journey, $args = array() ) {
 		</div>
 	</div>
 	<?php
+	// The slide-in panel for each symbol step (hidden until its icon is clicked).
+	if ( $args['panels'] ) {
+		foreach ( $steps as $step ) {
+			if ( ! empty( $step['symbol']['slug'] ) ) {
+				espire_symbol_panel( $step['symbol'] );
+			}
+		}
+	}
 }
 
 /** The original Tees journey, shown until a category has one set up. */
@@ -203,7 +211,9 @@ function espire_default_journey() {
 	$step    = function ( $label, $url, $slug = '' ) use ( $symbols ) {
 		$symbol = null;
 		if ( $slug && isset( $symbols[ $slug ] ) ) {
-			$symbol = $symbols[ $slug ];
+			// The real tag's symbol (with its edits) when the tag exists.
+			$term   = get_term_by( 'slug', $slug, 'product_tag' );
+			$symbol = $term ? espire_symbol_from_tag( $term ) : null;
 		}
 		return array( 'label' => $label, 'url' => home_url( $url ), 'symbol' => $symbol );
 	};
