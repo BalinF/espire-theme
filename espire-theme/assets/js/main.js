@@ -487,3 +487,51 @@
 		} );
 	} );
 } )();
+
+/**
+ * Filter rows (inc/shop-filters.php): each filter is one row that scrolls
+ * sideways. Show the left/right arrows only when there's more to see that
+ * way (the slide buttons themselves are handled above).
+ */
+( function () {
+	'use strict';
+
+	function update( row ) {
+		var track = row.querySelector( '.filter-track' );
+		if ( ! track ) {
+			return;
+		}
+		var max = track.scrollWidth - track.clientWidth;
+		row.classList.toggle( 'can-prev', track.scrollLeft > 2 );
+		row.classList.toggle( 'can-next', track.scrollLeft < max - 2 );
+	}
+
+	function updateAll() {
+		document.querySelectorAll( '.filter-row' ).forEach( update );
+	}
+
+	document.querySelectorAll( '.filter-row' ).forEach( function ( row ) {
+		var track = row.querySelector( '.filter-track' );
+		if ( ! track ) {
+			return;
+		}
+		track.addEventListener( 'scroll', function () {
+			update( row );
+		}, { passive: true } );
+		// Start scrolled to a chosen option, so a picked size/colour is in view.
+		var active = track.querySelector( '.is-active' );
+		if ( active && active.offsetLeft > track.clientWidth ) {
+			track.scrollLeft = active.offsetLeft - 40;
+		}
+	} );
+
+	window.addEventListener( 'resize', updateAll );
+	window.addEventListener( 'load', updateAll );
+	// Phones: rows are hidden until "Filters" is tapped, so measure again then.
+	document.querySelectorAll( '.filter-toggle' ).forEach( function ( btn ) {
+		btn.addEventListener( 'click', function () {
+			window.setTimeout( updateAll, 0 );
+		} );
+	} );
+	updateAll();
+} )();

@@ -1189,8 +1189,17 @@ body .woo-page #payment #place_order:hover{ background:#000; }
    ============================================================ */
 .filter-bar{ border-bottom:1px solid var(--line); }
 .filter-bar-inner{ max-width:1400px; margin:0 auto; padding:14px 5%; display:flex; align-items:center; gap:12px 26px; flex-wrap:wrap; }
-.filter-group{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; }
+.filter-group{ display:flex; align-items:center; gap:8px; min-width:0; }
+.filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; flex:none; width:58px; }
+/* Each filter is one row; extra options scroll sideways behind the arrows. */
+.filter-row{ position:relative; display:flex; align-items:center; flex:1; min-width:0; }
+.filter-track{ display:flex; align-items:center; gap:8px; overflow-x:auto; scroll-behavior:smooth; scrollbar-width:none; padding:4px 3px; min-width:0; }
+.filter-track::-webkit-scrollbar{ display:none; }
+.filter-track > *{ flex:none; }
+.filter-arrow{ display:none; flex:none; background:none; border:none; padding:2px 4px; cursor:pointer; color:var(--ink); }
+.filter-arrow:hover{ color:var(--rust); }
+.filter-arrow .espire-arrow-mark{ width:10px; height:34px; }
+.filter-row.can-prev .filter-prev, .filter-row.can-next .filter-next{ display:block; }
 .size-pill{ min-width:36px; height:32px; padding:0 8px; border-radius:4px; border:1px solid var(--ink); display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--ink); background:var(--white); transition:border-color .15s ease, background .15s ease, color .15s ease; }
 .size-pill:hover{ border-color:var(--rust); color:var(--rust); }
 .size-pill.is-active{ background:var(--redrock); border-color:var(--redrock); color:var(--white); }
@@ -1204,8 +1213,10 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-clear:hover{ color:var(--rust); }
 .filter-clear:hover{ color:var(--rust); }
 .filter-panel-btn{ margin-left:auto; border:none; }
-/* Desktop: the option groups sit straight in the bar's row. */
-.filter-groups{ display:contents; }
+/* The filters stack one row each; the green panel button sits top right. */
+.filter-bar-inner{ align-items:flex-start; flex-wrap:nowrap; }
+.filter-groups{ display:flex; flex-direction:column; align-items:stretch; gap:6px; flex:1; min-width:0; }
+.filter-groups .filter-clear{ align-self:flex-start; margin:2px 0 0 66px; }
 .filter-toggle{ display:none; }
 /* Phones: options fold away behind a "Filters" button, next to the green
    panel button; tapping it opens them underneath (main.js). */
@@ -1221,7 +1232,10 @@ body .woo-page #payment #place_order:hover{ background:#000; }
   .filter-toggle-chevron{ transition:transform .2s ease; }
   .filter-toggle[aria-expanded="true"] .filter-toggle-chevron{ transform:rotate(180deg); }
   .filter-panel-btn{ margin-left:0; flex:1 1 0; min-height:38px; text-align:center; }
-  .filter-groups{ display:none; order:3; flex-basis:100%; flex-direction:column; align-items:flex-start; gap:14px; padding-top:6px; }
+  .filter-bar-inner{ flex-wrap:wrap; align-items:center; }
+  .filter-groups{ display:none; order:3; flex-basis:100%; flex-direction:column; align-items:stretch; gap:10px; padding-top:6px; }
+  .filter-label{ width:50px; }
+  .filter-groups .filter-clear{ margin-left:58px; }
   .filter-groups.is-open{ display:flex; }
 }
 
