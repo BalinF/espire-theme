@@ -590,6 +590,13 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .fits-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
 .fits-list li{ display:flex; flex-direction:column; font-size:.85rem; border-bottom:1px solid var(--line); padding-bottom:8px; }
 .fits-list li span{ color:var(--ink-soft); font-size:.78rem; }
+/* Category "About" panel (archive-product.php) */
+.category-overview .overview-text{ font-size:.86rem; line-height:1.65; color:var(--ink); }
+.category-overview .overview-text p{ margin:0 0 12px; }
+.category-overview .overview-image{ display:block; width:100%; height:auto; margin:8px 0 6px; }
+.category-overview > p:not(.panel-intro):not(.panel-note){ font-size:.86rem; line-height:1.6; margin:0; }
+.category-overview .panel-note{ font-size:.74rem; color:var(--ink-soft); margin:10px 0 0; }
+.category-overview .btn-block{ margin-top:22px; }
 
 /* Any panel opened through main.js gets "is-open" on itself and its
    overlay — so new panels (Fit Guide, symbols, shipping…) need no
