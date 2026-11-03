@@ -67,6 +67,10 @@ The templates fall back gracefully when these are empty, so fill them in as you 
 
 **Products → Categories → edit a category** (sub-categories inherit from their parent)
 - *Category Emblem* — the collection badge shown beside the product name.
+- *Overview Intro*, *Overview*, *Overview Image* — the category's **About** panel
+  (green "About [Category]" button on the category page): what the category is
+  about, plus an optional picture (e.g. a build-your-hoodie graphic). Empty
+  Overview uses the category's own Description.
 - *Available Fits* — each fit's name and one-liner, plus the **Fit Guide** details
   (photo, intro, model note, size notes, measurements). The product page's
   "Fit Guide" button only appears once a fit has guide content.
@@ -124,9 +128,9 @@ attributes, either kind:
 A category page only offers the values its own products use. Click an option to
 switch it on and again to switch it off; several can be combined. If there's no Fit
 attribute, a category's sub-categories are the Fit buttons. Every category gets the
-green **Fit Guide** button: it opens the full Fit Guide when the category (or its
-parent) has fit details, otherwise the Sidebar Intro / Fits / Sourcing text, or a
-"contact us" note.
+green **About [Category]** button: an overview (intro, overview text and image, fit
+names with their one-liners, where it's made). The detailed **Fit Guide** with
+measurements shows on product pages only.
 
 **Swatch colours**, first found:
 1. Products → Attributes → Colour → edit a colour → *Swatch*

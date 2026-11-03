@@ -35,11 +35,13 @@ if ( is_product_category() ) {
 $espire_banner_image = espire_category_banner_image( $espire_term );
 $espire_banner_title = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_banner_title', $espire_term_id ) : '';
 $espire_banner_text  = ( $espire_term_id && function_exists( 'get_field' ) ) ? get_field( 'category_banner_text', $espire_term_id ) : '';
-// Fit Guide panel text: this category's, else the nearest parent's that
+// "About" panel content: this category's, else the nearest parent's that
 // has some (so "Fitted Tees" uses Tees').
 $espire_sidebar_intro    = '';
 $espire_sidebar_fits     = array();
 $espire_sidebar_sourcing = '';
+$espire_overview_text    = '';
+$espire_overview_image   = '';
 for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ) && function_exists( 'get_field' ); $espire_t = $espire_t->parent ? get_term( $espire_t->parent, 'product_cat' ) : null ) {
 	$espire_key              = 'product_cat_' . $espire_t->term_id;
 	$espire_sidebar_intro    = (string) get_field( 'category_sidebar_intro', $espire_key );
@@ -47,7 +49,9 @@ for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ) && funct
 		return is_array( $fit ) && ! empty( $fit['fit_name'] );
 	} ) );
 	$espire_sidebar_sourcing = (string) get_field( 'category_sidebar_sourcing', $espire_key );
-	if ( $espire_sidebar_intro || $espire_sidebar_fits || $espire_sidebar_sourcing ) {
+	$espire_overview_text    = (string) get_field( 'category_overview_text', $espire_key );
+	$espire_overview_image   = espire_image_url( get_field( 'category_overview_image', $espire_key ) );
+	if ( $espire_sidebar_intro || $espire_sidebar_fits || $espire_sidebar_sourcing || $espire_overview_text || $espire_overview_image ) {
 		break;
 	}
 }
@@ -98,7 +102,7 @@ if ( $espire_is_shop ) {
 	$espire_banner_title = $espire_shop_id > 0 ? get_the_title( $espire_shop_id ) : 'Shop';
 }
 $espire_show_tiles = false; // the shop lists every product (collection tiles live on the homepage)
-$espire_has_sidebar_content = $espire_sidebar_intro || ! empty( $espire_sidebar_fits ) || $espire_sidebar_sourcing;
+$espire_has_sidebar_content = $espire_sidebar_intro || ! empty( $espire_sidebar_fits ) || $espire_sidebar_sourcing || $espire_overview_text || $espire_overview_image;
 
 ?>
 
@@ -117,20 +121,12 @@ espire_collection_banner( array(
 
 <?php
 // Fit / Size / Colour filters (inc/shop-filters.php), with the green
-// "Fit Guide" button on the right.
-// The Fit Guide panel is printed now (hidden) so we know whether there is
-// one; categories without fit details fall back to the sidebar content.
-ob_start();
-$espire_has_fit_guide  = $espire_term ? espire_category_fit_guide_panel( $espire_term ) : false;
-$espire_fit_guide_html = ob_get_clean();
-// Every category gets the button: the full Fit Guide when its fits have
-// guide details, otherwise the simpler panel below.
-$espire_panel          = $espire_has_fit_guide ? 'fit-guide' : ( $espire_term ? 'category-sidebar' : '' );
-
+// "About [Category]" button on the right: a category overview. The
+// detailed Fit Guide (measurements) lives on product pages only.
 espire_filter_bar( array(
 	'category'    => $espire_term,
-	'panel'       => $espire_diy_guide ? 'design-guide' : $espire_panel,
-	'panel_label' => $espire_diy_guide ? 'Design Guide' : 'Fit Guide',
+	'panel'       => $espire_diy_guide ? 'design-guide' : ( $espire_term ? 'category-sidebar' : '' ),
+	'panel_label' => $espire_diy_guide ? 'Design Guide' : ( $espire_term ? 'About ' . $espire_term->name : '' ),
 ) );
 ?>
 
@@ -168,8 +164,6 @@ if ( $espire_show_tiles ) {
 echo '</div>';
 ?>
 
-<?php echo $espire_fit_guide_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built ?>
-
 <?php if ( $espire_diy_guide ) : ?>
 <div class="panel-overlay" data-panel-close="design-guide"></div>
 <aside class="info-panel" id="design-guide-panel" aria-label="Design Guide">
@@ -182,21 +176,30 @@ echo '</div>';
 </aside>
 <?php endif; ?>
 
-<?php if ( ! $espire_has_fit_guide && $espire_term && ! $espire_diy_guide ) : ?>
-<!-- Fallback "Fit Guide" slide-in for categories without full fit guide
-     details yet (no measurements/size notes) — same right-anchored panel pattern
-     as the mobile nav sidebar (see .mobile-sidebar in style.css and the
-     open/close JS in main.js), populated entirely from the ACF fields
-     above. Empty repeater rows are just skipped, so a category with no
-     fits entered yet doesn't show a blank "Available Fits" heading. -->
+<?php if ( $espire_term && ! $espire_diy_guide ) : ?>
+<!-- "About [Category]" slide-in: an overview of the category (Products →
+     Categories → edit → Overview Intro / Overview / Overview Image, Available
+     Fits names, Sourcing). No measurements here — those are in the Fit
+     Guide on each product page. -->
 <div class="panel-overlay" data-panel-close="category-sidebar"></div>
-<div class="info-panel" id="category-sidebar-panel">
+<aside class="info-panel category-overview" id="category-sidebar-panel" aria-label="About <?php echo esc_attr( $espire_term->name ); ?>">
 	<button type="button" class="panel-close" aria-label="Close" data-panel-close="category-sidebar">
 		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 	</button>
-	<h3>Fit Guide &mdash; <?php echo esc_html( $espire_term ? $espire_term->name : '' ); ?></h3>
+	<h3>About <?php echo esc_html( $espire_term->name ); ?></h3>
 	<?php if ( $espire_sidebar_intro ) : ?>
 		<p class="panel-intro"><?php echo esc_html( $espire_sidebar_intro ); ?></p>
+	<?php endif; ?>
+
+	<?php if ( $espire_overview_text ) : ?>
+		<div class="overview-text"><?php echo wp_kses_post( $espire_overview_text ); ?></div>
+	<?php elseif ( $espire_term->description ) : ?>
+		<?php // No Overview entered: the category's own Description (Products → Categories). ?>
+		<div class="overview-text"><?php echo wp_kses_post( wpautop( $espire_term->description ) ); ?></div>
+	<?php endif; ?>
+
+	<?php if ( $espire_overview_image ) : ?>
+		<img class="overview-image" src="<?php echo esc_url( $espire_overview_image ); ?>" alt="" loading="lazy">
 	<?php endif; ?>
 
 	<?php if ( ! empty( $espire_sidebar_fits ) ) : ?>
@@ -205,10 +208,13 @@ echo '</div>';
 			<?php foreach ( $espire_sidebar_fits as $espire_fit ) : ?>
 				<li>
 					<strong><?php echo esc_html( $espire_fit['fit_name'] ); ?></strong>
-					<span><?php echo esc_html( $espire_fit['fit_description'] ?? '' ); ?></span>
+					<?php if ( ! empty( $espire_fit['fit_description'] ) ) : ?>
+						<span><?php echo esc_html( $espire_fit['fit_description'] ); ?></span>
+					<?php endif; ?>
 				</li>
 			<?php endforeach; ?>
 		</ul>
+		<p class="panel-note">Full measurements are in the Fit Guide on each product.</p>
 	<?php endif; ?>
 
 	<?php if ( $espire_sidebar_sourcing ) : ?>
@@ -216,11 +222,11 @@ echo '</div>';
 		<p><?php echo esc_html( $espire_sidebar_sourcing ); ?></p>
 	<?php endif; ?>
 
-	<?php if ( ! $espire_has_sidebar_content ) : ?>
-		<p class="panel-intro">We're still putting together the fit details for <?php echo esc_html( $espire_term->name ); ?>. Unsure on sizing? Get in touch and we'll help you pick the right fit.</p>
+	<?php if ( ! $espire_has_sidebar_content && ! $espire_term->description ) : ?>
+		<p class="panel-intro">More about <?php echo esc_html( $espire_term->name ); ?> coming soon. Questions in the meantime? Get in touch.</p>
 	<?php endif; ?>
 
 	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
-</div>
+</aside>
 <?php endif; ?>
 <?php get_footer(); ?>
