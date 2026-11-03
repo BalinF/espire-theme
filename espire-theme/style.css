@@ -590,13 +590,65 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .fits-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
 .fits-list li{ display:flex; flex-direction:column; font-size:.85rem; border-bottom:1px solid var(--line); padding-bottom:8px; }
 .fits-list li span{ color:var(--ink-soft); font-size:.78rem; }
-/* Category "About" panel (archive-product.php) */
-.category-overview .overview-text{ font-size:.86rem; line-height:1.65; color:var(--ink); }
-.category-overview .overview-text p{ margin:0 0 12px; }
-.category-overview .overview-image{ display:block; width:100%; height:auto; margin:8px 0 6px; }
-.category-overview > p:not(.panel-intro):not(.panel-note){ font-size:.86rem; line-height:1.6; margin:0; }
-.category-overview .panel-note{ font-size:.74rem; color:var(--ink-soft); margin:10px 0 0; }
-.category-overview .btn-block{ margin-top:22px; }
+/* Category "About" panel (archive-product.php), laid out like the live
+   site's category popups: photo + emblem, olive bands, intro box, fits,
+   seed-to-store tags zig-zagging down. */
+.info-panel.category-overview{ width:min(520px,94vw); }
+.category-overview > .panel-close{ margin:-14px 0 -24px -12px; }
+.category-overview .ov-header{ position:relative; margin:-26px -24px 0; height:230px; background:#2b2b28 center / cover no-repeat; display:flex; align-items:center; justify-content:center; }
+.category-overview .ov-header::after{ content:""; position:absolute; inset:0; background:rgba(10,10,8,.28); }
+.category-overview .ov-emblem{ position:relative; z-index:1; max-width:62%; max-height:160px; width:auto; height:auto; object-fit:contain; filter:drop-shadow(0 4px 10px rgba(0,0,0,.45)); }
+.category-overview .ov-emblem.is-svg{ filter:invert(1) drop-shadow(0 4px 10px rgba(0,0,0,.45)); }
+.category-overview .ov-title{ position:relative; z-index:1; color:#fff; font-size:1.8rem; margin:0; }
+.category-overview .ov-band{ margin:0 -24px; padding:16px 24px; background:var(--olive); color:#fff; text-align:center; text-transform:uppercase; letter-spacing:.16em; font-weight:700; font-size:.92rem; line-height:1.5; }
+.category-overview h4.ov-band{ margin-top:26px; font-family:"League Spartan","Arial Black",sans-serif; font-size:1.25rem; letter-spacing:.06em; padding:12px 24px; }
+.category-overview .ov-box{ border:1.5px solid var(--ink); padding:16px 18px; margin:18px 0 0; text-align:center; }
+.category-overview .ov-intro{ font-weight:700; font-size:.9rem; margin:0; }
+.category-overview .ov-intro + .overview-text{ margin-top:10px; }
+.category-overview .overview-text{ font-size:.84rem; line-height:1.65; color:var(--ink); }
+.category-overview .overview-text p{ margin:0 0 10px; }
+.category-overview .overview-text p:last-child{ margin-bottom:0; }
+.category-overview .overview-image{ display:block; width:100%; height:auto; margin:16px 0 0; }
+.category-overview .fits-list{ margin-top:16px; }
+.category-overview .fits-list li img{ width:42px; height:42px; object-fit:contain; margin-bottom:4px; }
+.category-overview .panel-note{ font-size:.74rem; color:var(--ink-soft); margin:10px 0 0; text-align:center; }
+.category-overview .ov-steps{ list-style:none; margin:20px 0 0; padding:0; display:flex; flex-direction:column; gap:24px; }
+.category-overview .ov-step{ display:flex; align-items:center; gap:18px; }
+.category-overview .ov-step.is-flipped{ flex-direction:row-reverse; text-align:right; }
+.category-overview .ov-step-icon{ flex:none; width:96px; height:96px; display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.category-overview .ov-step-icon img, .category-overview .ov-step-icon svg{ width:100%; height:100%; object-fit:contain; }
+.category-overview .ov-step-body{ display:flex; flex-direction:column; gap:5px; font-size:.82rem; line-height:1.55; }
+.category-overview .ov-step-body strong{ font-size:.9rem; }
+.category-overview .ov-step-body span{ color:var(--ink-soft); }
+.category-overview .ov-step-body a{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); text-decoration:none; }
+.category-overview .ov-step-body a::after{ content:" \2192"; }
+.category-overview .ov-step-body a:hover{ color:var(--rust); }
+.category-overview .ov-sourcing{ font-size:.84rem; line-height:1.6; margin:14px 0 0; text-align:center; }
+.category-overview .btn-block{ margin-top:26px; }
+@media (max-width:480px){
+  .category-overview .ov-step-icon{ width:72px; height:72px; }
+}
+
+/* Product page Size Guide (inc/product-page.php): one tab per fit (icon +
+   name), then the fit's photo, text, diagrams, size chart. Wider than the
+   other panels so the charts stay readable. */
+.info-panel.size-guide-panel{ width:min(780px,96vw); }
+.size-guide-panel .fit-tab{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+.size-guide-panel .fit-tab-icon{ width:46px; height:46px; object-fit:contain; }
+.info-panel.size-guide-panel .fit-tab.is-active{ background:var(--white); color:var(--redrock); border-color:var(--redrock); box-shadow:inset 0 0 0 1.5px var(--redrock); }
+.size-guide-panel .fit-pane-top{ display:grid; grid-template-columns:minmax(0,220px) minmax(0,1fr); gap:20px; align-items:start; }
+.size-guide-panel .fit-pane-top.no-photo{ grid-template-columns:1fr; }
+.size-guide-panel .fit-photo{ width:100%; height:auto; aspect-ratio:auto; object-fit:contain; margin:0; }
+.size-guide-panel .fit-pane-intro h4{ margin-top:0; }
+.size-guide-panel .fit-text{ font-size:.82rem; line-height:1.6; color:var(--ink); }
+.size-guide-panel .fit-text p{ margin:0 0 10px; }
+.size-guide-panel .fit-text strong{ text-transform:uppercase; letter-spacing:.03em; }
+.size-guide-panel .fit-guide-img{ display:block; width:100%; height:auto; margin:18px 0 0; }
+@media (max-width:640px){
+  .size-guide-panel .fit-pane-top{ grid-template-columns:1fr; }
+  .size-guide-panel .fit-photo{ max-width:240px; margin:0 auto; }
+}
+.size-guide-btn{ display:inline-block; margin-top:18px; border:none; cursor:pointer; }
 
 /* Any panel opened through main.js gets "is-open" on itself and its
    overlay — so new panels (Fit Guide, symbols, shipping…) need no

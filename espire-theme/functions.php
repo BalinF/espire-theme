@@ -199,6 +199,22 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'instructions' => 'One or two lines at the top of the category\'s "About" slide-in panel (the green button on the category page), e.g. "The product that started it all."',
 				),
 				array(
+					'key'           => 'field_espire_cat_overview_header',
+					'label'         => 'Overview Header Photo',
+					'name'          => 'category_overview_header',
+					'type'          => 'image',
+					'return_format' => 'url',
+					'preview_size'  => 'medium',
+					'instructions'  => 'Photo at the top of the About panel, with the Category Emblem over it. Empty: the Banner Image.',
+				),
+				array(
+					'key'          => 'field_espire_cat_overview_tagline',
+					'label'        => 'Overview Tagline',
+					'name'         => 'category_overview_tagline',
+					'type'         => 'text',
+					'instructions' => 'Big line in the olive band under the photo, e.g. "Our staple garment, made in the mountains."',
+				),
+				array(
 					'key'          => 'field_espire_cat_overview_text',
 					'label'        => 'Overview',
 					'name'         => 'category_overview_text',
@@ -209,12 +225,12 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 				),
 				array(
 					'key'           => 'field_espire_cat_overview_image',
-					'label'         => 'Overview Image',
+					'label'         => 'Fits Overview Image',
 					'name'          => 'category_overview_image',
 					'type'          => 'image',
 					'return_format' => 'url',
 					'preview_size'  => 'medium',
-					'instructions'  => 'Optional picture for the About panel, e.g. a "build your hoodie" graphic (shape, size, length, neckline…). Shown full width of the panel.',
+					'instructions'  => 'Shown under the FITS heading in the About panel, e.g. the "build your hoodie" graphic (shape, size, length, neckline, pocket, logo). Empty: the fit names and one-liners are listed instead.',
 				),
 				array(
 					'key'          => 'field_espire_cat_sidebar_fits',
@@ -222,7 +238,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'name'         => 'category_sidebar_fits',
 					'type'         => 'repeater',
 					'max'          => 4,
-					'instructions' => 'Each fit\'s name and one-line description show in the category\'s About panel. The photo, intro, model note, size notes and measurements make up the detailed Fit Guide on this category\'s product pages.',
+					'instructions' => 'Each fit becomes a tab in the Size Guide on this category\'s product pages (button under the description): tab icon + name, model photo and note, text, diagrams, size chart. The name and one-liner also show in the category\'s About panel if there\'s no Fits Overview Image.',
 					'layout'       => 'block',
 					'button_label' => 'Add Fit',
 					'sub_fields'   => array(
@@ -231,6 +247,15 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'label' => 'Fit Name',
 							'name'  => 'fit_name',
 							'type'  => 'text',
+						),
+						array(
+							'key'           => 'field_espire_fit_icon',
+							'label'         => 'Tab Icon',
+							'name'          => 'fit_icon',
+							'type'          => 'image',
+							'return_format' => 'url',
+							'preview_size'  => 'thumbnail',
+							'instructions'  => 'Small icon on this fit\'s tab in the product Size Guide (e.g. the Classic cut circle). Optional.',
 						),
 						array(
 							'key'   => 'field_espire_fit_description',
@@ -243,7 +268,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 						// A fit with only a name (nothing else filled in) doesn't show there.
 						array(
 							'key'           => 'field_espire_fit_image',
-							'label'         => 'Fit Guide Photo',
+							'label'         => 'Model Photo',
 							'name'          => 'fit_image',
 							'type'          => 'image',
 							'return_format' => 'url',
@@ -251,11 +276,13 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 						),
 						array(
 							'key'          => 'field_espire_fit_intro',
-							'label'        => 'Fit Guide Intro',
+							'label'        => 'Size Guide Text',
 							'name'         => 'fit_intro',
-							'type'         => 'textarea',
-							'rows'         => 3,
-							'instructions' => 'e.g. "Our slim cut is fairly generous, with a tapered shape and higher shoulders…"',
+							'type'         => 'wysiwyg',
+							'tabs'         => 'visual',
+							'toolbar'      => 'basic',
+							'media_upload' => 0,
+							'instructions' => 'The cut, its lengths and sizes, e.g. "The CLASSIC all round comfort boyfriend hoodie…", then LENGTHS (Mini / Regular / Tall) and SIZES notes. Bold and lists are fine.',
 						),
 						array(
 							'key'          => 'field_espire_fit_model_note',
@@ -295,6 +322,9 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'rows'         => 7,
 							'instructions' => "One row per line, cells separated by | — first line is the sizes. Example:\n| XS | S | M | L | XL\nChest (B) | 109 | 114 | 119 | 124 | 129",
 						),
+						array( 'key' => 'field_espire_fit_lengths_image', 'label' => 'Lengths / Shape Diagram', 'name' => 'fit_lengths_image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail', 'instructions' => 'Optional, e.g. the Mini / Regular / Tall line drawing.' ),
+						array( 'key' => 'field_espire_fit_chart_image', 'label' => 'Size Chart Image', 'name' => 'fit_chart_image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail', 'instructions' => 'Optional: your measurement chart graphic (chest, shoulders, sleeve, lengths). Use this or the typed Measurements above.' ),
+						array( 'key' => 'field_espire_fit_lineup_image', 'label' => 'Size Lineup Photo', 'name' => 'fit_lineup_image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail', 'instructions' => 'Optional: the S / M / L / XL lineup strip.' ),
 					),
 				),
 				array(

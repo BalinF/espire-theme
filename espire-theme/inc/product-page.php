@@ -135,7 +135,7 @@ function espire_fits_with_guide( $fits ) {
 			return false;
 		}
 		// Anything beyond the name is enough to show it: a photo, a line of text, size notes or measurements.
-		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_size_notes', 'fit_measurements' ) as $key ) {
+		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_size_notes', 'fit_measurements', 'fit_lengths_image', 'fit_chart_image', 'fit_lineup_image' ) as $key ) {
 			if ( ! empty( $fit[ $key ] ) ) {
 				return true;
 			}
@@ -153,42 +153,51 @@ function espire_render_fit_guide( $fits, $term ) {
 	$multi = count( $fits ) > 1;
 	?>
 	<div class="panel-overlay" data-panel-close="fit-guide"></div>
-	<aside class="info-panel fit-guide-panel" id="fit-guide-panel" aria-label="Fit Guide">
+	<aside class="info-panel fit-guide-panel size-guide-panel" id="fit-guide-panel" aria-label="Size Guide">
 		<button type="button" class="panel-close" aria-label="Close" data-panel-close="fit-guide">
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 		</button>
-		<h3>Fit Guide &mdash; <?php echo esc_html( $term->name ); ?></h3>
+		<h3>Size Guide &mdash; <?php echo esc_html( $term->name ); ?></h3>
 
 		<?php if ( $multi ) : ?>
+			<?php // One tab per fit: its icon and name (Products → Categories → Available Fits). ?>
 			<div class="fit-tabs" role="tablist">
 				<?php foreach ( $fits as $i => $fit ) : ?>
-					<button type="button" role="tab" class="fit-tab<?php echo 0 === $i ? ' is-active' : ''; ?>" aria-selected="<?php echo 0 === $i ? 'true' : 'false'; ?>" data-fit-tab="<?php echo esc_attr( $i ); ?>"><?php echo esc_html( $fit['fit_name'] ); ?></button>
+					<button type="button" role="tab" class="fit-tab<?php echo 0 === $i ? ' is-active' : ''; ?>" aria-selected="<?php echo 0 === $i ? 'true' : 'false'; ?>" data-fit-tab="<?php echo esc_attr( $i ); ?>">
+						<?php if ( ! empty( $fit['fit_icon'] ) ) : ?>
+							<img class="fit-tab-icon" src="<?php echo esc_url( $fit['fit_icon'] ); ?>" alt="">
+						<?php endif; ?>
+						<span><?php echo esc_html( $fit['fit_name'] ); ?></span>
+					</button>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
 
 		<?php foreach ( $fits as $i => $fit ) : ?>
 			<section class="fit-pane" data-fit-pane="<?php echo esc_attr( $i ); ?>"<?php echo 0 === $i ? '' : ' hidden'; ?>>
-				<?php if ( ! empty( $fit['fit_image'] ) ) : ?>
-					<img class="fit-photo" src="<?php echo esc_url( $fit['fit_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> fit">
-				<?php endif; ?>
-				<h4>The Espire <?php echo esc_html( $fit['fit_name'] ); ?></h4>
-				<?php if ( ! empty( $fit['fit_intro'] ) ) : ?>
-					<p class="panel-intro"><?php echo esc_html( $fit['fit_intro'] ); ?></p>
-				<?php elseif ( ! empty( $fit['fit_description'] ) ) : ?>
-					<p class="panel-intro"><?php echo esc_html( $fit['fit_description'] ); ?></p>
-				<?php endif; ?>
-				<?php if ( ! empty( $fit['fit_model_note'] ) ) : ?>
-					<p class="fit-model-note"><?php echo esc_html( $fit['fit_model_note'] ); ?></p>
+				<div class="fit-pane-top<?php echo empty( $fit['fit_image'] ) ? ' no-photo' : ''; ?>">
+					<?php if ( ! empty( $fit['fit_image'] ) ) : ?>
+						<img class="fit-photo" src="<?php echo esc_url( $fit['fit_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> fit">
+					<?php endif; ?>
+					<div class="fit-pane-intro">
+						<h4>The Espire <?php echo esc_html( $fit['fit_name'] ); ?></h4>
+						<?php if ( ! empty( $fit['fit_model_note'] ) ) : ?>
+							<p class="fit-model-note"><?php echo esc_html( $fit['fit_model_note'] ); ?></p>
+						<?php endif; ?>
+						<?php if ( ! empty( $fit['fit_intro'] ) ) : ?>
+							<div class="fit-text"><?php echo wp_kses_post( wpautop( $fit['fit_intro'] ) ); ?></div>
+						<?php elseif ( ! empty( $fit['fit_description'] ) ) : ?>
+							<p class="panel-intro"><?php echo esc_html( $fit['fit_description'] ); ?></p>
+						<?php endif; ?>
+					</div>
+				</div>
+
+				<?php if ( ! empty( $fit['fit_lengths_image'] ) ) : ?>
+					<img class="fit-guide-img" src="<?php echo esc_url( $fit['fit_lengths_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> lengths" loading="lazy">
 				<?php endif; ?>
 
-				<?php if ( ! empty( $fit['fit_size_notes'] ) ) : ?>
-					<dl class="size-notes">
-						<?php foreach ( $fit['fit_size_notes'] as $note ) : ?>
-							<dt><?php echo esc_html( $note['size'] ); ?></dt>
-							<dd><?php echo esc_html( $note['note'] ); ?></dd>
-						<?php endforeach; ?>
-					</dl>
+				<?php if ( ! empty( $fit['fit_chart_image'] ) ) : ?>
+					<img class="fit-guide-img" src="<?php echo esc_url( $fit['fit_chart_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> size chart" loading="lazy">
 				<?php endif; ?>
 
 				<?php $rows = espire_parse_measurements( isset( $fit['fit_measurements'] ) ? $fit['fit_measurements'] : '' ); ?>
@@ -216,6 +225,19 @@ function espire_render_fit_guide( $fits, $term ) {
 						</table>
 					</div>
 					<p class="fit-model-note">All measurements in centimetres.</p>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $fit['fit_size_notes'] ) ) : ?>
+					<dl class="size-notes">
+						<?php foreach ( $fit['fit_size_notes'] as $note ) : ?>
+							<dt><?php echo esc_html( $note['size'] ); ?></dt>
+							<dd><?php echo esc_html( $note['note'] ); ?></dd>
+						<?php endforeach; ?>
+					</dl>
+				<?php endif; ?>
+
+				<?php if ( ! empty( $fit['fit_lineup_image'] ) ) : ?>
+					<img class="fit-guide-img" src="<?php echo esc_url( $fit['fit_lineup_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> size lineup" loading="lazy">
 				<?php endif; ?>
 			</section>
 		<?php endforeach; ?>

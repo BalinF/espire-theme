@@ -67,13 +67,16 @@ The templates fall back gracefully when these are empty, so fill them in as you 
 
 **Products → Categories → edit a category** (sub-categories inherit from their parent)
 - *Category Emblem* — the collection badge shown beside the product name.
-- *Overview Intro*, *Overview*, *Overview Image* — the category's **About** panel
-  (green "About [Category]" button on the category page): what the category is
-  about, plus an optional picture (e.g. a build-your-hoodie graphic). Empty
-  Overview uses the category's own Description.
-- *Available Fits* — each fit's name and one-liner, plus the **Fit Guide** details
-  (photo, intro, model note, size notes, measurements). The product page's
-  "Fit Guide" button only appears once a fit has guide content.
+- **About panel** (green "About [Category]" button on the category page), built like
+  the live category popups: *Overview Header Photo* (Banner Image if empty) with the
+  *Category Emblem* over it → *Overview Tagline* (olive band) → *Overview Intro* and
+  *Overview* (category Description if empty) → **Fits**: the *Fits Overview Image*
+  (e.g. the build-your-hoodie graphic), else the fit names → **From Seed To Store**:
+  the category's journey tags (symbol icon, tagline and intro) → contact.
+- *Available Fits* — each fit is a tab in the product page **Size Guide** (button
+  under the description): *Tab Icon* + name, *Model Photo* and *Model Note*, *Size
+  Guide Text* (cut, lengths, sizes), *Lengths / Shape Diagram*, *Size Chart Image*
+  and/or typed *Measurements*, *Size Notes*, *Size Lineup Photo*.
   Measurements are typed one row per line with `|` between cells:
   ```
   | XS | S | M | L | XL
@@ -128,9 +131,8 @@ attributes, either kind:
 A category page only offers the values its own products use. Click an option to
 switch it on and again to switch it off; several can be combined. If there's no Fit
 attribute, a category's sub-categories are the Fit buttons. Every category gets the
-green **About [Category]** button: an overview (intro, overview text and image, fit
-names with their one-liners, where it's made). The detailed **Fit Guide** with
-measurements shows on product pages only.
+green **About [Category]** button (the overview above). The detailed **Size Guide**
+with measurements is on product pages only, as a button under the description.
 
 **Swatch colours**, first found:
 1. Products → Attributes → Colour → edit a colour → *Swatch*
