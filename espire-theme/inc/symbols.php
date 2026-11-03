@@ -267,6 +267,12 @@ function espire_symbol_badge( $s ) {
 
 /** The slide-in panel that tells one symbol's story. */
 function espire_symbol_panel( $s ) {
+	// Each symbol's panel goes on the page once, however many buttons open it.
+	static $printed = array();
+	if ( empty( $s['slug'] ) || isset( $printed[ $s['slug'] ] ) ) {
+		return;
+	}
+	$printed[ $s['slug'] ] = true;
 	$id = 'symbol-' . $s['slug'];
 	?>
 	<div class="panel-overlay" data-panel-close="<?php echo esc_attr( $id ); ?>"></div>
