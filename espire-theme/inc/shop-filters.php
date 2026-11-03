@@ -406,6 +406,29 @@ function espire_filter_options( $label, $category = null ) {
  *   'panel'     — id of a slide-in panel for the green button on the
  *                 right (e.g. "category-sidebar"), and 'panel_label'
  */
+/**
+ * One filter's options as a single row that scrolls sideways, with the
+ * site's arrow marks either side (shown only when the row overflows —
+ * see the filter-row script in main.js).
+ */
+function espire_filter_row_open( $key ) {
+	$id = 'filter-row-' . sanitize_html_class( $key );
+	?>
+	<div class="filter-row">
+		<button type="button" class="filter-arrow filter-prev" aria-label="Scroll left" data-slide-prev="<?php echo esc_attr( $id ); ?>" data-slide-amount="container"><?php espire_arrow_icon( 'prev' ); ?></button>
+		<div class="filter-track" id="<?php echo esc_attr( $id ); ?>">
+	<?php
+}
+
+function espire_filter_row_close( $key ) {
+	$id = 'filter-row-' . sanitize_html_class( $key );
+	?>
+		</div>
+		<button type="button" class="filter-arrow filter-next" aria-label="Scroll right" data-slide-next="<?php echo esc_attr( $id ); ?>" data-slide-amount="container"><?php espire_arrow_icon( 'next' ); ?></button>
+	</div>
+	<?php
+}
+
 function espire_filter_bar( $args = array() ) {
 	$args = wp_parse_args( $args, array(
 		'action'      => '',
@@ -461,16 +484,19 @@ function espire_filter_bar( $args = array() ) {
 			<?php if ( $fit_terms ) : ?>
 				<div class="filter-group filter-fit">
 					<span class="filter-label">Fit</span>
+					<?php espire_filter_row_open( 'fit' ); ?>
 					<a href="<?php echo esc_url( get_term_link( $fit_base ) ); ?>" class="fit-pill<?php echo $fit_base->term_id === $category->term_id ? ' is-active' : ''; ?>">All</a>
 					<?php foreach ( $fit_terms as $fit ) : ?>
 						<a href="<?php echo esc_url( get_term_link( $fit ) ); ?>" class="fit-pill<?php echo ( $category && $category->term_id === $fit->term_id ) ? ' is-active' : ''; ?>"><?php echo esc_html( $fit->name ); ?></a>
 					<?php endforeach; ?>
+					<?php espire_filter_row_close( 'fit' ); ?>
 				</div>
 			<?php endif; ?>
 
 			<?php foreach ( $groups as $label => $options ) : ?>
 				<div class="filter-group filter-<?php echo esc_attr( strtolower( $label ) ); ?>" role="group" aria-label="<?php echo esc_attr( $label ); ?>">
 					<span class="filter-label"><?php echo esc_html( $label ); ?></span>
+					<?php espire_filter_row_open( strtolower( $label ) ); ?>
 					<?php foreach ( $options as $option ) : ?>
 						<?php
 						$on      = in_array( $option['slug'], espire_filter_chosen( $option['key'] ), true );
@@ -489,6 +515,7 @@ function espire_filter_bar( $args = array() ) {
 							<a href="<?php echo esc_url( $href ); ?>" class="fit-pill<?php echo $on ? ' is-active' : ''; ?>"<?php echo $current; // phpcs:ignore WordPress.Security.EscapeOutput ?>><?php echo esc_html( $option['name'] ); ?></a>
 						<?php endif; ?>
 					<?php endforeach; ?>
+					<?php espire_filter_row_close( strtolower( $label ) ); ?>
 				</div>
 			<?php endforeach; ?>
 
