@@ -1190,7 +1190,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-bar{ border-bottom:1px solid var(--line); }
 .filter-bar-inner{ max-width:1400px; margin:0 auto; padding:14px 5%; display:flex; align-items:center; gap:12px 26px; flex-wrap:wrap; }
 .filter-group{ display:flex; align-items:center; gap:8px; min-width:0; }
-.filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; flex:none; width:58px; }
+.filter-label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700; flex:none; }
 /* Each filter is one row; extra options scroll sideways behind the arrows. */
 .filter-row{ position:relative; display:flex; align-items:center; flex:1; min-width:0; }
 .filter-track{ display:flex; align-items:center; gap:8px; overflow-x:auto; scroll-behavior:smooth; scrollbar-width:none; padding:4px 3px; min-width:0; }
@@ -1215,8 +1215,12 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-panel-btn{ margin-left:auto; border:none; }
 /* The filters stack one row each; the green panel button sits top right. */
 .filter-bar-inner{ align-items:flex-start; flex-wrap:nowrap; }
-.filter-groups{ display:flex; flex-direction:column; align-items:stretch; gap:6px; flex:1; min-width:0; }
-.filter-groups .filter-clear{ align-self:flex-start; margin:2px 0 0 66px; }
+.filter-groups{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 28px; flex:1; min-width:0; }
+/* Each filter takes only the room it needs, so short ones (e.g. Fit + Size
+   on Shirts) share a line; one too long for the line gets the full width
+   and scrolls sideways. */
+.filter-groups .filter-group{ flex:0 1 auto; max-width:100%; }
+.filter-groups .filter-clear{ align-self:center; }
 .filter-toggle{ display:none; }
 /* Phones: options fold away behind a "Filters" button, next to the green
    panel button; tapping it opens them underneath (main.js). */
@@ -1234,8 +1238,10 @@ body .woo-page #payment #place_order:hover{ background:#000; }
   .filter-panel-btn{ margin-left:0; flex:1 1 0; min-height:38px; text-align:center; }
   .filter-bar-inner{ flex-wrap:wrap; align-items:center; }
   .filter-groups{ display:none; order:3; flex-basis:100%; flex-direction:column; align-items:stretch; gap:10px; padding-top:6px; }
+  .filter-groups{ flex-wrap:nowrap; }
+  .filter-groups .filter-group{ max-width:none; }
   .filter-label{ width:50px; }
-  .filter-groups .filter-clear{ margin-left:58px; }
+  .filter-groups .filter-clear{ align-self:flex-start; margin-left:58px; }
   .filter-groups.is-open{ display:flex; }
 }
 
