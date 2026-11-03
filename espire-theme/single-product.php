@@ -55,12 +55,12 @@ while ( have_posts() ) :
 		ob_start();
 		?>
 		<div class="panel-overlay" data-panel-close="fit-guide"></div>
-		<aside class="info-panel fit-guide-panel" id="fit-guide-panel" aria-label="Fit Guide">
+		<aside class="info-panel fit-guide-panel" id="fit-guide-panel" aria-label="Size Guide">
 			<button type="button" class="panel-close" aria-label="Close" data-panel-close="fit-guide">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 			</button>
-			<h3>Fit Guide</h3>
-			<p class="panel-intro">We're still putting together the fit details for this piece. Unsure on sizing? Get in touch and we'll help you pick the right fit.</p>
+			<h3>Size Guide</h3>
+			<p class="panel-intro">We're still putting together the size details for this piece. Unsure on sizing? Get in touch and we'll help you pick the right fit.</p>
 			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
 		</aside>
 		<?php
@@ -104,12 +104,6 @@ while ( have_posts() ) :
 
 				<div class="avail-bar">
 					<span><?php echo $product->is_in_stock() ? 'Have it made for you' : 'Currently out of stock'; ?></span>
-					<?php if ( $espire_has_fit_guide ) : ?>
-						<button type="button" class="avail-link" data-panel-open="fit-guide">
-							Fit Guide
-							<span class="arrow-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-						</button>
-					<?php endif; ?>
 				</div>
 
 				<?php
@@ -148,6 +142,9 @@ while ( have_posts() ) :
 							<?php endforeach; ?>
 						</dl>
 					<?php endif; ?>
+
+					<?php // Size Guide: this category's fits, one tab each (inc/product-page.php). ?>
+					<button type="button" class="btn olive size-guide-btn" data-panel-open="fit-guide">Size Guide &rarr;</button>
 
 					<div class="trust-lines">
 						<div class="trust-item">
