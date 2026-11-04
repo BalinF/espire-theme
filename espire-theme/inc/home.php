@@ -52,8 +52,9 @@ function espire_home_hero() {
 /**
  * The two full-width photo banners on the homepage, editable on the
  * homepage in wp-admin ("Homepage Banners" box); defaults until then.
- * $n is 1 (Design Your Own, under Shop By Collection) or 2 (Our Mission
- * Is Circular, under Shop The Set).
+ * $n is 1 (Design Your Own, under Shop By Collection), 2 (Our Mission
+ * Is Circular, under Shop The Set) or 3 (More From The Store, near the
+ * bottom of every product page).
  */
 function espire_home_banner( $n ) {
 	$uri      = get_template_directory_uri() . '/assets/';
@@ -70,6 +71,13 @@ function espire_home_banner( $n ) {
 			'title'  => 'Our Mission Is Circular',
 			'text'   => 'What goes around comes back around — from Good Earth Cotton through to the Respired program, every piece is designed to be repaired, returned or remade rather than landfilled.',
 			'button' => 'See The Respired Program',
+			'link'   => home_url( '/store/' ),
+		),
+		3 => array(
+			'image'  => $uri . 'store-banner.jpg',
+			'title'  => 'More From The Store',
+			'text'   => '',
+			'button' => 'Browse All Collections',
 			'link'   => home_url( '/store/' ),
 		),
 	);
@@ -241,7 +249,7 @@ add_action( 'acf/init', function () {
 		'position' => 'acf_after_title',
 	) );
 	$banner_fields = array();
-	foreach ( array( 1 => 'Design Your Own banner', 2 => 'Our Mission Is Circular banner' ) as $n => $label ) {
+	foreach ( array( 1 => 'Design Your Own banner', 2 => 'Our Mission Is Circular banner', 3 => 'More From The Store banner near the bottom of every product page' ) as $n => $label ) {
 		$banner_fields[] = array( 'key' => 'field_espire_banner' . $n . '_tab', 'label' => 'Banner ' . $n, 'name' => '', 'type' => 'tab' );
 		$banner_fields[] = array( 'key' => 'field_espire_banner' . $n . '_note', 'label' => '', 'name' => '', 'type' => 'message', 'message' => 'The ' . $label . '. Anything left empty keeps the current photo/wording.' );
 		$banner_fields[] = array( 'key' => 'field_espire_banner' . $n . '_image', 'label' => 'Photo', 'name' => 'banner' . $n . '_image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'medium', 'instructions' => 'Wide landscape photo, at least 1600px across.' );

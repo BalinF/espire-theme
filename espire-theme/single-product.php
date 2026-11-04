@@ -182,12 +182,18 @@ while ( have_posts() ) :
 
 	</div><?php // .product-page — the banner below runs edge to edge ?>
 
+	<?php $espire_more = espire_home_banner( 3 ); // Pages → Home → "Homepage Banners" → Banner 3 ?>
 	<div class="lifestyle-banner">
-		<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/store-banner.jpg' ); ?>" alt="Espire hangtags and pattern pieces on the workroom rack, Bright VIC" loading="lazy">
+		<img src="<?php echo esc_url( $espire_more['image'] ); ?>" alt="" loading="lazy">
 		<div class="overlay"></div>
 		<div class="banner-text">
-			<h2>More From The Store</h2>
-			<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>">Browse All Collections</a>
+			<h2><?php echo esc_html( $espire_more['title'] ); ?></h2>
+			<?php if ( $espire_more['text'] ) : ?>
+				<p><?php echo esc_html( $espire_more['text'] ); ?></p>
+			<?php endif; ?>
+			<?php if ( $espire_more['button'] ) : ?>
+				<a href="<?php echo esc_url( $espire_more['link'] ); ?>"><?php echo esc_html( $espire_more['button'] ); ?></a>
+			<?php endif; ?>
 		</div>
 	</div>
 
