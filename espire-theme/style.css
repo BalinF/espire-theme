@@ -1127,9 +1127,9 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .pillar.has-icon h3{ font-size:1.3rem; letter-spacing:.12em; line-height:1.15; }
 .pillar.has-icon .p-link{ align-self:center; }
 
-.stat-strip{ display:flex; align-items:center; gap:26px; margin-top:44px; padding:26px 5%; background:var(--ink); color:#fff; }
-.stat-strip .stat-num{ font-family:"League Spartan","Arial Black",sans-serif; font-size:2.4rem; font-weight:800; flex:none; }
-.stat-strip .stat-text{ margin:0; font-size:.88rem; color:#D8D4C0; line-height:1.5; max-width:760px; }
+.stat-strip{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; margin-top:44px; padding:34px 6%; background:var(--ink); color:#fff; }
+.stat-strip .stat-num{ font-family:"League Spartan","Arial Black",sans-serif; font-size:clamp(2.4rem,4.5vw,3.4rem); font-weight:800; line-height:1; flex:none; }
+.stat-strip .stat-text{ margin:0; font-size:.95rem; color:#D8D4C0; line-height:1.6; max-width:720px; }
 .stat-strip .stat-text b{ color:#fff; }
 
 .story-feature{ display:flex; align-items:stretch; gap:32px; max-width:calc(1400px - 10%); margin:44px auto 0; width:90%; background:var(--white); border:1.5px solid var(--ink); }
