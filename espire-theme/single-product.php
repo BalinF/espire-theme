@@ -164,7 +164,11 @@ while ( have_posts() ) :
 						<?php espire_shipping_content(); ?>
 					</div>
 				</div>
-				<?php if ( $espire_emblem ) : ?>
+				<?php if ( $espire_emblem && $espire_cat_term ) : ?>
+					<button type="button" class="product-emblem-btn desc-emblem-btn" data-panel-open="category-sidebar" aria-label="About <?php echo esc_attr( $espire_cat_term->name ); ?>" title="About <?php echo esc_attr( $espire_cat_term->name ); ?>">
+						<img class="desc-emblem" src="<?php echo esc_url( $espire_emblem ); ?>" alt="">
+					</button>
+				<?php elseif ( $espire_emblem ) : ?>
 					<img class="desc-emblem" src="<?php echo esc_url( $espire_emblem ); ?>" alt="">
 				<?php endif; ?>
 			</div>

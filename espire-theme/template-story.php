@@ -39,9 +39,14 @@ while ( have_posts() ) :
 			<?php endif; ?>
 			<div class="pillar-grid">
 				<?php foreach ( $espire_s['pillars'] as $espire_p ) : ?>
-					<?php list( $espire_img, $espire_title, $espire_text, $espire_label, $espire_url ) = $espire_p; ?>
-					<article class="pillar">
-						<?php if ( $espire_img ) : ?>
+					<?php
+					list( $espire_img, $espire_title, $espire_text, $espire_label, $espire_url ) = $espire_p;
+					$espire_icon = isset( $espire_p[5] ) ? $espire_p[5] : '';
+					?>
+					<article class="pillar<?php echo $espire_icon ? ' has-icon' : ''; ?>">
+						<?php if ( $espire_icon ) : ?>
+							<div class="p-icon"><img src="<?php echo esc_url( espire_story_link( $espire_icon ) ); ?>" alt="" loading="lazy"></div>
+						<?php elseif ( $espire_img ) : ?>
 							<div class="p-shot"><img src="<?php echo esc_url( espire_story_image_url( $espire_img ) ); ?>" alt="" loading="lazy"></div>
 						<?php endif; ?>
 						<div class="p-body">
@@ -86,23 +91,27 @@ while ( have_posts() ) :
 	<?php endif; ?>
 
 	<?php if ( $espire_s['closing_title'] ) : ?>
-		<section class="story-closing is-<?php echo esc_attr( 'feature' === $espire_s['closing_style'] ? 'feature' : 'band' ); ?>">
+		<?php // Closing hero: big title over a full-width photo, a "find us"-style link with a round arrow, then a line of text. ?>
+		<section class="story-closing-hero">
 			<?php if ( $espire_s['closing_image'] ) : ?>
 				<img src="<?php echo esc_url( espire_story_image_url( $espire_s['closing_image'] ) ); ?>" alt="" loading="lazy">
 			<?php endif; ?>
 			<div class="overlay"></div>
-			<div class="c-text">
+			<div class="ch-inner">
 				<?php if ( $espire_s['closing_label'] ) : ?>
 					<span class="story-label"><?php echo esc_html( $espire_s['closing_label'] ); ?></span>
 				<?php endif; ?>
 				<h2><?php echo esc_html( $espire_s['closing_title'] ); ?></h2>
+				<?php if ( $espire_s['closing_button'][1] ) : ?>
+					<a class="ch-link" href="<?php echo esc_url( espire_story_link( $espire_s['closing_button'][1] ) ); ?>">
+						<?php echo esc_html( $espire_s['closing_button'][0] ); ?>
+						<span class="ch-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M13 8l4 4-4 4"/></svg></span>
+					</a>
+				<?php endif; ?>
 				<?php if ( $espire_s['closing_text'] ) : ?>
 					<p><?php echo esc_html( $espire_s['closing_text'] ); ?></p>
 				<?php endif; ?>
 			</div>
-			<?php if ( $espire_s['closing_button'][1] ) : ?>
-				<a class="btn" href="<?php echo esc_url( espire_story_link( $espire_s['closing_button'][1] ) ); ?>"><?php echo esc_html( $espire_s['closing_button'][0] ); ?> &rarr;</a>
-			<?php endif; ?>
 		</section>
 	<?php endif; ?>
 

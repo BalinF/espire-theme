@@ -29,9 +29,9 @@ function espire_story_defaults( $slug ) {
 			'hero_intro'      => 'We operate in a unique way, with our workroom integrated into our store. So every piece of Australian made clothing comes together in one place, start to finish.',
 			'pillars_heading' => 'Why We Make Locally',
 			'pillars'         => array(
-				array( 'story-couple-hoodies.jpg', 'The Mother & Son Story', 'ESPIRE started as a joint venture between Jane & Balin — decades of manufacturing expertise combined with a genuine passion for sustainability.', 'The Espire Story', '/mother-son/' ),
-				array( 'story-sewing-repair.jpg', 'The Ability To Customise To You', 'Garments should fit you — that should be industry standard. Custom adjustments, our product builder, and lifetime repairs, all under one roof.', 'Our Programs', '/locally-made-what-we-can-offer/' ),
-				array( 'story-bright-aerial.jpg', 'The Importance Of Economy', 'Every garment made here keeps work, skills and money in the local economy — reviving Australian garment manufacturing, one piece at a time.', 'Know The Numbers', '/australian-economy/' ),
+				array( 'story-couple-hoodies.jpg', 'The Mother & Son Story', 'ESPIRE started as a joint venture between Jane & Balin — decades of manufacturing expertise combined with a genuine passion for sustainability.', 'The Espire Story', '/mother-son/', '/wp-content/uploads/2025/08/Untitled_Artwork-30.png' ),
+				array( 'story-sewing-repair.jpg', 'The Ability To Customise To You', 'Garments should fit you — that should be industry standard. Custom adjustments, our product builder, and lifetime repairs, all under one roof.', 'Our Workroom', '/locally-made-what-we-can-offer/', '/wp-content/uploads/2025/08/Untitled_Artwork-44.png' ),
+				array( 'story-bright-aerial.jpg', 'The Importance Of Economy', 'Every garment made here keeps work, skills and money in the local economy — reviving Australian garment manufacturing, one piece at a time.', 'Know The Numbers', '/australian-economy/', '/wp-content/uploads/2025/08/Untitled_Artwork-38.png' ),
 			),
 			'stat_number'     => '100%',
 			'stat_lead'       => 'Every garment made here keeps work, skills and money in the local economy',
@@ -45,9 +45,9 @@ function espire_story_defaults( $slug ) {
 			'closing_style'   => 'band',
 			'closing_image'   => 'story-bright-aerial.jpg',
 			'closing_label'   => '',
-			'closing_title'   => "We're Located In Bright, Victoria",
-			'closing_text'    => "Drop into the store and you'll see the workroom mid-stitch.",
-			'closing_button'  => array( 'Find Us', '/contact/' ),
+			'closing_title'   => 'Australian Made Clothes, Right Here.',
+			'closing_text'    => "Drop into the store and you'll see the workroom mid-stitch — no back door, no separate factory. Just Australian made clothes, coming together right in front of you.",
+			'closing_button'  => array( "We're Located In Bright, Victoria", '/contact/' ),
 		),
 		'sustainability'  => array(
 			'hero_image'      => 'store-banner.jpg',
@@ -56,9 +56,9 @@ function espire_story_defaults( $slug ) {
 			'hero_intro'      => 'Espire began with a passion to build circular fashion for a more sustainable future.',
 			'pillars_heading' => 'Our Circular Fashion Framework',
 			'pillars'         => array(
-				array( 'story-lifestyle-ivy.jpg', 'From Seed To Store', 'Responsibly sourced materials and transparent, sustainable fabric sourcing — the same story that anchors the "Seed to Store" symbol used across the site.', '', '' ),
-				array( 'story-sewing-repair.jpg', 'Production In Espire', 'A zero-waste policy — every scrap of fabric used, with a circular vision in mind, cut and sewn right here in our own workroom.', '', '' ),
-				array( 'story-couple-hoodies.jpg', 'End Of Life', 'A post-consumer garment lifecycle system, built to minimise landfill — the foundation of our Respired take-back program.', '', '' ),
+				array( 'story-lifestyle-ivy.jpg', 'From Seed To Store', 'Responsibly sourced materials and transparent, sustainable fabric sourcing — the same story that anchors the "Seed to Store" symbol used across the site.', 'Learn More', '/from-seed-to-store/', '/wp-content/uploads/2025/08/Untitled_Artwork-45.png' ),
+				array( 'story-sewing-repair.jpg', 'Production In Espire', 'A zero-waste policy — every scrap of fabric used, with a circular vision in mind, cut and sewn right here in our own workroom.', 'Learn More', '/sustainable-production/', '/wp-content/uploads/2025/08/Untitled_Artwork-42.png' ),
+				array( 'story-couple-hoodies.jpg', 'End Of Life', 'A post-consumer garment lifecycle system, built to minimise landfill — the foundation of our Respired take-back program.', 'Learn More', '/respired/', '/wp-content/uploads/2025/08/Untitled_Artwork-19.png' ),
 			),
 			'stat_number'     => '<1%',
 			'stat_lead'       => 'Less than 1% of clothing is recycled each year in Australia',
@@ -71,10 +71,10 @@ function espire_story_defaults( $slug ) {
 			'definition_text' => 'an economic system based on the reuse and regeneration of materials or products.',
 			'closing_style'   => 'feature',
 			'closing_image'   => 'story-couple-hoodies.jpg',
-			'closing_label'   => 'Respired',
-			'closing_title'   => 'A Real Plan For What Happens Next.',
+			'closing_label'   => '',
+			'closing_title'   => 'Proof That Circular Fashion Can Be Bold.',
 			'closing_text'    => "Every Espire piece is built inside a circular fashion system: responsibly sourced materials, zero-waste production, and a real plan for what happens when you're done wearing it. Wear it proudly, then bring it back to us — we'll repair it, remake it or responsibly recycle it.",
-			'closing_button'  => array( 'Respired', '/product-tag/respired/' ),
+			'closing_button'  => array( 'See The Respired Program', '/product-tag/respired/' ),
 		),
 	);
 	$empty = array(
@@ -130,7 +130,7 @@ function espire_story_content( $post ) {
 	if ( $pillars ) {
 		$c['pillars'] = array();
 		foreach ( $pillars as $p ) {
-			$c['pillars'][] = array( $p['image'], $p['title'], $p['text'], $p['link_label'], $p['link_url'] );
+			$c['pillars'][] = array( $p['image'], $p['title'], $p['text'], $p['link_label'], $p['link_url'], isset( $p['icon'] ) ? $p['icon'] : '' );
 		}
 	}
 	if ( ! $c['hero_title'] ) {
@@ -220,6 +220,7 @@ add_action( 'acf/init', function () {
 				'button_label' => 'Add Pillar',
 				'instructions' => 'Usually three. Each links to its own longer post. Leave the link empty to hide the button.',
 				'sub_fields'   => array(
+					array( 'key' => 'field_espire_story_p_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail', 'instructions' => 'Line icon shown on top of the card (like the cotton plant). Used instead of the photo when set.' ),
 					array( 'key' => 'field_espire_story_p_image', 'label' => 'Photo', 'name' => 'image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail' ),
 					array( 'key' => 'field_espire_story_p_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text' ),
 					array( 'key' => 'field_espire_story_p_text', 'label' => 'Text', 'name' => 'text', 'type' => 'textarea', 'rows' => 3 ),
@@ -239,7 +240,6 @@ add_action( 'acf/init', function () {
 			$text( 'definition_term', 'Definition Word', 'Optional line under the shop feature, e.g. "Circular economy".' ),
 			$text( 'definition_text', 'Definition' ),
 			$tab( 'Closing Banner' ),
-			array( 'key' => 'field_espire_story_closing_style', 'label' => 'Style', 'name' => 'story_closing_style', 'type' => 'select', 'choices' => array( '' => 'Page default', 'band' => 'Short band (title + button)', 'feature' => 'Tall feature (label, title, paragraph, button)' ) ),
 			$image( 'closing_image', 'Background Photo' ),
 			$text( 'closing_label', 'Small Label' ),
 			$text( 'closing_title', 'Title' ),
