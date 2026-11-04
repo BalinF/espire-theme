@@ -176,6 +176,14 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'instructions' => 'Leave this category out of "Shop By Collection" on the homepage. It still shows in the Store and menus.',
 				),
 				array(
+					'key'          => 'field_espire_cat_tile_text',
+					'label'        => 'Tile Text',
+					'name'         => 'category_tile_text',
+					'type'         => 'textarea',
+					'rows'         => 2,
+					'instructions' => 'One short line for this category\'s tile on the homepage and Store page, e.g. "Hand-knitted pieces, beanies included." Empty: the built-in line, else the start of the description.',
+				),
+				array(
 					'key'          => 'field_espire_cat_banner_title',
 					'label'        => 'Banner Title',
 					'name'         => 'category_banner_title',

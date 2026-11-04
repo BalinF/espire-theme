@@ -76,7 +76,7 @@ function espire_journey_step( $tag, $label = '' ) {
 	return array(
 		'label'  => $label ? $label : $tag->name,
 		'url'    => is_wp_error( $link ) ? '' : $link,
-		'symbol' => espire_symbol_from_tag( $tag ),
+		'symbol' => espire_symbol_from_tag( $tag, true ),
 		'tag_id' => (int) $tag->term_id,
 	);
 }
