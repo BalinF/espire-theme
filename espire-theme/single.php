@@ -82,7 +82,7 @@ while ( have_posts() ) :
 					<p><?php echo esc_html( espire_article_field( 'article_callout_text' ) ); ?></p>
 				<?php endif; ?>
 				<?php if ( espire_article_field( 'article_callout_button_link' ) ) : ?>
-					<a class="btn" href="<?php echo esc_url( espire_story_link( espire_article_field( 'article_callout_button_link' ) ) ); ?>"><?php echo esc_html( espire_article_field( 'article_callout_button_label' ) ?: 'Find Out More' ); ?> &rarr;</a>
+					<a class="btn" href="<?php echo esc_url( espire_story_link( espire_article_field( 'article_callout_button_link' ) ) ); ?>"><?php echo esc_html( espire_article_field( 'article_callout_button_label' ) ?: 'Find Out More' ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 				<?php endif; ?>
 			</section>
 		<?php endif; ?>
@@ -109,7 +109,7 @@ while ( have_posts() ) :
 								<?php if ( $espire_r_text ) : ?>
 									<p><?php echo esc_html( wp_trim_words( $espire_r_text, 32 ) ); ?></p>
 								<?php endif; ?>
-								<a class="p-link" href="<?php echo esc_url( get_permalink( $espire_r ) ); ?>">Read The Story &rarr;</a>
+								<a class="p-link" href="<?php echo esc_url( get_permalink( $espire_r ) ); ?>">Read The Story<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 							</div>
 						</article>
 					<?php endforeach; ?>

@@ -162,9 +162,9 @@ function espire_set_step_bar( $product_id ) {
 			<?php endforeach; ?>
 		</ol>
 		<?php if ( $next ) : ?>
-			<a class="set-skip" href="<?php echo esc_url( espire_set_piece_url( $next, $ids ) ); ?>">Skip to next piece &rarr;</a>
+			<a class="set-skip" href="<?php echo esc_url( espire_set_piece_url( $next, $ids ) ); ?>">Skip to next piece<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 		<?php elseif ( function_exists( 'wc_get_cart_url' ) ) : ?>
-			<a class="set-skip" href="<?php echo esc_url( wc_get_cart_url() ); ?>">Go to cart &rarr;</a>
+			<a class="set-skip" href="<?php echo esc_url( wc_get_cart_url() ); ?>">Go to cart<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 		<?php endif; ?>
 	</div>
 	<?php

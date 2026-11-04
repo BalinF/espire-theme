@@ -77,12 +77,14 @@ espire_quicklinks_bar();
  * swap a category's 'image' key (inc/collections.php) to a filename in
  * /assets/ once one's supplied, same pattern as the Seed to Store icons above.
  */
-$espire_collections = espire_collection_defaults(); // list lives in inc/collections.php
+// Live top-level categories with products, in the order dragged in Products →
+// Categories, minus any with "Hide From Homepage" ticked (inc/collections.php).
+$espire_collections = espire_store_tiles( true );
 ?>
 <div class="section-wrap">
 	<div class="section-head">
 		<h2>Shop By Collection</h2>
-		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="view-all">Shop All &rarr;</a>
+		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="view-all">Shop All<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</div>
 	<div class="collection-slider">
 		<button type="button" class="cs-arrow cs-prev" aria-label="Previous collection" data-slide-prev="collection-track">
@@ -90,10 +92,10 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 		</button>
 		<div class="collection-track" id="collection-track">
 			<?php foreach ( $espire_collections as $espire_c ) : ?>
-				<a class="collection-slide" href="<?php echo esc_url( home_url( $espire_c['url'] ) ); ?>">
-					<?php if ( ! empty( $espire_c['image'] ) && file_exists( get_template_directory() . '/assets/' . $espire_c['image'] ) ) : ?>
+				<a class="collection-slide" href="<?php echo esc_url( $espire_c['url'] ); ?>">
+					<?php if ( ! empty( $espire_c['image'] ) ) : ?>
 						<div class="cs-shot">
-							<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/' . $espire_c['image'] ); ?>" alt="<?php echo esc_attr( $espire_c['alt'] ?? '' ); ?>">
+							<img src="<?php echo esc_url( $espire_c['image'] ); ?>" alt="<?php echo esc_attr( $espire_c['alt'] ); ?>" loading="lazy">
 						</div>
 					<?php else : ?>
 						<div class="cs-shot placeholder">
@@ -102,8 +104,10 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 					<?php endif; ?>
 					<div class="cs-body">
 						<h3><?php echo esc_html( $espire_c['label'] ); ?></h3>
-						<p><?php echo esc_html( $espire_c['copy'] ); ?></p>
-						<span class="cs-link"><?php echo esc_html( $espire_c['cta'] ); ?> &rarr;</span>
+						<?php if ( $espire_c['copy'] ) : ?>
+							<p><?php echo esc_html( $espire_c['copy'] ); ?></p>
+						<?php endif; ?>
+						<span class="cs-link"><?php echo esc_html( $espire_c['cta'] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></span>
 					</div>
 				</a>
 			<?php endforeach; ?>
@@ -121,7 +125,7 @@ $espire_collections = espire_collection_defaults(); // list lives in inc/collect
 	<div class="content">
 		<h2><?php echo esc_html( $espire_banner['title'] ); ?></h2>
 		<p><?php echo esc_html( $espire_banner['text'] ); ?></p>
-		<a href="<?php echo esc_url( $espire_banner['link'] ); ?>" class="btn solid"><?php echo esc_html( $espire_banner['button'] ); ?> &rarr;</a>
+		<a href="<?php echo esc_url( $espire_banner['link'] ); ?>" class="btn solid"><?php echo esc_html( $espire_banner['button'] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</div>
 </div>
 
@@ -139,7 +143,7 @@ $espire_set = espire_shop_the_set();
 <div class="section-wrap">
 	<div class="section-head">
 		<h2>Shop The Set</h2>
-		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="view-all">Shop All &rarr;</a>
+		<a href="<?php echo esc_url( home_url( '/store/' ) ); ?>" class="view-all">Shop All<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</div>
 	<div class="look">
 		<div class="look-shot">
@@ -187,7 +191,7 @@ $espire_set = espire_shop_the_set();
 	<div class="content">
 		<h2><?php echo esc_html( $espire_banner['title'] ); ?></h2>
 		<p><?php echo esc_html( $espire_banner['text'] ); ?></p>
-		<a href="<?php echo esc_url( $espire_banner['link'] ); ?>" class="btn solid"><?php echo esc_html( $espire_banner['button'] ); ?> &rarr;</a>
+		<a href="<?php echo esc_url( $espire_banner['link'] ); ?>" class="btn solid"><?php echo esc_html( $espire_banner['button'] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</div>
 </div>
 

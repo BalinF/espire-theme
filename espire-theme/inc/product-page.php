@@ -259,7 +259,7 @@ function espire_render_fit_guide( $fits, $term ) {
 		</button>
 		<h3>Size Guide &mdash; <?php echo esc_html( $term->name ); ?></h3>
 		<?php espire_size_guide_content( $fits, $term ); ?>
-		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
+		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</aside>
 	<?php
 	return true;
@@ -313,7 +313,7 @@ function espire_shipping_panel() {
 		<h3>Shipping &amp; Returns</h3>
 		<p class="panel-intro">The most common questions, answered &mdash; see the full FAQ for everything else.</p>
 		<?php espire_shipping_content(); ?>
-		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
+		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</aside>
 	<?php
 }

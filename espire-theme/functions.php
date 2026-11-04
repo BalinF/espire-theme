@@ -123,22 +123,23 @@ add_action( 'woocommerce_before_shop_loop', function () {
 	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
 }, 1 );
 
+/** The site icon on its side, pointing right (traced from the logo; same shape as assets/arrow-mark.svg). */
+define( 'ESPIRE_ARROW_PATH', 'M154 110L215 110L202 100C195 95 179 84 167 75C154 66 141 57 138 55L133 51L125 59L117 67L120 69C138 83 144 88 144 89C144 89 130 90 114 90C97 91 74 91 62 92L41 92L49 83C54 78 69 63 81 50L104 27L199 62C252 81 308 102 325 108C342 114 356 120 356 120C356 120 351 123 345 125C333 130 191 188 137 210C120 217 105 223 104 223C103 223 89 206 72 186L41 150L68 149C82 149 106 149 120 149L146 150L132 162C124 168 118 174 118 174C118 174 121 179 126 183L133 192L134 191C163 169 212 130 211 130C209 130 1 132 0 132C0 133 102 249 104 249C105 249 139 235 179 218C219 201 272 179 295 169C319 159 354 144 374 135C395 127 408 120 408 120C407 119 338 92 255 59L103 0L99 4C97 6 74 30 47 58L-1 108L46 109C72 110 120 110 154 110Z' );
+
 /**
- * Espire's own arrow mark — the real brand mark (the "diamond, split in
- * half" shape Balin already uses on live product pages), used as the
- * prev/next control anywhere the site needs an arrow, instead of a
- * generic chevron. One shared function so every arrow on the site is
- * the exact same mark, not slightly different hand-copies of it.
+ * Espire's arrow: the site icon (the diamond with the arrow inside) turned
+ * on its side to point the way. Every arrow on the site uses it — slider
+ * and filter controls, and the arrow after links like "Shop All" — so they
+ * all match. fill="currentColor", so it takes the colour of the text or
+ * button it sits in (rust on hover and so on).
  *
- * It's shown upright — tall and thin, as drawn — with its point facing
- * left by default; pass 'next' for the right-facing version (the CSS in
- * style.css, .espire-arrow-mark, does the mirroring). fill="currentColor" (not stroke) because the
- * source mark is a solid shape, so it picks up whatever text colour is
- * already set on its container/button, light or dark, automatically.
+ * Usage: espire_arrow_icon();                 // points left (prev)
+ *        espire_arrow_icon( 'next' );         // points right
+ *        echo espire_arrow_svg();              // inline after link text, points right
+ *        espire_arrow_svg( 'down', 'my-class' ) // also 'up'
  *
- * Usage: espire_arrow_icon(); // points left (prev)
- *        espire_arrow_icon( 'next' ); // points right (next)
- *        espire_arrow_icon( 'next', 'my-extra-class' );
+ * CSS-only arrows (a ::after on a link) use assets/arrow-mark.svg as a mask
+ * — see .espire-arrow-after in style.css.
  */
 /**
  * Category Archive banner + sidebar — ACF fields, defined here in code
@@ -167,6 +168,14 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'return_format' => 'url',
 					'preview_size'  => 'medium',
 					'instructions'  => 'The wide photo filling the banner at the top of this category page (about 2000 × 600px). Not the emblem — that\'s the small badge below.',
+				),
+				array(
+					'key'          => 'field_espire_cat_hide_home',
+					'label'        => 'Hide From Homepage',
+					'name'         => 'category_hide_on_homepage',
+					'type'         => 'true_false',
+					'ui'           => 1,
+					'instructions' => 'Leave this category out of "Shop By Collection" on the homepage. It still shows in the Store and menus.',
 				),
 				array(
 					'key'          => 'field_espire_cat_banner_title',
@@ -695,17 +704,15 @@ function espire_quicklinks_bar() {
 	<?php
 }
 
-function espire_arrow_icon( $direction = 'prev', $extra_class = '' ) {
-	$classes = 'espire-arrow-mark';
-	if ( 'next' === $direction ) {
-		$classes .= ' is-next';
-	}
+function espire_arrow_svg( $direction = 'next', $extra_class = 'is-inline' ) {
+	$classes = 'espire-arrow-mark is-' . ( in_array( $direction, array( 'prev', 'next', 'up', 'down' ), true ) ? $direction : 'next' );
 	if ( $extra_class ) {
 		$classes .= ' ' . $extra_class;
 	}
-	?>
-	<svg class="<?php echo esc_attr( $classes ); ?>" viewBox="0 0 154.9 561" aria-hidden="true">
-		<path fill="currentColor" d="m0 0 12.3 34.5 134 373.6 8.6 23.8-18.5 17.1-98 90.5L15.2 561V289.1h2.7l20.5 29.8 49.9 72.3-19.1 13.2-30.8-44.5v147.9l89.4-82.5L0 68.9"/>
-	</svg>
-	<?php
+	return '<svg class="' . esc_attr( $classes ) . '" viewBox="0 0 410 250" aria-hidden="true" focusable="false"><path fill="currentColor" d="' . ESPIRE_ARROW_PATH . '"/></svg>';
+}
+
+/** Slider / scroll controls: the arrow on its own (no inline spacing). */
+function espire_arrow_icon( $direction = 'prev', $extra_class = '' ) {
+	echo espire_arrow_svg( $direction, $extra_class ); // phpcs:ignore WordPress.Security.EscapeOutput -- fixed markup
 }
