@@ -732,7 +732,7 @@ button.btn-block{ border:none; }
 
 .product-info{ display:flex; flex-direction:column; gap:16px; }
 .info-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; }
-.info-top h1{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.01em; font-size:1.5rem; line-height:1.15; margin:0; }
+.info-top h1{ font-family:"League Spartan","Arial Black",sans-serif; text-transform:uppercase; letter-spacing:.01em; font-size:clamp(1.5rem,2.4vw,1.95rem); line-height:1.12; margin:0; }
 /* Category emblem beside the product name (doubled selector beats
    WooCommerce's ".woocommerce img { height:auto }"). */
 .product-page .info-top .product-emblem{ flex:none; width:110px; height:118px; max-width:none; object-fit:contain; }
@@ -1361,3 +1361,45 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .woocommerce dl.variation{ display:grid !important; grid-template-columns:auto minmax(0,1fr); column-gap:4px; row-gap:1px; }
 .woocommerce dl.variation dt, .woocommerce dl.variation dd{ float:none !important; clear:none !important; margin:0 !important; padding:0 !important; display:block !important; font-weight:400; }
 .woocommerce dl.variation dd p{ margin:0 !important; display:inline; }
+
+/* Product page: category emblem opens the category's About panel */
+.product-emblem-btn{ flex:none; background:none; border:none; padding:0; cursor:pointer; transition:transform .15s ease; }
+.product-emblem-btn:hover{ transform:scale(1.04); }
+
+/* Product page tabs: Information / Sizing / Shipping & Returns */
+.product-tabs .ptabs-nav{ display:flex; gap:6px; flex-wrap:wrap; margin:0 0 18px; border-bottom:1.5px solid var(--ink); }
+.product-tabs .ptab{ background:none; border:1.5px solid transparent; border-bottom:none; margin-bottom:-1.5px; padding:10px 16px; font:inherit; font-size:.74rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); cursor:pointer; border-radius:4px 4px 0 0; }
+.product-tabs .ptab:hover{ color:var(--rust); }
+.product-tabs .ptab.is-active{ color:var(--ink); background:var(--white); border-color:var(--ink); }
+.product-tabs .ptab-pane > h2{ margin-top:0; }
+.product-tabs .info-notes{ list-style:none; margin:18px 0 0; padding:14px 0 0; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px 28px; font-size:.78rem; color:var(--ink-soft); }
+.product-tabs .info-notes a{ font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); text-decoration:none; }
+.product-tabs .info-notes a::after{ content:" \2192"; }
+.product-tabs .info-notes a:hover{ color:var(--rust); }
+.product-tabs .shipping-content{ max-width:720px; }
+.product-tabs .shipping-content .panel-textlink{ text-align:left; }
+.product-tabs .size-guide .fit-pane-top{ display:grid; grid-template-columns:minmax(0,240px) minmax(0,1fr); gap:24px; align-items:start; }
+.product-tabs .size-guide .fit-pane-top.no-photo{ grid-template-columns:1fr; }
+.product-tabs .size-guide .fit-photo{ width:100%; height:auto; aspect-ratio:auto; object-fit:contain; margin:0; }
+.product-tabs .size-guide .fit-pane-intro h4{ margin-top:0; }
+.product-tabs .size-guide .fit-text{ font-size:.84rem; line-height:1.6; }
+.product-tabs .size-guide .fit-text p{ margin:0 0 10px; }
+.product-tabs .size-guide .fit-guide-img{ display:block; width:100%; max-width:900px; height:auto; margin:18px 0 0; }
+.product-tabs .size-guide .fit-tabs{ max-width:640px; }
+.product-tabs .size-guide .fit-tab{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+.product-tabs .size-guide .fit-tab-icon{ width:46px; height:46px; object-fit:contain; }
+.product-tabs .size-guide .fit-tab.is-active{ background:var(--white); color:var(--redrock); border-color:var(--redrock); box-shadow:inset 0 0 0 1.5px var(--redrock); }
+@media (max-width:640px){
+  .product-tabs .ptab{ padding:9px 10px; font-size:.68rem; }
+  .product-tabs .size-guide .fit-pane-top{ grid-template-columns:1fr; }
+  .product-tabs .size-guide .fit-photo{ max-width:240px; }
+}
+
+/* Category About panel: each Seed To Store step links to its tag page */
+.category-overview .ov-step-link{ display:flex; align-items:center; gap:18px; width:100%; color:inherit; text-decoration:none; }
+.category-overview .ov-step.is-flipped .ov-step-link{ flex-direction:row-reverse; text-align:right; }
+.category-overview a.ov-step-link:hover strong, .category-overview a.ov-step-link:hover .ov-step-more{ color:var(--rust); }
+.category-overview .ov-step-more{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); }
+.category-overview .ov-step-more::after{ content:" \2192"; }
+/* Product title a touch larger (beats WooCommerce's .product_title size) */
+.woocommerce .product-page .info-top h1.product_title{ font-size:clamp(1.55rem,2.4vw,1.95rem); line-height:1.12; }

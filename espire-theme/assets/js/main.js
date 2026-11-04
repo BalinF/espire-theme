@@ -535,3 +535,46 @@
 	} );
 	updateAll();
 } )();
+
+/**
+ * Product page tabs (single-product.php): Information / Sizing / Shipping &
+ * Returns. A link to #sizing or #shipping on the page opens that tab too.
+ */
+( function () {
+	'use strict';
+
+	document.querySelectorAll( '.product-tabs' ).forEach( function ( box ) {
+		var tabs = box.querySelectorAll( '[data-ptab]' );
+
+		function show( name ) {
+			var found = false;
+			tabs.forEach( function ( t ) {
+				var on = t.getAttribute( 'data-ptab' ) === name;
+				found = found || on;
+				t.classList.toggle( 'is-active', on );
+				t.setAttribute( 'aria-selected', on ? 'true' : 'false' );
+			} );
+			if ( ! found ) {
+				return false;
+			}
+			box.querySelectorAll( '[data-ptab-pane]' ).forEach( function ( pane ) {
+				pane.hidden = pane.getAttribute( 'data-ptab-pane' ) !== name;
+			} );
+			return true;
+		}
+
+		tabs.forEach( function ( t ) {
+			t.addEventListener( 'click', function () {
+				show( t.getAttribute( 'data-ptab' ) );
+			} );
+		} );
+
+		document.addEventListener( 'click', function ( e ) {
+			var link = e.target.closest && e.target.closest( 'a[href="#sizing"], a[href="#shipping"]' );
+			if ( link && show( link.getAttribute( 'href' ).slice( 1 ) ) ) {
+				e.preventDefault();
+				box.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+			}
+		} );
+	} );
+} )();
