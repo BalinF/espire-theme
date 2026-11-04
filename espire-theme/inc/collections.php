@@ -87,11 +87,16 @@ function espire_store_tiles( $for_homepage = false ) {
 }
 
 /**
- * A tile's short line: the hand-written tile copy when there is one, else
+ * A tile's short line: the category's "Tile Text" box, else the built-in
+ * tile copy when there is one, else
  * the start of the category description (descriptions are a full paragraph,
  * too long for a tile).
  */
 function espire_tile_copy( $term, $fallback ) {
+	$own = function_exists( 'get_field' ) ? trim( (string) get_field( 'category_tile_text', 'product_cat_' . $term->term_id ) ) : '';
+	if ( $own ) {
+		return $own; // "Tile Text" on the category
+	}
 	if ( ! empty( $fallback['copy'] ) ) {
 		return $fallback['copy'];
 	}
