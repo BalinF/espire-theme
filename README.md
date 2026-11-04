@@ -211,6 +211,14 @@ opens WooCommerce's Shop page. To make `/store/` the shop itself, set WooCommerc
 Settings → Products → *Shop page* to "Store". The banner photo and line come from the
 Shop page's featured image and excerpt, or the Store page's if those are blank.
 
+**Story articles (Posts → edit → Article Layout box)** — the posts linked from the
+story pages (Mother & Son, Australian Economy, From Seed To Store…) share one layout
+(single.php): hero (Featured image + title + *Hero Intro*) → black *Statement Band*
+(*stars* make words red) → *Sections* (image left / right / full width / text only) →
+olive *Callout* → three "Read more" cards (*Read More Stories*, else the newest in
+the same category; each card shows that story's *Card Icon*). A post switches to this
+layout once its Statement or a Section is filled in; until then it shows as built.
+
 **Australian Made / F\*ck Fast Fashion (Pages → edit → Brand Story box)** — hero,
 pillar cards (each linking to its longer post), stat strip, shop feature,
 definition line and closing banner, in tabs. Blank fields use the starting copy.
