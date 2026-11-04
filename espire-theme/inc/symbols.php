@@ -138,7 +138,7 @@ function espire_symbol_page_default( $slug, $key ) {
  * Everything needed to draw one symbol, merged from the tag's ACF fields
  * over the built-in defaults. Returns null when the tag isn't a symbol.
  */
-function espire_symbol_from_tag( $tag ) {
+function espire_symbol_from_tag( $tag, $for_journey = false ) {
 	$defaults = espire_symbol_defaults();
 	$base     = isset( $defaults[ $tag->slug ] ) ? $defaults[ $tag->slug ] : null;
 	$field    = function ( $name ) use ( $tag ) {
@@ -148,6 +148,12 @@ function espire_symbol_from_tag( $tag ) {
 	// "Show as symbol": yes / no, or automatic = only the built-in ones.
 	$mode    = $field( 'symbol_enabled' );
 	$enabled = 'yes' === $mode || ( 'no' !== $mode && $base );
+	// In From Seed To Store, a tag with its own Icon, Panel Tagline or Panel
+	// Intro filled in gets a popup too (on Automatic), without also becoming
+	// a badge on product pages.
+	if ( ! $enabled && $for_journey && 'no' !== $mode ) {
+		$enabled = (bool) ( $field( 'symbol_icon' ) || $field( 'symbol_tagline' ) || $field( 'symbol_intro' ) );
+	}
 	if ( ! $enabled ) {
 		return null;
 	}
