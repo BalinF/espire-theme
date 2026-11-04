@@ -301,3 +301,7 @@ from `espire_arrow_svg()` / `espire_arrow_icon()` in functions.php, or
 **Homepage → Shop By Collection**: shows the live top-level categories that have
 products, in the order dragged in Products → Categories. To leave one out, edit the
 category and switch on **Hide From Homepage** (it still shows in the Store).
+
+**Product pages → "More From The Store" banner**: Pages → Home → *Homepage Banners*
+→ **Banner 3** (photo, title, optional text, button text and link). Empty fields keep
+the current photo and wording.
