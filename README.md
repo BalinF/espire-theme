@@ -307,3 +307,8 @@ line, else the first 20 words of the description).
 **Product pages → "More From The Store" banner**: Pages → Home → *Homepage Banners*
 → **Banner 3** (photo, title, optional text, button text and link). Empty fields keep
 the current photo and wording.
+
+**DIY products → Zakeke 3D builder**: products in the DIY category (or its
+sub-categories) show `[zakeke_configurator product_id=<this product>]` in place of the
+photos and add-to-cart box. Override per product with **Zakeke Builder** (Product Page
+Extras): Automatic / Yes / No.
