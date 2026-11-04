@@ -1527,3 +1527,10 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 /* Model photo with the "model is wearing" note underneath */
 .fit-photo-wrap{ margin:0; }
 .fit-photo-wrap .fit-model-note{ margin:8px 0 0; text-align:center; font-size:.78rem; line-height:1.45; }
+
+/* Measurement table: size icons across the top, measured part down the side */
+.measure-grid{ border-collapse:separate; border-spacing:0; font-size:.92rem; }
+.measure-grid thead th{ border:0; padding:6px 4px 10px; }
+.measure-grid thead img{ width:40px; height:40px; object-fit:contain; display:block; margin:0 auto; }
+.measure-grid tbody th{ text-transform:uppercase; font-size:.82rem; letter-spacing:.03em; padding:10px 14px 10px 0; border-bottom:1px solid var(--line); }
+.measure-grid tbody td{ padding:10px 6px; border-bottom:1px solid var(--line); border-left:1px solid var(--line); }

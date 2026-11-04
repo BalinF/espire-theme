@@ -135,7 +135,7 @@ function espire_fits_with_guide( $fits ) {
 			return false;
 		}
 		// Anything beyond the name is enough to show it: a photo, a line of text, size notes or measurements.
-		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_sections', 'fit_size_notes', 'fit_measurements', 'fit_lengths_image', 'fit_chart_image', 'fit_lineup_image' ) as $key ) {
+		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_sections', 'fit_table_rows', 'fit_lengths_image', 'fit_chart_image', 'fit_lineup_image' ) as $key ) {
 			if ( ! empty( $fit[ $key ] ) ) {
 				return true;
 			}
@@ -237,24 +237,34 @@ function espire_size_guide_content( $fits, $term ) {
 					<img class="fit-guide-img" src="<?php echo esc_url( $fit['fit_chart_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> size chart" loading="lazy">
 				<?php endif; ?>
 
-				<?php $rows = espire_parse_measurements( isset( $fit['fit_measurements'] ) ? $fit['fit_measurements'] : '' ); ?>
-				<?php if ( $rows ) : ?>
+				<?php
+				// Measurement table: size icons across the top, what's measured down the side.
+				$espire_cols = array_values( array_filter( ! empty( $fit['fit_table_sizes'] ) ? (array) $fit['fit_table_sizes'] : array(), function ( $c ) {
+					return ! empty( $c['icon'] ) || ! empty( $c['label'] );
+				} ) );
+				$espire_trows = ! empty( $fit['fit_table_rows'] ) ? (array) $fit['fit_table_rows'] : array();
+				?>
+				<?php if ( $espire_cols && $espire_trows ) : ?>
 					<div class="measure-table-wrap">
-						<table class="measure-table">
+						<table class="measure-table measure-grid">
 							<thead><tr>
-								<?php foreach ( $rows[0] as $cell ) : ?>
-									<th scope="col"><?php echo esc_html( $cell ); ?></th>
+								<td></td>
+								<?php foreach ( $espire_cols as $col ) : ?>
+									<th scope="col">
+										<?php if ( ! empty( $col['icon'] ) ) : ?>
+											<img src="<?php echo esc_url( $col['icon'] ); ?>" alt="<?php echo esc_attr( $col['label'] ?? '' ); ?>" loading="lazy">
+										<?php else : ?>
+											<?php echo esc_html( $col['label'] ); ?>
+										<?php endif; ?>
+									</th>
 								<?php endforeach; ?>
 							</tr></thead>
 							<tbody>
-								<?php foreach ( array_slice( $rows, 1 ) as $row ) : ?>
+								<?php foreach ( $espire_trows as $row ) : ?>
 									<tr>
-										<?php foreach ( $row as $c => $cell ) : ?>
-											<?php if ( 0 === $c ) : ?>
-												<th scope="row"><?php echo esc_html( $cell ); ?></th>
-											<?php else : ?>
-												<td><?php echo esc_html( $cell ); ?></td>
-											<?php endif; ?>
+										<th scope="row"><?php echo esc_html( $row['part'] ?? '' ); ?></th>
+										<?php foreach ( array_keys( $espire_cols ) as $ci ) : ?>
+											<td><?php echo esc_html( $row[ 'v' . ( $ci + 1 ) ] ?? '' ); ?></td>
 										<?php endforeach; ?>
 									</tr>
 								<?php endforeach; ?>
@@ -264,20 +274,6 @@ function espire_size_guide_content( $fits, $term ) {
 					<p class="fit-model-note">All measurements in centimetres.</p>
 				<?php endif; ?>
 
-				<?php if ( ! empty( $fit['fit_size_notes'] ) ) : ?>
-					<dl class="size-notes">
-						<?php foreach ( $fit['fit_size_notes'] as $note ) : ?>
-							<dt>
-								<?php if ( ! empty( $note['icon'] ) ) : ?>
-									<img class="size-note-icon" src="<?php echo esc_url( $note['icon'] ); ?>" alt="<?php echo esc_attr( $note['size'] ?? '' ); ?>" loading="lazy">
-								<?php else : ?>
-									<?php echo esc_html( $note['size'] ?? '' ); ?>
-								<?php endif; ?>
-							</dt>
-							<dd><?php echo esc_html( $note['note'] ); ?></dd>
-						<?php endforeach; ?>
-					</dl>
-				<?php endif; ?>
 
 				<?php if ( ! empty( $fit['fit_lineup_image'] ) ) : ?>
 					<img class="fit-guide-img" src="<?php echo esc_url( $fit['fit_lineup_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> size lineup" loading="lazy">
