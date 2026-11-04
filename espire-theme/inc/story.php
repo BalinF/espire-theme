@@ -171,6 +171,27 @@ add_filter( 'template_include', function ( $template ) {
 	return $template;
 }, 999 );
 
+/**
+ * The theme links to /sustainability/ and /australian-made/. If the real page
+ * has a different address (live uses /sustainability-page/), send visitors
+ * there instead of a "not found" page.
+ */
+add_action( 'template_redirect', function () {
+	if ( ! is_404() ) {
+		return;
+	}
+	$path = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH ), '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	if ( ! in_array( $path, array( 'sustainability', 'australian-made' ), true ) ) {
+		return;
+	}
+	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => -1 ) ) as $page ) {
+		if ( espire_story_page_slug( $page ) === $path ) {
+			wp_safe_redirect( get_permalink( $page ), 301 );
+			exit;
+		}
+	}
+} );
+
 /** ACF fields for story pages ("Brand Story" box). */
 add_action( 'acf/init', function () {
 	if ( ! function_exists( 'acf_add_local_field_group' ) ) {
