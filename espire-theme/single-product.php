@@ -69,17 +69,19 @@ while ( have_posts() ) :
 		<?php
 		// "Added to cart" / error notices.
 		do_action( 'woocommerce_before_single_product' );
-		woocommerce_breadcrumb( array(
-			'delimiter'   => ' / ',
-			'wrap_before' => '<nav class="product-crumb" aria-label="Breadcrumb">',
-			'wrap_after'  => '</nav>',
-		) );
+		$espire_builder = espire_product_builder_html( $espire_id ); // Zakeke 3D builder on DIY products (inc/pages.php)
+		if ( ! $espire_builder ) { // DIY builder pages go straight into the builder
+			woocommerce_breadcrumb( array(
+				'delimiter'   => ' / ',
+				'wrap_before' => '<nav class="product-crumb" aria-label="Breadcrumb">',
+				'wrap_after'  => '</nav>',
+			) );
+		}
 
 		// "Piece X of N" when arriving from the homepage's Shop This Set (inc/shop-the-set.php).
 		espire_set_step_bar( $espire_id );
 		?>
 
-		<?php $espire_builder = espire_product_builder_html( $espire_id ); // Zakeke 3D builder on DIY products (inc/pages.php) ?>
 		<?php if ( $espire_builder ) : ?>
 			<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'product-main product-main--builder', $product ); ?>>
 				<?php // The builder has its own layout; the name stays for Google and screen readers. ?>
@@ -162,7 +164,7 @@ while ( have_posts() ) :
 					<?php endif; ?>
 
 						<ul class="info-notes">
-							<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Unsure on size? Give us a call</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><span class="contact-icon" aria-hidden="true"></span>Unsure on size? Give us a call</a></li>
 							<li>Orders can take up to 4 weeks &mdash; made to order, cut and sewn here in Bright.</li>
 						</ul>
 					</div>

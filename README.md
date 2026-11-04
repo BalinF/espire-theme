@@ -312,3 +312,11 @@ the current photo and wording.
 sub-categories) show `[zakeke_configurator product_id=<this product>]` in place of the
 photos and add-to-cart box. Override per product with **Zakeke Builder** (Product Page
 Extras): Automatic / Yes / No.
+
+**Product pages → Shipping & Returns tab**: Pages → FAQ → *Shipping & Returns Tab* rows
+(icon + text each; empty uses the built-in three). Optional Quick Answers show below them.
+
+**Icons in `espire-theme/assets/`**: `icon-contact.svg` (phone with our logo, shown
+before "Contact us" buttons/links via `<span class="contact-icon">`), `icon-shipping.svg`,
+`icon-returns.svg`, `icon-hanger-leaf.svg` (thickened hanger + leaf for environmental
+copy). DIY builder pages have no breadcrumbs.

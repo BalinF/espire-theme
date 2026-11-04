@@ -162,7 +162,7 @@ for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ); $espire
 		<p class="panel-intro">More about <?php echo esc_html( $espire_term->name ); ?> coming soon. Questions in the meantime? Get in touch.</p>
 	<?php endif; ?>
 
-	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Any Questions? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
+	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block"><span class="contact-icon" aria-hidden="true"></span>Any Questions? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 </aside>
 	<?php
 }
