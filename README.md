@@ -154,6 +154,8 @@ at the bottom of the menu screen:
 - **Primary Header Menu**: the links across the top, and in the phone menu. Open an item
   to pick its **Menu Icon** (pencil, shop front, globe, leaf, T-shirt …), choose *No
   icon*, or upload your own. Left on *Automatic*, an icon is matched from the link.
+  Uploaded icons are recoloured to match the menu text (white, rust on hover); tick
+  *Keep The Icon's Own Colours* to show one as it is.
 - **Category Bar**: the dark strip of collection links under the banners. Add
   categories from *Product categories* on the left and drag to reorder.
 
