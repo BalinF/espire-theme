@@ -22,6 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** The one button on every tag popup, leading to that tag's page. */
+define( 'ESPIRE_SYMBOL_BUTTON_TEXT', 'Read More & Shop The Range' );
+
 /**
  * Built-in starting copy, keyed by tag slug. Only used where the tag's
  * own fields are blank.
@@ -310,14 +313,16 @@ function espire_symbol_panel( $s ) {
 				<?php endforeach; ?>
 			</ul>
 		<?php endif; ?>
-		<div class="panel-links">
-			<?php if ( $s['story'] ) : ?>
-				<a class="btn olive btn-sm" href="<?php echo esc_url( $s['story'][1] ); ?>"><?php echo esc_html( $s['story'][0] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
-			<?php endif; ?>
-			<?php if ( $s['shop'] && ! is_wp_error( $s['shop'][1] ) ) : ?>
-				<a class="btn olive btn-sm" href="<?php echo esc_url( $s['shop'][1] ); ?>"><?php echo esc_html( $s['shop'][0] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
-			<?php endif; ?>
-		</div>
+		<?php
+		// One button on every tag popup: to the tag's own page (its story + pieces).
+		$espire_tag_term = get_term_by( 'slug', $s['slug'], 'product_tag' );
+		$espire_tag_link = $espire_tag_term ? get_term_link( $espire_tag_term ) : '';
+		?>
+		<?php if ( $espire_tag_link && ! is_wp_error( $espire_tag_link ) ) : ?>
+			<div class="panel-links">
+				<a class="btn olive btn-sm" href="<?php echo esc_url( $espire_tag_link ); ?>"><?php echo esc_html( ESPIRE_SYMBOL_BUTTON_TEXT ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
+			</div>
+		<?php endif; ?>
 	</aside>
 	<?php
 }

@@ -135,7 +135,7 @@ function espire_fits_with_guide( $fits ) {
 			return false;
 		}
 		// Anything beyond the name is enough to show it: a photo, a line of text, size notes or measurements.
-		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_size_notes', 'fit_measurements', 'fit_lengths_image', 'fit_chart_image', 'fit_lineup_image' ) as $key ) {
+		foreach ( array( 'fit_image', 'fit_description', 'fit_intro', 'fit_model_note', 'fit_sections', 'fit_size_notes', 'fit_measurements', 'fit_lengths_image', 'fit_chart_image', 'fit_lineup_image' ) as $key ) {
 			if ( ! empty( $fit[ $key ] ) ) {
 				return true;
 			}
@@ -163,10 +163,14 @@ function espire_size_guide_content( $fits, $term ) {
 			<div class="fit-tabs" role="tablist">
 				<?php foreach ( $fits as $i => $fit ) : ?>
 					<button type="button" role="tab" class="fit-tab<?php echo 0 === $i ? ' is-active' : ''; ?>" aria-selected="<?php echo 0 === $i ? 'true' : 'false'; ?>" data-fit-tab="<?php echo esc_attr( $i ); ?>">
-						<?php if ( ! empty( $fit['fit_icon'] ) ) : ?>
-							<img class="fit-tab-icon" src="<?php echo esc_url( $fit['fit_icon'] ); ?>" alt="">
+						<?php if ( ! empty( $fit['fit_name_image'] ) ) : ?>
+							<img class="fit-tab-image" src="<?php echo esc_url( $fit['fit_name_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?>">
+						<?php else : ?>
+							<?php if ( ! empty( $fit['fit_icon'] ) ) : ?>
+								<img class="fit-tab-icon" src="<?php echo esc_url( $fit['fit_icon'] ); ?>" alt="">
+							<?php endif; ?>
+							<span><?php echo esc_html( $fit['fit_name'] ); ?></span>
 						<?php endif; ?>
-						<span><?php echo esc_html( $fit['fit_name'] ); ?></span>
 					</button>
 				<?php endforeach; ?>
 			</div>
@@ -190,6 +194,35 @@ function espire_size_guide_content( $fits, $term ) {
 						<?php endif; ?>
 					</div>
 				</div>
+
+				<?php foreach ( ! empty( $fit['fit_sections'] ) ? (array) $fit['fit_sections'] : array() as $si => $section ) : ?>
+					<?php // Guide Sections (LENGTHS, SIZES…): title, rows of icon + label + text, sketch alongside. ?>
+					<section class="guide-section<?php echo $si % 2 ? ' is-flipped' : ''; ?><?php echo empty( $section['image'] ) ? ' no-image' : ''; ?>">
+						<?php if ( ! empty( $section['title'] ) ) : ?>
+							<h3 class="gs-title"><?php echo esc_html( $section['title'] ); ?></h3>
+						<?php endif; ?>
+						<div class="gs-body">
+							<div class="gs-rows">
+								<?php foreach ( ! empty( $section['rows'] ) ? (array) $section['rows'] : array() as $row ) : ?>
+									<div class="gs-row">
+										<?php if ( ! empty( $row['icon'] ) ) : ?>
+											<img class="gs-icon" src="<?php echo esc_url( $row['icon'] ); ?>" alt="" loading="lazy">
+										<?php endif; ?>
+										<p>
+											<?php if ( ! empty( $row['label'] ) ) : ?>
+												<strong><?php echo esc_html( $row['label'] ); ?></strong><?php echo ! empty( $row['text'] ) ? ' &ndash; ' : ''; ?>
+											<?php endif; ?>
+											<?php echo ! empty( $row['text'] ) ? esc_html( $row['text'] ) : ''; ?>
+										</p>
+									</div>
+								<?php endforeach; ?>
+							</div>
+							<?php if ( ! empty( $section['image'] ) ) : ?>
+								<img class="gs-image" src="<?php echo esc_url( $section['image'] ); ?>" alt="<?php echo esc_attr( trim( $fit['fit_name'] . ' ' . ( $section['title'] ?? '' ) ) ); ?>" loading="lazy">
+							<?php endif; ?>
+						</div>
+					</section>
+				<?php endforeach; ?>
 
 				<?php if ( ! empty( $fit['fit_lengths_image'] ) ) : ?>
 					<img class="fit-guide-img" src="<?php echo esc_url( $fit['fit_lengths_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> lengths" loading="lazy">
@@ -229,7 +262,13 @@ function espire_size_guide_content( $fits, $term ) {
 				<?php if ( ! empty( $fit['fit_size_notes'] ) ) : ?>
 					<dl class="size-notes">
 						<?php foreach ( $fit['fit_size_notes'] as $note ) : ?>
-							<dt><?php echo esc_html( $note['size'] ); ?></dt>
+							<dt>
+								<?php if ( ! empty( $note['icon'] ) ) : ?>
+									<img class="size-note-icon" src="<?php echo esc_url( $note['icon'] ); ?>" alt="<?php echo esc_attr( $note['size'] ?? '' ); ?>" loading="lazy">
+								<?php else : ?>
+									<?php echo esc_html( $note['size'] ?? '' ); ?>
+								<?php endif; ?>
+							</dt>
 							<dd><?php echo esc_html( $note['note'] ); ?></dd>
 						<?php endforeach; ?>
 					</dl>
