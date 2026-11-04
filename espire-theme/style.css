@@ -113,6 +113,9 @@ nav.primary-nav a:hover{ color:var(--rust); }
    rust on hover) with no extra CSS needed per icon. */
 nav.primary-nav a svg{ width:15px; height:15px; flex:none; stroke:currentColor; }
 nav.primary-nav a .menu-icon, .mobile-sidebar a .menu-icon{ width:15px; height:15px; flex:none; object-fit:contain; }
+.mobile-sidebar a .menu-icon{ width:17px; height:17px; }
+/* Uploaded menu icons, recoloured to the link colour (white, rust on hover). */
+.menu-icon-mask{ display:inline-block; background-color:currentColor; -webkit-mask:var(--menu-icon) center/contain no-repeat; mask:var(--menu-icon) center/contain no-repeat; }
 
 .head-actions{ font-size:.8rem; font-weight:700; display:flex; gap:14px; align-items:center; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.4); }
 

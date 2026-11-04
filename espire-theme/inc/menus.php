@@ -107,7 +107,15 @@ add_action( 'acf/init', function () {
 				'type'          => 'image',
 				'return_format' => 'url',
 				'preview_size'  => 'thumbnail',
-				'instructions'  => 'Optional — replaces the icon above. A small square SVG or PNG (about 48 × 48px) works best.',
+				'instructions'  => 'Optional — replaces the icon above. A small square SVG or PNG (about 48 × 48px) on a transparent background works best. It\'s recoloured to match the menu text (white, rust on hover).',
+			),
+			array(
+				'key'           => 'field_espire_menu_icon_own_colours',
+				'label'         => 'Keep The Icon\'s Own Colours',
+				'name'          => 'menu_icon_own_colours',
+				'type'          => 'true_false',
+				'ui'            => 1,
+				'instructions'  => 'Tick to show the uploaded icon exactly as it is instead of recolouring it.',
 			),
 		),
 		'location' => array( array( array( 'param' => 'nav_menu_item', 'operator' => '==', 'value' => 'location/primary' ) ) ),
@@ -122,7 +130,11 @@ add_filter( 'nav_menu_item_title', function ( $title, $item, $args, $depth ) {
 	$choice = function_exists( 'get_field' ) ? (string) get_field( 'menu_icon', $item->ID ) : '';
 	$image  = function_exists( 'get_field' ) ? (string) get_field( 'menu_icon_image', $item->ID ) : '';
 	if ( $image ) {
-		return '<img class="menu-icon" src="' . esc_url( $image ) . '" alt="" aria-hidden="true">' . $title;
+		if ( get_field( 'menu_icon_own_colours', $item->ID ) ) {
+			return '<img class="menu-icon" src="' . esc_url( $image ) . '" alt="" aria-hidden="true">' . $title;
+		}
+		// Drawn in the text colour: the image's shape is used as a mask over currentColor.
+		return '<span class="menu-icon menu-icon-mask" style="--menu-icon:url(\'' . esc_url( $image ) . '\')" aria-hidden="true"></span>' . $title;
 	}
 	if ( 'none' === $choice ) {
 		return $title;
