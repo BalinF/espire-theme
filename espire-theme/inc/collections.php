@@ -39,8 +39,8 @@ function espire_collection_slug( $tile ) {
 /**
  * Live Store hub tiles: every top-level product category that has
  * products, in the order set by dragging in Products > Categories. Photo:
- * the category's ACF banner, else its WooCommerce thumbnail, else the
- * homepage tile's photo. Copy: espire_tile_copy().
+ * the category's Thumbnail, else its Banner Image, else the homepage
+ * tile's photo. Copy: espire_tile_copy().
  *
  * $for_homepage: the homepage "Shop By Collection" slider, which skips
  * categories with "Hide From Homepage" ticked (Products → Categories → edit).
@@ -65,10 +65,11 @@ function espire_store_tiles( $for_homepage = false ) {
 			continue; // "Hide From Homepage" ticked on the category
 		}
 		$fallback = isset( $defaults[ $term->slug ] ) ? $defaults[ $term->slug ] : array();
-		$image    = function_exists( 'get_field' ) ? get_field( 'category_banner_image', 'product_cat_' . $term->term_id ) : '';
-		if ( ! $image ) {
-			$thumb_id = get_term_meta( $term->term_id, 'thumbnail_id', true );
-			$image    = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'large' ) : '';
+		// The category's Thumbnail (squarer, suits the tile), else its banner.
+		$thumb_id = get_term_meta( $term->term_id, 'thumbnail_id', true );
+		$image    = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'large' ) : '';
+		if ( ! $image && function_exists( 'get_field' ) ) {
+			$image = get_field( 'category_banner_image', 'product_cat_' . $term->term_id );
 		}
 		if ( ! $image && ! empty( $fallback['image'] ) ) {
 			$image = get_template_directory_uri() . '/assets/' . $fallback['image'];
