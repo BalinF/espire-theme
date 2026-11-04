@@ -40,8 +40,7 @@ function espire_collection_slug( $tile ) {
  * Live Store hub tiles: every top-level product category that has
  * products, in the order set by dragging in Products > Categories. Photo:
  * the category's ACF banner, else its WooCommerce thumbnail, else the
- * homepage tile's photo. Copy: the category description, else the
- * homepage tile's copy.
+ * homepage tile's photo. Copy: espire_tile_copy().
  *
  * $for_homepage: the homepage "Shop By Collection" slider, which skips
  * categories with "Hide From Homepage" ticked (Products → Categories → edit).
@@ -79,12 +78,24 @@ function espire_store_tiles( $for_homepage = false ) {
 			'url'   => get_term_link( $term ),
 			'image' => $image,
 			'alt'   => isset( $fallback['alt'] ) ? $fallback['alt'] : '',
-			'copy'  => $term->description ? wp_strip_all_tags( $term->description ) : ( isset( $fallback['copy'] ) ? $fallback['copy'] : '' ),
+			'copy'  => espire_tile_copy( $term, $fallback ),
 			'cta'   => 'Shop ' . $term->name,
 			'count' => (int) $term->count,
 		);
 	}
 	return $tiles;
+}
+
+/**
+ * A tile's short line: the hand-written tile copy when there is one, else
+ * the start of the category description (descriptions are a full paragraph,
+ * too long for a tile).
+ */
+function espire_tile_copy( $term, $fallback ) {
+	if ( ! empty( $fallback['copy'] ) ) {
+		return $fallback['copy'];
+	}
+	return $term->description ? wp_trim_words( wp_strip_all_tags( $term->description ), 20 ) : '';
 }
 
 /**

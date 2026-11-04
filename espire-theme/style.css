@@ -193,7 +193,7 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
   border:none; padding:0; cursor:pointer; color:#fff;
 }
 .ql-arrow:hover{ color:var(--rust); }
-.ql-arrow .espire-arrow-mark{ width:22px; height:13.4px; }
+.ql-arrow .espire-slide-arrow{ width:9px; height:30px; }
 .ql-prev{ left:0; box-shadow:6px 0 8px -4px rgba(0,0,0,.6); }
 .ql-next{ right:0; box-shadow:-6px 0 8px -4px rgba(0,0,0,.6); }
 
@@ -268,13 +268,16 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 /* Just outside the cards, in the page's side margin */
 .cs-prev{ left:-46px; }
 .cs-next{ right:-46px; }
-.cs-arrow .espire-arrow-mark{ width:44px; height:26.8px; }
+.cs-arrow .espire-slide-arrow{ width:22px; height:80px; }
 
 /* Espire's own arrow mark (see espire_arrow_icon() in functions.php) —
    shared sizing for every prev/next control on the site, so .cs-arrow,
    .ql-arrow and anything added later all use it the same way. Shown
    upright (tall and thin, as drawn): as drawn its point faces right, so
    "next" uses it as-is and "prev" is mirrored. */
+/* Slider / scroll-row controls: the tall half-diamond mark, pointing left unless .is-next. */
+.espire-slide-arrow{ display:block; flex:none; width:9px; height:32px; transform:scaleX(-1); }
+.espire-slide-arrow.is-next{ transform:none; }
 .espire-arrow-mark{ display:block; flex:none; width:22px; height:13.4px; overflow:visible; transition:transform .15s ease; }
 .espire-arrow-mark.is-prev{ transform:scaleX(-1); }
 .espire-arrow-mark.is-up{ transform:rotate(-90deg); }
@@ -293,7 +296,7 @@ button.trust-link span::after, .product-tabs .info-notes a::after, .category-ove
    touch swipe alone isn't an obvious affordance, the arrows are what
    tells people there's more to see. */
 @media (max-width:900px){
-  .cs-arrow .espire-arrow-mark{ width:32px; height:19.5px; }
+  .cs-arrow .espire-slide-arrow{ width:16px; height:58px; }
 }
 /* Narrow screens have too little side margin for the arrows, so the
    slider makes room for them inside its own edges instead. */
@@ -349,7 +352,7 @@ button.trust-link span::after, .product-tabs .info-notes a::after, .category-ove
    wider than the screen (same arrow mark as the sliders). */
 .d-arrow{ display:none; position:absolute; top:34px; transform:translateY(-50%); z-index:2; background:none; border:none; padding:4px 2px; cursor:pointer; color:var(--ink); }
 .d-arrow:hover{ color:var(--rust); }
-.d-arrow .espire-arrow-mark{ width:26px; height:15.9px; }
+.d-arrow .espire-slide-arrow{ width:12px; height:42px; }
 .d-prev{ left:0; }
 .d-next{ right:0; }
 /* The row makes room for the arrows at its sides, so they never cover a step */
@@ -1292,7 +1295,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-track > *{ flex:none; }
 .filter-arrow{ display:none; flex:none; background:none; border:none; padding:2px 4px; cursor:pointer; color:var(--ink); }
 .filter-arrow:hover{ color:var(--rust); }
-.filter-arrow .espire-arrow-mark{ width:22px; height:13.4px; }
+.filter-arrow .espire-slide-arrow{ width:10px; height:34px; }
 .filter-row.can-prev .filter-prev, .filter-row.can-next .filter-next{ display:block; }
 .size-pill{ min-width:36px; height:32px; padding:0 8px; border-radius:4px; border:1px solid var(--ink); display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--ink); background:var(--white); transition:border-color .15s ease, background .15s ease, color .15s ease; }
 .size-pill:hover{ border-color:var(--rust); color:var(--rust); }

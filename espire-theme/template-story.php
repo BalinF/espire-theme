@@ -105,7 +105,7 @@ while ( have_posts() ) :
 				<?php if ( $espire_s['closing_button'][1] ) : ?>
 					<a class="ch-link" href="<?php echo esc_url( espire_story_link( $espire_s['closing_button'][1] ) ); ?>">
 						<?php echo esc_html( $espire_s['closing_button'][0] ); ?>
-						<span class="ch-arrow" aria-hidden="true"><?php espire_arrow_icon( 'next' ); ?></span>
+						<span class="ch-arrow" aria-hidden="true"><?php echo espire_arrow_svg( 'next', '' ); // phpcs:ignore -- fixed markup ?></span>
 					</a>
 				<?php endif; ?>
 				<?php if ( $espire_s['closing_text'] ) : ?>

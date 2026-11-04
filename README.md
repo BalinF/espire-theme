@@ -293,8 +293,8 @@ Why not GitHub's green *Code → Download ZIP* button? That zips the whole repo
 (README, workflow and all) with the theme one folder down, so WordPress can't
 find `style.css` and rejects it. The Actions artifact is just the theme folder.
 
-**Arrows**: every arrow on the site (slider and filter controls, the arrow after
-"Shop All", "Read The Story", buttons and text links) is the site icon on its side,
+**Arrows**: the arrow after links and buttons (
+"Shop All", "Read The Story" and so on) is the site icon on its side; slider and scroll-row controls keep the half-diamond mark,
 from `espire_arrow_svg()` / `espire_arrow_icon()` in functions.php, or
 `assets/arrow-mark.svg` for CSS-only arrows. It takes the text colour.
 

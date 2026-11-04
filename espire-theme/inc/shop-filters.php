@@ -477,7 +477,7 @@ function espire_filter_bar( $args = array() ) {
 				<button type="button" class="filter-toggle" aria-expanded="false" aria-controls="filter-groups">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
 					Filters<?php echo $picked ? ' (' . (int) $picked . ')' : ''; ?>
-					<?php espire_arrow_icon( 'down', 'filter-toggle-chevron' ); ?>
+					<?php echo espire_arrow_svg( 'down', 'filter-toggle-chevron' ); // phpcs:ignore -- fixed markup ?>
 				</button>
 			<?php endif; ?>
 			<div class="filter-groups" id="filter-groups">

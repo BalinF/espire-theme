@@ -128,14 +128,12 @@ define( 'ESPIRE_ARROW_PATH', 'M154 110L215 110L202 100C195 95 179 84 167 75C154 
 
 /**
  * Espire's arrow: the site icon (the diamond with the arrow inside) turned
- * on its side to point the way. Every arrow on the site uses it — slider
- * and filter controls, and the arrow after links like "Shop All" — so they
- * all match. fill="currentColor", so it takes the colour of the text or
+ * on its side to point the way, used after links and buttons ("Shop All",
+ * "Read The Story"…). Slider controls keep the half-diamond mark
+ * (espire_arrow_icon() below). fill="currentColor", so it takes the colour of the text or
  * button it sits in (rust on hover and so on).
  *
- * Usage: espire_arrow_icon();                 // points left (prev)
- *        espire_arrow_icon( 'next' );         // points right
- *        echo espire_arrow_svg();              // inline after link text, points right
+ * Usage: echo espire_arrow_svg();              // inline after link text, points right
  *        espire_arrow_svg( 'down', 'my-class' ) // also 'up'
  *
  * CSS-only arrows (a ::after on a link) use assets/arrow-mark.svg as a mask
@@ -712,7 +710,16 @@ function espire_arrow_svg( $direction = 'next', $extra_class = 'is-inline' ) {
 	return '<svg class="' . esc_attr( $classes ) . '" viewBox="0 0 410 250" aria-hidden="true" focusable="false"><path fill="currentColor" d="' . ESPIRE_ARROW_PATH . '"/></svg>';
 }
 
-/** Slider / scroll controls: the arrow on its own (no inline spacing). */
+/**
+ * Slider and scroll-row controls (Shop By Collection, the category strip,
+ * Seed To Store, filter rows): the tall half-diamond mark, upright, pointing
+ * left by default; 'next' points right (mirrored in CSS, .espire-slide-arrow).
+ */
 function espire_arrow_icon( $direction = 'prev', $extra_class = '' ) {
-	echo espire_arrow_svg( $direction, $extra_class ); // phpcs:ignore WordPress.Security.EscapeOutput -- fixed markup
+	$classes = 'espire-slide-arrow' . ( 'next' === $direction ? ' is-next' : '' ) . ( $extra_class ? ' ' . $extra_class : '' );
+	?>
+	<svg class="<?php echo esc_attr( $classes ); ?>" viewBox="0 0 154.9 561" aria-hidden="true" focusable="false">
+		<path fill="currentColor" d="m0 0 12.3 34.5 134 373.6 8.6 23.8-18.5 17.1-98 90.5L15.2 561V289.1h2.7l20.5 29.8 49.9 72.3-19.1 13.2-30.8-44.5v147.9l89.4-82.5L0 68.9"/>
+	</svg>
+	<?php
 }
