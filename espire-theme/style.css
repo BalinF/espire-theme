@@ -1534,3 +1534,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .measure-grid thead img{ width:40px; height:40px; object-fit:contain; display:block; margin:0 auto; }
 .measure-grid tbody th{ text-transform:uppercase; font-size:.82rem; letter-spacing:.03em; padding:10px 14px 10px 0; border-bottom:1px solid var(--line); }
 .measure-grid tbody td{ padding:10px 6px; border-bottom:1px solid var(--line); border-left:1px solid var(--line); }
+
+/* Ready-made "The Espire …" title graphic at the top of a fit */
+.fit-title-image{ margin:0 0 12px; }
+.fit-title-image img{ display:block; max-width:min(100%,380px); max-height:120px; width:auto; height:auto; }

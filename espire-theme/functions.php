@@ -272,7 +272,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'type'          => 'image',
 							'return_format' => 'url',
 							'preview_size'  => 'thumbnail',
-							'instructions'  => 'Optional: your ready-made fit graphic (e.g. the hoodie sketch with "classic cut"). Shown instead of the icon + name on the Size Guide tab and in the About panel. Still type the Fit Name above, it\'s used for headings and screen readers.',
+							'instructions'  => 'Optional: your ready-made title graphic (e.g. "The Espire Classic Hoodie"). Shown in place of the "The Espire …" heading at the top of this fit in the Size Guide, and in the About panel\'s fits list. The tab keeps the Tab Icon sketch + name. Still type the Fit Name above, it\'s used for screen readers.',
 						),
 						array(
 							'key'           => 'field_espire_fit_icon',
@@ -316,6 +316,34 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'name'         => 'fit_model_note',
 							'type'         => 'text',
 							'instructions' => 'e.g. "Model is wearing size M, 180cm tall."',
+						),
+						array(
+							'key'          => 'field_espire_fit_sections',
+							'label'        => 'Guide Sections',
+							'name'         => 'fit_sections',
+							'type'         => 'repeater',
+							'max'          => 3,
+							'layout'       => 'block',
+							'button_label' => 'Add Section',
+							'instructions' => 'Up to 3 sections in this fit\'s Size Guide, e.g. LENGTHS, SIZES, NOTES: a title, a sketch beside the rows, and rows of icon + label + short text (e.g. the M icon, "MINI", "10cm shorter front and back…"). Sketches alternate sides.',
+							'sub_fields'   => array(
+								array( 'key' => 'field_espire_fit_section_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text' ),
+								array( 'key' => 'field_espire_fit_section_image', 'label' => 'Sketch Image', 'name' => 'image', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail' ),
+								array(
+									'key'          => 'field_espire_fit_section_rows',
+									'label'        => 'Rows',
+									'name'         => 'rows',
+									'type'         => 'repeater',
+									'max'          => 5,
+									'layout'       => 'table',
+									'button_label' => 'Add Row',
+									'sub_fields'   => array(
+										array( 'key' => 'field_espire_fit_section_row_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'image', 'return_format' => 'url', 'preview_size' => 'thumbnail' ),
+										array( 'key' => 'field_espire_fit_section_row_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'instructions' => 'Bold, e.g. MINI' ),
+										array( 'key' => 'field_espire_fit_section_row_text', 'label' => 'Text', 'name' => 'text', 'type' => 'textarea', 'rows' => 2 ),
+									),
+								),
+							),
 						),
 						array(
 							'key'          => 'field_espire_fit_table_sizes',

@@ -163,14 +163,10 @@ function espire_size_guide_content( $fits, $term ) {
 			<div class="fit-tabs" role="tablist">
 				<?php foreach ( $fits as $i => $fit ) : ?>
 					<button type="button" role="tab" class="fit-tab<?php echo 0 === $i ? ' is-active' : ''; ?>" aria-selected="<?php echo 0 === $i ? 'true' : 'false'; ?>" data-fit-tab="<?php echo esc_attr( $i ); ?>">
-						<?php if ( ! empty( $fit['fit_name_image'] ) ) : ?>
-							<img class="fit-tab-image" src="<?php echo esc_url( $fit['fit_name_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?>">
-						<?php else : ?>
-							<?php if ( ! empty( $fit['fit_icon'] ) ) : ?>
-								<img class="fit-tab-icon" src="<?php echo esc_url( $fit['fit_icon'] ); ?>" alt="">
-							<?php endif; ?>
-							<span><?php echo esc_html( $fit['fit_name'] ); ?></span>
+						<?php if ( ! empty( $fit['fit_icon'] ) ) : ?>
+							<img class="fit-tab-icon" src="<?php echo esc_url( $fit['fit_icon'] ); ?>" alt="">
 						<?php endif; ?>
+						<span><?php echo esc_html( $fit['fit_name'] ); ?></span>
 					</button>
 				<?php endforeach; ?>
 			</div>
@@ -188,7 +184,11 @@ function espire_size_guide_content( $fits, $term ) {
 						</figure>
 					<?php endif; ?>
 					<div class="fit-pane-intro">
-						<h4>The Espire <?php echo esc_html( $fit['fit_name'] ); ?></h4>
+						<?php if ( ! empty( $fit['fit_name_image'] ) ) : ?>
+							<h4 class="fit-title-image"><img src="<?php echo esc_url( $fit['fit_name_image'] ); ?>" alt="The Espire <?php echo esc_attr( $fit['fit_name'] ); ?>"></h4>
+						<?php else : ?>
+							<h4>The Espire <?php echo esc_html( $fit['fit_name'] ); ?></h4>
+						<?php endif; ?>
 						<?php if ( empty( $fit['fit_image'] ) && ! empty( $fit['fit_model_note'] ) ) : ?>
 							<p class="fit-model-note"><?php echo esc_html( $fit['fit_model_note'] ); ?></p>
 						<?php endif; ?>
