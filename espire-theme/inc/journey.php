@@ -72,11 +72,16 @@ function espire_category_journey( $term ) {
 
 /** One journey step from a product tag: array( label, url, symbol, tag_id ). */
 function espire_journey_step( $tag, $label = '' ) {
-	$link = get_term_link( $tag );
+	$link   = get_term_link( $tag );
+	$symbol = espire_symbol_from_tag( $tag );
+	// The tag's uploaded Icon (Products → Tags → edit), even when the tag
+	// isn't shown as a symbol badge; else the symbol's built-in mark.
+	$upload = function_exists( 'get_field' ) ? (string) get_field( 'symbol_icon', 'product_tag_' . $tag->term_id ) : '';
 	return array(
 		'label'  => $label ? $label : $tag->name,
 		'url'    => is_wp_error( $link ) ? '' : $link,
-		'symbol' => espire_symbol_from_tag( $tag ),
+		'symbol' => $symbol,
+		'icon'   => $upload ? 'url:' . $upload : ( $symbol ? (string) $symbol['icon'] : '' ),
 		'tag_id' => (int) $tag->term_id,
 	);
 }
@@ -166,15 +171,15 @@ function espire_journey_section( $journey, $args = array() ) {
 						<div class="d-step">
 							<?php
 							$mark = function () use ( $step ) {
-								if ( $step['symbol'] && ! empty( $step['symbol']['icon'] ) ) {
-									espire_symbol_icon( $step['symbol'] );
+								if ( ! empty( $step['icon'] ) ) {
+									espire_symbol_icon( $step );
 								} else {
 									// Plain leaf mark for steps that aren't symbols.
 									echo '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>';
 								}
 							};
 							// Uploaded icons (circular, with their own text) show as-is, without the ring.
-							$ic = ( $step['symbol'] && 0 === strpos( (string) $step['symbol']['icon'], 'url:' ) ) ? 'ic has-image' : 'ic';
+							$ic = 0 === strpos( (string) $step['icon'], 'url:' ) ? 'ic has-image' : 'ic';
 							?>
 							<?php if ( $args['panels'] && ! empty( $step['symbol']['slug'] ) ) : ?>
 								<button type="button" class="<?php echo esc_attr( $ic ); ?>" data-panel-open="symbol-<?php echo esc_attr( $step['symbol']['slug'] ); ?>" aria-label="<?php echo esc_attr( $step['label'] ); ?>"><?php $mark(); ?></button>
@@ -215,7 +220,7 @@ function espire_default_journey() {
 			$term   = get_term_by( 'slug', $slug, 'product_tag' );
 			$symbol = $term ? espire_symbol_from_tag( $term ) : null;
 		}
-		return array( 'label' => $label, 'url' => home_url( $url ), 'symbol' => $symbol );
+		return array( 'label' => $label, 'url' => home_url( $url ), 'symbol' => $symbol, 'icon' => $symbol ? (string) $symbol['icon'] : '' );
 	};
 	return array(
 		'title'  => 'Our Tees: From Seed To Store',
