@@ -109,10 +109,14 @@ for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ); $espire
 			<ul class="fits-list">
 				<?php foreach ( $espire_sidebar_fits as $espire_fit ) : ?>
 					<li>
-						<?php if ( ! empty( $espire_fit['fit_icon'] ) ) : ?>
-							<img src="<?php echo esc_url( $espire_fit['fit_icon'] ); ?>" alt="" loading="lazy">
+						<?php if ( ! empty( $espire_fit['fit_name_image'] ) ) : ?>
+							<img class="fit-name-image" src="<?php echo esc_url( $espire_fit['fit_name_image'] ); ?>" alt="<?php echo esc_attr( $espire_fit['fit_name'] ); ?>" loading="lazy">
+						<?php else : ?>
+							<?php if ( ! empty( $espire_fit['fit_icon'] ) ) : ?>
+								<img src="<?php echo esc_url( $espire_fit['fit_icon'] ); ?>" alt="" loading="lazy">
+							<?php endif; ?>
+							<strong><?php echo esc_html( $espire_fit['fit_name'] ); ?></strong>
 						<?php endif; ?>
-						<strong><?php echo esc_html( $espire_fit['fit_name'] ); ?></strong>
 						<?php if ( ! empty( $espire_fit['fit_description'] ) ) : ?>
 							<span><?php echo esc_html( $espire_fit['fit_description'] ); ?></span>
 						<?php endif; ?>
@@ -149,6 +153,10 @@ for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ); $espire
 					</span>
 					</<?php echo ! empty( $espire_step['url'] ) ? 'a' : 'div'; ?>>
 				</li>
+				<?php if ( $espire_i < count( $espire_ov_steps ) - 1 ) : ?>
+					<?php // Faint half-arrow mark leading to the next step, zig-zagging with the steps. ?>
+					<li class="ov-connector<?php echo $espire_i % 2 ? ' is-back' : ''; ?>" aria-hidden="true"></li>
+				<?php endif; ?>
 			<?php endforeach; ?>
 		</ol>
 	<?php endif; ?>
