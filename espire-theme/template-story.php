@@ -53,7 +53,7 @@ while ( have_posts() ) :
 							<h3><?php echo esc_html( $espire_title ); ?></h3>
 							<p><?php echo esc_html( $espire_text ); ?></p>
 							<?php if ( $espire_url ) : ?>
-								<a class="p-link" href="<?php echo esc_url( espire_story_link( $espire_url ) ); ?>"><?php echo esc_html( $espire_label ?: 'Learn More' ); ?> &rarr;</a>
+								<a class="p-link" href="<?php echo esc_url( espire_story_link( $espire_url ) ); ?>"><?php echo esc_html( $espire_label ?: 'Learn More' ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 							<?php endif; ?>
 						</div>
 					</article>
@@ -80,7 +80,7 @@ while ( have_posts() ) :
 				<h2><?php echo esc_html( $espire_s['feature_title'] ); ?></h2>
 				<p><?php echo esc_html( $espire_s['feature_text'] ); ?></p>
 				<?php if ( $espire_s['feature_button'][1] ) : ?>
-					<a class="btn olive" href="<?php echo esc_url( espire_story_link( $espire_s['feature_button'][1] ) ); ?>"><?php echo esc_html( $espire_s['feature_button'][0] ); ?> &rarr;</a>
+					<a class="btn olive" href="<?php echo esc_url( espire_story_link( $espire_s['feature_button'][1] ) ); ?>"><?php echo esc_html( $espire_s['feature_button'][0] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 				<?php endif; ?>
 			</div>
 		</section>
@@ -105,7 +105,7 @@ while ( have_posts() ) :
 				<?php if ( $espire_s['closing_button'][1] ) : ?>
 					<a class="ch-link" href="<?php echo esc_url( espire_story_link( $espire_s['closing_button'][1] ) ); ?>">
 						<?php echo esc_html( $espire_s['closing_button'][0] ); ?>
-						<span class="ch-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M13 8l4 4-4 4"/></svg></span>
+						<span class="ch-arrow" aria-hidden="true"><?php espire_arrow_icon( 'next' ); ?></span>
 					</a>
 				<?php endif; ?>
 				<?php if ( $espire_s['closing_text'] ) : ?>

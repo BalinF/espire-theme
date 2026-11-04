@@ -42,8 +42,11 @@ function espire_collection_slug( $tile ) {
  * the category's ACF banner, else its WooCommerce thumbnail, else the
  * homepage tile's photo. Copy: the category description, else the
  * homepage tile's copy.
+ *
+ * $for_homepage: the homepage "Shop By Collection" slider, which skips
+ * categories with "Hide From Homepage" ticked (Products → Categories → edit).
  */
-function espire_store_tiles() {
+function espire_store_tiles( $for_homepage = false ) {
 	$defaults = array();
 	foreach ( espire_collection_defaults() as $tile ) {
 		$defaults[ espire_collection_slug( $tile ) ] = $tile;
@@ -59,6 +62,9 @@ function espire_store_tiles() {
 	}
 	$tiles = array();
 	foreach ( $terms as $term ) {
+		if ( $for_homepage && function_exists( 'get_field' ) && get_field( 'category_hide_on_homepage', 'product_cat_' . $term->term_id ) ) {
+			continue; // "Hide From Homepage" ticked on the category
+		}
 		$fallback = isset( $defaults[ $term->slug ] ) ? $defaults[ $term->slug ] : array();
 		$image    = function_exists( 'get_field' ) ? get_field( 'category_banner_image', 'product_cat_' . $term->term_id ) : '';
 		if ( ! $image ) {
@@ -72,6 +78,7 @@ function espire_store_tiles() {
 			'label' => isset( $fallback['label'] ) ? $fallback['label'] : $term->name,
 			'url'   => get_term_link( $term ),
 			'image' => $image,
+			'alt'   => isset( $fallback['alt'] ) ? $fallback['alt'] : '',
 			'copy'  => $term->description ? wp_strip_all_tags( $term->description ) : ( isset( $fallback['copy'] ) ? $fallback['copy'] : '' ),
 			'cta'   => 'Shop ' . $term->name,
 			'count' => (int) $term->count,
@@ -112,7 +119,7 @@ function espire_store_tiles_grid() {
 					<?php if ( $tile['copy'] ) : ?>
 						<p><?php echo esc_html( $tile['copy'] ); ?></p>
 					<?php endif; ?>
-					<span class="cs-link"><?php echo esc_html( $tile['cta'] ); ?> &rarr;</span>
+					<span class="cs-link"><?php echo esc_html( $tile['cta'] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></span>
 				</div>
 			</a>
 		<?php endforeach; ?>

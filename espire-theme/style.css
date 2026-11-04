@@ -193,7 +193,7 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
   border:none; padding:0; cursor:pointer; color:#fff;
 }
 .ql-arrow:hover{ color:var(--rust); }
-.ql-arrow .espire-arrow-mark{ width:9px; height:30px; }
+.ql-arrow .espire-arrow-mark{ width:22px; height:13.4px; }
 .ql-prev{ left:0; box-shadow:6px 0 8px -4px rgba(0,0,0,.6); }
 .ql-next{ right:0; box-shadow:-6px 0 8px -4px rgba(0,0,0,.6); }
 
@@ -268,20 +268,32 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
 /* Just outside the cards, in the page's side margin */
 .cs-prev{ left:-46px; }
 .cs-next{ right:-46px; }
-.cs-arrow .espire-arrow-mark{ width:22px; height:80px; }
+.cs-arrow .espire-arrow-mark{ width:44px; height:26.8px; }
 
 /* Espire's own arrow mark (see espire_arrow_icon() in functions.php) —
    shared sizing for every prev/next control on the site, so .cs-arrow,
    .ql-arrow and anything added later all use it the same way. Shown
    upright (tall and thin, as drawn): as drawn its point faces right, so
    "next" uses it as-is and "prev" is mirrored. */
-.espire-arrow-mark{ width:9px; height:32px; flex:none; transform:scaleX(-1); }
-.espire-arrow-mark.is-next{ transform:none; }
+.espire-arrow-mark{ display:block; flex:none; width:22px; height:13.4px; overflow:visible; transition:transform .15s ease; }
+.espire-arrow-mark.is-prev{ transform:scaleX(-1); }
+.espire-arrow-mark.is-up{ transform:rotate(-90deg); }
+.espire-arrow-mark.is-down{ transform:rotate(90deg); }
+/* After link/button text ("Shop All", "Read The Story"…) */
+.espire-arrow-mark.is-inline{ display:inline-block; width:1.6em; height:.98em; margin-left:.45em; vertical-align:-.2em; }
+a:hover > .espire-arrow-mark.is-inline, a:hover .cs-link > .espire-arrow-mark.is-inline{ transform:translateX(3px); }
+/* The same arrow on links that get it from CSS (::after), drawn from
+   assets/arrow-mark.svg in the link's text colour. */
+.category-overview .ov-step-body a::after, .panel-textlink::after, .trust-item a::after,
+button.trust-link span::after, .product-tabs .info-notes a::after, .category-overview .ov-step-more::after{
+  content:""; display:inline-block; width:1.6em; height:.98em; margin-left:.45em; vertical-align:-.2em;
+  background-color:currentColor; -webkit-mask:url(assets/arrow-mark.svg) center/contain no-repeat; mask:url(assets/arrow-mark.svg) center/contain no-repeat;
+}
 /* Kept visible (not hidden) on mobile, just scaled down a little —
    touch swipe alone isn't an obvious affordance, the arrows are what
    tells people there's more to see. */
 @media (max-width:900px){
-  .cs-arrow .espire-arrow-mark{ width:16px; height:58px; }
+  .cs-arrow .espire-arrow-mark{ width:32px; height:19.5px; }
 }
 /* Narrow screens have too little side margin for the arrows, so the
    slider makes room for them inside its own edges instead. */
@@ -337,7 +349,7 @@ body.mobile-nav-open .mobile-sidebar-overlay{ display:block; }
    wider than the screen (same arrow mark as the sliders). */
 .d-arrow{ display:none; position:absolute; top:34px; transform:translateY(-50%); z-index:2; background:none; border:none; padding:4px 2px; cursor:pointer; color:var(--ink); }
 .d-arrow:hover{ color:var(--rust); }
-.d-arrow .espire-arrow-mark{ width:12px; height:42px; }
+.d-arrow .espire-arrow-mark{ width:26px; height:15.9px; }
 .d-prev{ left:0; }
 .d-next{ right:0; }
 /* The row makes room for the arrows at its sides, so they never cover a step */
@@ -624,7 +636,6 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .category-overview .ov-step-body strong{ font-size:.9rem; }
 .category-overview .ov-step-body span{ color:var(--ink-soft); }
 .category-overview .ov-step-body a{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); text-decoration:none; }
-.category-overview .ov-step-body a::after{ content:" \2192"; }
 .category-overview .ov-step-body a:hover{ color:var(--rust); }
 .category-overview .ov-sourcing{ font-size:.84rem; line-height:1.6; margin:14px 0 0; text-align:center; }
 .category-overview .btn-block{ margin-top:26px; }
@@ -660,7 +671,6 @@ body.panel-open-fit-guide-sidebar #fit-guide-sidebar-panel{
 .info-panel.is-open{ transform:translateX(0); }
 .info-panel{ width:min(440px,92vw); }
 .panel-textlink{ display:block; text-align:center; margin-top:14px; font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; text-decoration:none; color:var(--ink); }
-.panel-textlink::after{ content:" \2192"; }
 .panel-textlink:hover{ color:var(--rust); }
 button.btn-block{ border:none; }
 
@@ -816,7 +826,6 @@ button.trust-link{ background:none; border:none; padding:0; font:inherit; font-s
 
 /* Links in the trust row: the site's usual text-link style (bold caps + arrow, rust on hover) */
 .trust-item a, button.trust-link span{ font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; line-height:1.5; color:var(--ink); text-decoration:none; transition:color .15s ease; }
-.trust-item a::after, button.trust-link span::after{ content:" \2192"; }
 .trust-item a:hover, button.trust-link:hover span{ color:var(--rust); }
 @media (max-width:640px){
   .desc-box{ flex-direction:column-reverse; padding:22px 18px; }
@@ -1160,9 +1169,9 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .story-closing-hero .story-label{ align-self:flex-end; }
 .story-closing-hero h2{ margin:0; max-width:900px; text-align:right; color:#fff; font-family:"League Spartan","Arial Black",sans-serif; text-transform:none; letter-spacing:-.01em; font-size:clamp(2.6rem,7.5vw,6.2rem); line-height:.98; text-shadow:0 3px 18px rgba(0,0,0,.4); }
 .story-closing-hero .ch-link{ display:inline-flex; align-items:center; gap:12px; color:#fff; text-decoration:none; text-transform:uppercase; font-family:"League Spartan","Arial Black",sans-serif; font-weight:700; font-size:clamp(1.05rem,2.2vw,1.75rem); letter-spacing:.01em; text-shadow:0 2px 10px rgba(0,0,0,.4); }
-.story-closing-hero .ch-arrow svg{ width:1.3em; height:1.3em; display:block; transition:transform .15s ease; }
+.story-closing-hero .ch-arrow .espire-arrow-mark{ width:1.9em; height:1.16em; }
 .story-closing-hero .ch-link:hover{ color:var(--white); }
-.story-closing-hero .ch-link:hover .ch-arrow svg{ transform:translateX(4px); }
+.story-closing-hero .ch-link:hover .ch-arrow .espire-arrow-mark{ transform:translateX(5px); }
 .story-closing-hero p{ align-self:center; margin:6px 0 0; max-width:960px; text-align:center; font-size:clamp(.92rem,1.3vw,1.05rem); line-height:1.6; color:#F1EEE4; text-shadow:0 1px 8px rgba(0,0,0,.45); }
 @media (max-width:640px){
   .story-closing-hero .ch-inner{ align-items:center; }
@@ -1283,7 +1292,7 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .filter-track > *{ flex:none; }
 .filter-arrow{ display:none; flex:none; background:none; border:none; padding:2px 4px; cursor:pointer; color:var(--ink); }
 .filter-arrow:hover{ color:var(--rust); }
-.filter-arrow .espire-arrow-mark{ width:10px; height:34px; }
+.filter-arrow .espire-arrow-mark{ width:22px; height:13.4px; }
 .filter-row.can-prev .filter-prev, .filter-row.can-next .filter-next{ display:block; }
 .size-pill{ min-width:36px; height:32px; padding:0 8px; border-radius:4px; border:1px solid var(--ink); display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:var(--ink); background:var(--white); transition:border-color .15s ease, background .15s ease, color .15s ease; }
 .size-pill:hover{ border-color:var(--rust); color:var(--rust); }
@@ -1318,8 +1327,8 @@ body .woo-page #payment #place_order:hover{ background:#000; }
     text-transform:uppercase; letter-spacing:.04em; cursor:pointer;
   }
   .filter-toggle svg{ width:16px; height:16px; flex:none; }
-  .filter-toggle-chevron{ transition:transform .2s ease; }
-  .filter-toggle[aria-expanded="true"] .filter-toggle-chevron{ transform:rotate(180deg); }
+  .filter-toggle .filter-toggle-chevron{ width:20px; height:12.2px; }
+  .filter-toggle[aria-expanded="true"] .filter-toggle-chevron{ transform:rotate(-90deg); }
   .filter-panel-btn{ margin-left:0; flex:1 1 0; min-height:38px; text-align:center; }
   .filter-bar-inner{ flex-wrap:wrap; align-items:center; }
   .filter-groups{ display:none; order:3; flex-basis:100%; flex-direction:column; align-items:stretch; gap:10px; padding-top:6px; }
@@ -1400,7 +1409,6 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .product-tabs .ptab-pane > h2{ margin-top:0; }
 .product-tabs .info-notes{ list-style:none; margin:18px 0 0; padding:14px 0 0; border-top:1px solid var(--line); display:flex; flex-wrap:wrap; gap:8px 28px; font-size:.78rem; color:var(--ink-soft); }
 .product-tabs .info-notes a{ font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); text-decoration:none; }
-.product-tabs .info-notes a::after{ content:" \2192"; }
 .product-tabs .info-notes a:hover{ color:var(--rust); }
 .product-tabs .shipping-content{ max-width:720px; }
 .product-tabs .shipping-content .panel-textlink{ text-align:left; }
@@ -1426,7 +1434,6 @@ body .woo-page #payment #place_order:hover{ background:#000; }
 .category-overview .ov-step.is-flipped .ov-step-link{ flex-direction:row-reverse; text-align:right; }
 .category-overview a.ov-step-link:hover strong, .category-overview a.ov-step-link:hover .ov-step-more{ color:var(--rust); }
 .category-overview .ov-step-more{ font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink); }
-.category-overview .ov-step-more::after{ content:" \2192"; }
 /* Product title a touch larger (beats WooCommerce's .product_title size) */
 .woocommerce .product-page .info-top h1.product_title{ font-size:clamp(1.55rem,2.4vw,1.95rem); line-height:1.12; }
 

@@ -306,10 +306,10 @@ function espire_symbol_panel( $s ) {
 		<?php endif; ?>
 		<div class="panel-links">
 			<?php if ( $s['story'] ) : ?>
-				<a class="btn olive btn-sm" href="<?php echo esc_url( $s['story'][1] ); ?>"><?php echo esc_html( $s['story'][0] ); ?> &rarr;</a>
+				<a class="btn olive btn-sm" href="<?php echo esc_url( $s['story'][1] ); ?>"><?php echo esc_html( $s['story'][0] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 			<?php endif; ?>
 			<?php if ( $s['shop'] && ! is_wp_error( $s['shop'][1] ) ) : ?>
-				<a class="btn olive btn-sm" href="<?php echo esc_url( $s['shop'][1] ); ?>"><?php echo esc_html( $s['shop'][0] ); ?> &rarr;</a>
+				<a class="btn olive btn-sm" href="<?php echo esc_url( $s['shop'][1] ); ?>"><?php echo esc_html( $s['shop'][0] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 			<?php endif; ?>
 		</div>
 	</aside>

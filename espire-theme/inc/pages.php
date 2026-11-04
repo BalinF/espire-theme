@@ -75,7 +75,7 @@ function espire_diy_card_buttons( $on ) {
 		return 'Start Designing';
 	};
 	$link = function ( $html, $product ) {
-		return sprintf( '<a href="%s" class="button diy-start">Start Designing &rarr;</a>', esc_url( $product->get_permalink() ) );
+		return sprintf( '<a href="%s" class="button diy-start">Start Designing %s</a>', esc_url( $product->get_permalink() ), espire_arrow_svg() );
 	};
 	if ( $on ) {
 		// Cards normally have no button (inc/product-cards.php); DIY cards do.

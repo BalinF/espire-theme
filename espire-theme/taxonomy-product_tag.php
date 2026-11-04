@@ -71,7 +71,7 @@ get_header();
 	<div class="symbol-ctas">
 		<a class="btn olive" href="#symbol-products">Shop <?php echo esc_html( $espire_s['label'] ); ?> Pieces &darr;</a>
 		<?php if ( $espire_s['story'] ) : ?>
-			<a class="btn outline-ink" href="<?php echo esc_url( $espire_s['story'][1] ); ?>"><?php echo esc_html( $espire_s['story'][0] ); ?> &rarr;</a>
+			<a class="btn outline-ink" href="<?php echo esc_url( $espire_s['story'][1] ); ?>"><?php echo esc_html( $espire_s['story'][0] ); ?><?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 		<?php endif; ?>
 	</div>
 </div>
