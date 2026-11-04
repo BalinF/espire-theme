@@ -9,38 +9,13 @@
 	<footer class="site-footer">
 
 		<div class="footer-cols">
-			<div class="footer-col">
-				<h4>Shop</h4>
-				<ul>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/tees/' ) ); ?>">The Tee Bar</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/leg-hoodies/' ) ); ?>">Leg Hoodies &amp; Shorts</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/the-bad-batch/' ) ); ?>">The Bad Batch</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/nannas-threads/' ) ); ?>">Nanna's Threads</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/kids/' ) ); ?>">Kids</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/product-category/shirts/' ) ); ?>">Shirts</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/store/' ) ); ?>">Shop All</a></li>
-				</ul>
-			</div>
-
-			<div class="footer-col">
-				<h4>Support</h4>
-				<ul>
-					<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>">Returns &amp; Exchanges</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/store/' ) ); ?>">Size Guides</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/privacypolicy/' ) ); ?>">Privacy &amp; Cookies</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a></li>
-					<li><a href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>">My Account</a></li>
-				</ul>
-			</div>
-
-			<div class="footer-col">
-				<h4>Our Story</h4>
-				<ul>
-					<li><a href="<?php echo esc_url( home_url( '/australian-made/' ) ); ?>">The Aussie Story</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/sustainability/' ) ); ?>">F*ck Fast Fashion</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/made-in-store/' ) ); ?>">Made In Store</a></li>
-				</ul>
-			</div>
+			<?php
+			// Shop / Support / Our Story: Appearance → Menus, locations
+			// "Footer: Shop" etc. (see inc/menus.php). Built-in links until set.
+			espire_footer_column( 'footer-shop' );
+			espire_footer_column( 'footer-support' );
+			espire_footer_column( 'footer-story' );
+			?>
 
 			<div class="footer-col">
 				<h4>Get In Touch</h4>

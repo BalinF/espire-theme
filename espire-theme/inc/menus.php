@@ -11,6 +11,8 @@
  *   - Category Bar — the dark strip of collection links under the
  *     banner (Shirts, Hoodies, Tees …). Drag to reorder; add or remove
  *     categories with "Product categories" on the left.
+ *   - Footer: Shop / Footer: Support / Footer: Our Story — the first three
+ *     footer columns. The menu's name is the column heading.
  *
  * Until a menu is assigned to a location, the built-in links are used,
  * so the site never shows an empty menu.
@@ -22,7 +24,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 add_action( 'after_setup_theme', function () {
 	register_nav_menus( array(
-		'category-bar' => __( 'Category Bar', 'espire' ),
+		'category-bar'   => __( 'Category Bar', 'espire' ),
+		'footer-shop'    => __( 'Footer: Shop', 'espire' ),
+		'footer-support' => __( 'Footer: Support', 'espire' ),
+		'footer-story'   => __( 'Footer: Our Story', 'espire' ),
 	) );
 } );
 
@@ -171,4 +176,68 @@ function espire_category_bar_links() {
 		array( 'label' => "Nanna's Threads", 'url' => home_url( '/product-category/nannas-threads/' ) ),
 		array( 'label' => 'Design Your Own', 'url' => home_url( '/diy/' ) ),
 	);
+}
+
+/** Built-in footer columns, used until a menu is assigned: heading + array( label => url ). */
+function espire_footer_defaults( $location ) {
+	$defaults = array(
+		'footer-shop'    => array( 'Shop', array(
+			'The Tee Bar'             => home_url( '/product-category/tees/' ),
+			'Leg Hoodies & Shorts'    => home_url( '/product-category/leg-hoodies/' ),
+			'The Bad Batch'           => home_url( '/product-category/the-bad-batch/' ),
+			"Nanna's Threads"         => home_url( '/product-category/nannas-threads/' ),
+			'Kids'                    => home_url( '/product-category/kids/' ),
+			'Shirts'                  => home_url( '/product-category/shirts/' ),
+			'Shop All'                => home_url( '/store/' ),
+		) ),
+		'footer-support' => array( 'Support', array(
+			'Returns & Exchanges' => home_url( '/faq/' ),
+			'Size Guides'         => home_url( '/store/' ),
+			'Privacy & Cookies'   => home_url( '/privacypolicy/' ),
+			'Contact'             => home_url( '/contact/' ),
+			'My Account'          => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : home_url( '/my-account/' ),
+		) ),
+		'footer-story'   => array( 'Our Story', array(
+			'The Aussie Story'  => home_url( '/australian-made/' ),
+			'F*ck Fast Fashion' => home_url( '/sustainability/' ),
+		) ),
+	);
+	return isset( $defaults[ $location ] ) ? $defaults[ $location ] : array( '', array() );
+}
+
+/**
+ * One footer column: the menu assigned to $location (its name is the
+ * heading), else the built-in links. An empty assigned menu hides the column.
+ */
+function espire_footer_column( $location ) {
+	list( $heading, $links ) = espire_footer_defaults( $location );
+	$locations = get_nav_menu_locations();
+	if ( ! empty( $locations[ $location ] ) ) {
+		$menu  = wp_get_nav_menu_object( $locations[ $location ] );
+		$items = $menu ? (array) wp_get_nav_menu_items( $menu->term_id ) : array();
+		$links = array();
+		foreach ( $items as $item ) {
+			if ( empty( $item->menu_item_parent ) ) {
+				$links[] = array( $item->title, $item->url, ! empty( $item->target ) );
+			}
+		}
+		$heading = $menu ? $menu->name : $heading;
+	} else {
+		$links = array_map( null, array_keys( $links ), array_values( $links ) );
+	}
+	if ( ! $links ) {
+		return;
+	}
+	?>
+	<div class="footer-col">
+		<?php if ( $heading ) : ?>
+			<h4><?php echo esc_html( $heading ); ?></h4>
+		<?php endif; ?>
+		<ul>
+			<?php foreach ( $links as $link ) : ?>
+				<li><a href="<?php echo esc_url( $link[1] ); ?>"<?php echo ! empty( $link[2] ) ? ' target="_blank" rel="noopener"' : ''; ?>><?php echo esc_html( $link[0] ); ?></a></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+	<?php
 }

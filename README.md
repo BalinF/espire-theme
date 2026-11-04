@@ -159,6 +159,10 @@ at the bottom of the menu screen:
 - **Category Bar**: the dark strip of collection links under the banners. Add
   categories from *Product categories* on the left and drag to reorder.
 
+- **Footer: Shop / Footer: Support / Footer: Our Story**: the first three footer
+  columns. The menu's **name** is the column heading, so call it e.g. "Shop". Remove
+  every item from a menu to hide that column. (*Get In Touch* comes from the Contact page.)
+
 Until a menu is assigned, the built-in links show.
 
 **Homepage → From Seed To Store** (Products → Categories → edit → *Seed To
