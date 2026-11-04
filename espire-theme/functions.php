@@ -434,7 +434,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 					'type'          => 'image',
 					'return_format' => 'url',
 					'preview_size'  => 'thumbnail',
-					'instructions'  => 'The mark in the middle of the badge, and this tag\'s icon in From Seed To Store (even when Show as symbol is off). Single-colour artwork on a transparent background (PNG or SVG) works best — it\'s printed in ink colour automatically.',
+					'instructions'  => 'The mark in the middle of the badge. Single-colour artwork on a transparent background (PNG or SVG) works best — it\'s printed in ink colour automatically.',
 				),
 				array(
 					'key'          => 'field_espire_symbol_ring_text',

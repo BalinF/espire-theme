@@ -132,8 +132,8 @@ for ( $espire_t = $espire_term; $espire_t && ! is_wp_error( $espire_t ); $espire
 					<?php $espire_tag = ! empty( $espire_step['url'] ) ? 'a href="' . esc_url( $espire_step['url'] ) . '"' : 'div'; ?>
 					<<?php echo $espire_tag; // phpcs:ignore WordPress.Security.EscapeOutput -- built from esc_url() above ?> class="ov-step-link">
 					<span class="ov-step-icon">
-						<?php if ( ! empty( $espire_step['icon'] ) ) : ?>
-							<?php espire_symbol_icon( $espire_step ); ?>
+						<?php if ( $espire_sym && ! empty( $espire_sym['icon'] ) ) : ?>
+							<?php espire_symbol_icon( $espire_sym ); ?>
 						<?php else : ?>
 							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0114 0c0 5-3 9-7 11z"/><path d="M12 21V9"/></svg>
 						<?php endif; ?>
