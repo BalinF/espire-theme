@@ -180,11 +180,16 @@ function espire_size_guide_content( $fits, $term ) {
 			<section class="fit-pane" data-fit-pane="<?php echo esc_attr( $i ); ?>"<?php echo 0 === $i ? '' : ' hidden'; ?>>
 				<div class="fit-pane-top<?php echo empty( $fit['fit_image'] ) ? ' no-photo' : ''; ?>">
 					<?php if ( ! empty( $fit['fit_image'] ) ) : ?>
-						<img class="fit-photo" src="<?php echo esc_url( $fit['fit_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> fit">
+						<figure class="fit-photo-wrap">
+							<img class="fit-photo" src="<?php echo esc_url( $fit['fit_image'] ); ?>" alt="<?php echo esc_attr( $fit['fit_name'] ); ?> fit">
+							<?php if ( ! empty( $fit['fit_model_note'] ) ) : ?>
+								<figcaption class="fit-model-note"><?php echo esc_html( $fit['fit_model_note'] ); ?></figcaption>
+							<?php endif; ?>
+						</figure>
 					<?php endif; ?>
 					<div class="fit-pane-intro">
 						<h4>The Espire <?php echo esc_html( $fit['fit_name'] ); ?></h4>
-						<?php if ( ! empty( $fit['fit_model_note'] ) ) : ?>
+						<?php if ( empty( $fit['fit_image'] ) && ! empty( $fit['fit_model_note'] ) ) : ?>
 							<p class="fit-model-note"><?php echo esc_html( $fit['fit_model_note'] ); ?></p>
 						<?php endif; ?>
 						<?php if ( ! empty( $fit['fit_intro'] ) ) : ?>
