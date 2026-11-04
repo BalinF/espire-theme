@@ -151,7 +151,7 @@ echo '</div>';
 	</button>
 	<h3>Design Guide</h3>
 	<div class="panel-rich"><?php echo wp_kses_post( $espire_diy_guide ); ?></div>
-	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
+	<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block"><span class="contact-icon" aria-hidden="true"></span>Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 </aside>
 <?php endif; ?>
 

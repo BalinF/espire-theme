@@ -627,6 +627,34 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 				'title'    => 'Product Page Quick Answers',
 				'fields'   => array(
 					array(
+						'key'          => 'field_espire_shipping_rows',
+						'label'        => 'Shipping & Returns Tab',
+						'name'         => 'shipping_tab_rows',
+						'type'         => 'repeater',
+						'max'          => 4,
+						'layout'       => 'block',
+						'button_label' => 'Add Row',
+						'instructions' => 'The rows in the "Shipping & Returns" tab on every product page: an icon and a paragraph each. Leave all empty to use the built-in three (shipping, contact, returns).',
+						'sub_fields'   => array(
+							array(
+								'key'           => 'field_espire_shipping_row_icon',
+								'label'         => 'Icon',
+								'name'          => 'icon',
+								'type'          => 'image',
+								'return_format' => 'url',
+								'preview_size'  => 'thumbnail',
+								'instructions'  => 'Empty: the built-in box / phone / returns icon for that row.',
+							),
+							array(
+								'key'   => 'field_espire_shipping_row_text',
+								'label' => 'Text',
+								'name'  => 'text',
+								'type'  => 'textarea',
+								'rows'  => 4,
+							),
+						),
+					),
+					array(
 						'key'          => 'field_espire_faq_quick',
 						'label'        => 'Quick Answers',
 						'name'         => 'faq_quick_answers',
@@ -634,7 +662,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 						'max'          => 5,
 						'layout'       => 'block',
 						'button_label' => 'Add Question',
-						'instructions' => 'Shown in the "Shipping & Returns" panel on product pages — keep it to the 3–4 questions people ask before buying.',
+						'instructions' => 'Optional questions shown under the rows above in the "Shipping & Returns" tab on product pages.',
 						'sub_fields'   => array(
 							array(
 								'key'   => 'field_espire_faq_quick_q',

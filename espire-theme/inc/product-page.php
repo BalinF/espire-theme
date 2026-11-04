@@ -259,7 +259,7 @@ function espire_render_fit_guide( $fits, $term ) {
 		</button>
 		<h3>Size Guide &mdash; <?php echo esc_html( $term->name ); ?></h3>
 		<?php espire_size_guide_content( $fits, $term ); ?>
-		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
+		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block"><span class="contact-icon" aria-hidden="true"></span>Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</aside>
 	<?php
 	return true;
@@ -274,6 +274,27 @@ function espire_render_fit_guide( $fits, $term ) {
  * from the live /faq/ page is shown.
  */
 /** The shipping & returns answers (FAQ page → Quick Answers), for the product page tab. */
+function espire_shipping_rows() {
+	$faq_page = get_page_by_path( 'faq' );
+	$rows     = ( $faq_page && function_exists( 'get_field' ) ) ? (array) get_field( 'shipping_tab_rows', $faq_page->ID ) : array();
+	$rows     = array_values( array_filter( $rows, function ( $row ) {
+		return ! empty( $row['text'] );
+	} ) );
+	if ( $rows ) {
+		return $rows;
+	}
+	$icon = get_template_directory_uri() . '/assets/';
+	return array(
+		array( 'icon' => $icon . 'icon-shipping.svg', 'text' => 'Ready-to-ship items are dispatched within 1–2 days, while made-to-order products may take up to 4 weeks. We use Australia Post for all orders, with a flat rate of $9 for domestic and $20 for international shipping.' ),
+		array( 'icon' => $icon . 'icon-contact.svg', 'text' => 'Customers receive order notifications with tracking via email or text, alternatively you can text or email us if you have any shipping related questions, please use your order number as it helps us track your order quicker.' ),
+		array( 'icon' => $icon . 'icon-returns.svg', 'text' => "Our returns policy allows for a full refund within 90 days for unworn items, with the customer covering return shipping.\nIf the garment doesn't fit we offer exchanges, we can send out a new item in the correct size with a package to return the one that doesn't fit, this only applies if you plan to keep the item." ),
+	);
+}
+
+/**
+ * The Shipping & Returns tab / panel: icon + text rows (Pages → FAQ →
+ * "Shipping & Returns Tab"), then any Quick Answers set on the FAQ page.
+ */
 function espire_shipping_content() {
 	$faqs     = array();
 	$faq_page = get_page_by_path( 'faq' );
@@ -284,16 +305,20 @@ function espire_shipping_content() {
 			}
 		}
 	}
-	if ( ! $faqs ) {
-		$faqs[] = array(
-			'Can I return an item if I change my mind?',
-			"If the item hasn't been worn yet and you want to return it, this can be done with a full refund but the shipping will be paid by the customer. Please address it to our Bright store and return with the tag and wrapping within 90 days.",
-		);
-	}
+	$icons = get_template_directory_uri() . '/assets/';
 	?>
 	<div class="shipping-content">
-		<?php foreach ( $faqs as $i => $faq ) : ?>
-			<details class="faq-item"<?php echo 0 === $i ? ' open' : ''; ?>>
+		<ul class="ship-rows">
+			<?php foreach ( espire_shipping_rows() as $i => $row ) : ?>
+				<?php $espire_icon = ! empty( $row['icon'] ) ? $row['icon'] : $icons . array( 'icon-shipping.svg', 'icon-contact.svg', 'icon-returns.svg' )[ $i % 3 ]; ?>
+				<li class="ship-row">
+					<img class="ship-row-icon" src="<?php echo esc_url( $espire_icon ); ?>" alt="" loading="lazy">
+					<div class="ship-row-text"><?php echo wp_kses_post( wpautop( $row['text'] ) ); ?></div>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+		<?php foreach ( $faqs as $faq ) : ?>
+			<details class="faq-item">
 				<summary><?php echo esc_html( $faq[0] ); ?></summary>
 				<?php echo wp_kses_post( wpautop( $faq[1] ) ); ?>
 			</details>
@@ -313,7 +338,7 @@ function espire_shipping_panel() {
 		<h3>Shipping &amp; Returns</h3>
 		<p class="panel-intro">The most common questions, answered &mdash; see the full FAQ for everything else.</p>
 		<?php espire_shipping_content(); ?>
-		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
+		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block"><span class="contact-icon" aria-hidden="true"></span>Need Help? Contact Us Here<?php echo espire_arrow_svg(); // phpcs:ignore -- fixed markup ?></a>
 	</aside>
 	<?php
 }
