@@ -79,6 +79,26 @@ while ( have_posts() ) :
 		espire_set_step_bar( $espire_id );
 		?>
 
+		<?php $espire_builder = espire_product_builder_html( $espire_id ); // Zakeke 3D builder on DIY products (inc/pages.php) ?>
+		<?php if ( $espire_builder ) : ?>
+			<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'product-main product-main--builder', $product ); ?>>
+				<div class="builder-head">
+					<h1 class="product_title"><?php the_title(); ?></h1>
+					<?php if ( $espire_emblem && $espire_cat_term ) : ?>
+						<button type="button" class="product-emblem-btn" data-panel-open="category-sidebar" aria-label="About <?php echo esc_attr( $espire_cat_term->name ); ?>" title="About <?php echo esc_attr( $espire_cat_term->name ); ?>">
+							<img class="product-emblem" src="<?php echo esc_url( $espire_emblem ); ?>" alt="">
+						</button>
+					<?php endif; ?>
+				</div>
+				<div class="product-builder"><?php echo $espire_builder; // phpcs:ignore WordPress.Security.EscapeOutput -- Zakeke's own shortcode output ?></div>
+				<?php
+				// Product schema for Google (normally printed with the add-to-cart box).
+				if ( function_exists( 'WC' ) && isset( WC()->structured_data ) ) {
+					WC()->structured_data->generate_product_data();
+				}
+				?>
+			</div>
+		<?php else : ?>
 		<div id="product-<?php the_ID(); ?>" <?php wc_product_class( 'product-main', $product ); ?>>
 
 			<div class="product-gallery">
@@ -113,6 +133,7 @@ while ( have_posts() ) :
 				</p>
 			</div>
 		</div>
+		<?php endif; ?>
 
 		<section class="product-section">
 			<div class="desc-box">

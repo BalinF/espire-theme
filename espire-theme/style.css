@@ -849,6 +849,14 @@ button.trust-link{ background:none; border:none; padding:0; font:inherit; font-s
 .symbol-badge:hover .ring-wrap > svg, .symbol-badge:hover .center-ic svg, .symbol-badge:hover .lb{ color:var(--rust); }
 .symbol-badge:focus-visible{ outline:2px solid var(--rust); outline-offset:4px; border-radius:50%; }
 
+/* DIY products: the Zakeke 3D builder in place of the photos + add-to-cart box */
+.product-main--builder{ display:block; }
+.product-main--builder .builder-head{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.product-main--builder .builder-head .product_title{ margin:0; }
+.product-builder{ width:100%; min-height:80vh; }
+.product-builder iframe, #zakeke-configurator-container{ width:100%; }
+#zakeke-configurator-frame{ width:100%; height:100%; min-height:80vh; border:0; overflow:hidden; display:block; }
+
 .lifestyle-banner{ position:relative; width:100%; height:260px; overflow:hidden; margin-top:20px; }
 .lifestyle-banner img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .lifestyle-banner .overlay{ position:absolute; inset:0; background:rgba(10,10,8,.28); }

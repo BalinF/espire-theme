@@ -67,6 +67,36 @@ add_action( 'template_redirect', function () {
 } );
 
 /**
+ * The Zakeke 3D builder for a product page, or ''. DIY products (in the DIY
+ * category or its sub-categories) get it automatically: the same
+ * [zakeke_configurator product_id=…] shortcode the old Elementor product
+ * template used, with this product's own ID. "Zakeke Builder" on the product
+ * (Product Page Extras) can force it on or off.
+ */
+function espire_product_builder_html( $product_id ) {
+	if ( ! shortcode_exists( 'zakeke_configurator' ) ) {
+		return ''; // Zakeke plugin not active
+	}
+	$mode = function_exists( 'get_field' ) ? (string) get_field( 'product_builder', $product_id ) : '';
+	if ( 'no' === $mode ) {
+		return '';
+	}
+	if ( 'yes' !== $mode ) {
+		$is_diy = false;
+		foreach ( (array) get_the_terms( $product_id, 'product_cat' ) as $cat ) {
+			if ( $cat instanceof WP_Term && espire_is_diy_category( $cat ) ) {
+				$is_diy = true;
+				break;
+			}
+		}
+		if ( ! $is_diy ) {
+			return '';
+		}
+	}
+	return do_shortcode( '[zakeke_configurator product_id=' . (int) $product_id . ']' );
+}
+
+/**
  * On the DIY page, product cards say "Start Designing" and go to the
  * product page (where the Zakeke designer opens) instead of adding to cart.
  */

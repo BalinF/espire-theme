@@ -373,6 +373,19 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 			'title'    => 'Product Page Extras',
 			'fields'   => array(
 				array(
+					'key'           => 'field_espire_product_builder',
+					'label'         => 'Zakeke Builder',
+					'name'          => 'product_builder',
+					'type'          => 'select',
+					'choices'       => array(
+						'auto' => 'Automatic (on for products in the DIY category)',
+						'yes'  => 'Yes — show the 3D builder on this product page',
+						'no'   => 'No',
+					),
+					'default_value' => 'auto',
+					'instructions'  => 'The builder takes the place of the photos and add-to-cart box; the description tabs stay below it.',
+				),
+				array(
 					'key'          => 'field_espire_product_raw_materials',
 					'label'        => 'Raw Materials',
 					'name'         => 'product_raw_materials',
