@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once get_template_directory() . '/inc/acf-rows.php';
 require_once get_template_directory() . '/inc/symbols.php';
 require_once get_template_directory() . '/inc/product-page.php';
+require_once get_template_directory() . '/inc/category-overview.php';
 require_once get_template_directory() . '/inc/cart-checkout.php';
 require_once get_template_directory() . '/inc/shipping.php';
 require_once get_template_directory() . '/inc/collections.php';
@@ -264,7 +265,7 @@ if ( function_exists( 'acf_add_local_field_group' ) ) {
 							'type'  => 'text',
 						),
 						// Everything below feeds the Fit Guide panel on product
-						// pages (see espire_fit_guide_panel() in inc/product-page.php).
+						// pages (see espire_size_guide_content() in inc/product-page.php).
 						// A fit with only a name (nothing else filled in) doesn't show there.
 						array(
 							'key'           => 'field_espire_fit_image',

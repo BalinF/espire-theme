@@ -45,27 +45,19 @@ while ( have_posts() ) :
 		}
 	}
 
-	// Print the Fit Guide panel into a buffer first, so we know whether
-	// there's any fit content before deciding to show the button.
+	// Sizing tab content: the category's fits (Products → Categories →
+	// Available Fits), one sub-tab each. Buffered to know if there's any.
+	list( $espire_fits, $espire_fits_term ) = espire_product_category_field( $espire_id, 'category_sidebar_fits' );
 	ob_start();
-	$espire_has_fit_guide = espire_fit_guide_panel( $espire_id );
-	$espire_fit_guide_html = ob_get_clean();
-	if ( ! $espire_has_fit_guide ) {
-		// No fit details for this category yet: the button still opens a short note.
-		ob_start();
-		?>
-		<div class="panel-overlay" data-panel-close="fit-guide"></div>
-		<aside class="info-panel fit-guide-panel" id="fit-guide-panel" aria-label="Size Guide">
-			<button type="button" class="panel-close" aria-label="Close" data-panel-close="fit-guide">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-			</button>
-			<h3>Size Guide</h3>
-			<p class="panel-intro">We're still putting together the size details for this piece. Unsure on sizing? Get in touch and we'll help you pick the right fit.</p>
-			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
-		</aside>
-		<?php
-		$espire_fit_guide_html = ob_get_clean();
-		$espire_has_fit_guide  = true;
+	$espire_has_sizing  = $espire_fits_term && espire_size_guide_content( $espire_fits, $espire_fits_term );
+	$espire_sizing_html = ob_get_clean();
+
+	// The category whose "About" panel the emblem opens: the one the emblem
+	// comes from, else the product's first category.
+	list( , $espire_cat_term ) = espire_product_category_field( $espire_id, 'category_emblem' );
+	if ( ! $espire_cat_term ) {
+		$espire_cats     = get_the_terms( $espire_id, 'product_cat' );
+		$espire_cat_term = ( $espire_cats && ! is_wp_error( $espire_cats ) ) ? $espire_cats[0] : null;
 	}
 
 	// "From Seed To Store" for this product: its tags + sketch (inc/journey.php).
@@ -96,7 +88,11 @@ while ( have_posts() ) :
 			<div class="product-info summary entry-summary">
 				<div class="info-top">
 					<h1 class="product_title"><?php the_title(); ?></h1>
-					<?php if ( $espire_emblem ) : ?>
+					<?php if ( $espire_emblem && $espire_cat_term ) : ?>
+						<button type="button" class="product-emblem-btn" data-panel-open="category-sidebar" aria-label="About <?php echo esc_attr( $espire_cat_term->name ); ?>" title="About <?php echo esc_attr( $espire_cat_term->name ); ?>">
+							<img class="product-emblem" src="<?php echo esc_url( $espire_emblem ); ?>" alt="">
+						</button>
+					<?php elseif ( $espire_emblem ) : ?>
 						<img class="product-emblem" src="<?php echo esc_url( $espire_emblem ); ?>" alt="">
 					<?php endif; ?>
 				</div>
@@ -120,8 +116,15 @@ while ( have_posts() ) :
 
 		<section class="product-section">
 			<div class="desc-box">
-				<div class="desc-text">
-					<h2>About The <?php the_title(); ?></h2>
+				<div class="desc-text product-tabs">
+					<div class="ptabs-nav" role="tablist">
+						<button type="button" role="tab" class="ptab is-active" aria-selected="true" data-ptab="info">Information</button>
+						<button type="button" role="tab" class="ptab" aria-selected="false" data-ptab="sizing">Sizing</button>
+						<button type="button" role="tab" class="ptab" aria-selected="false" data-ptab="shipping">Shipping &amp; Returns</button>
+					</div>
+
+					<div class="ptab-pane" role="tabpanel" data-ptab-pane="info">
+						<h2>About The <?php the_title(); ?></h2>
 					<?php
 					// The product's Short Description (Products → edit → "Product short
 					// description" box); the main description if that's empty.
@@ -143,22 +146,22 @@ while ( have_posts() ) :
 						</dl>
 					<?php endif; ?>
 
-					<?php // Size Guide: this category's fits, one tab each (inc/product-page.php). ?>
-					<button type="button" class="btn olive size-guide-btn" data-panel-open="fit-guide">Size Guide &rarr;</button>
+						<ul class="info-notes">
+							<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Unsure on size? Give us a call</a></li>
+							<li>Orders can take up to 4 weeks &mdash; made to order, cut and sewn here in Bright.</li>
+						</ul>
+					</div>
 
-					<div class="trust-lines">
-						<div class="trust-item">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-							<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Unsure on size? Pick up the phone and give us a call</a>
-						</div>
-						<div class="trust-item">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V5a4 4 0 018 0v2"/></svg>
-							<span>Orders can take up to 4 weeks &mdash; made to order, cut and sewn here in Bright.</span>
-						</div>
-						<button type="button" class="trust-item trust-link" data-panel-open="shipping">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 3H1v13h15M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-							<span>Shipping &amp; Returns</span>
-						</button>
+					<div class="ptab-pane" role="tabpanel" data-ptab-pane="sizing" hidden>
+						<?php if ( $espire_has_sizing ) : ?>
+							<?php echo $espire_sizing_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built ?>
+						<?php else : ?>
+							<p class="panel-intro">We're still putting together the size details for this piece. Unsure on sizing? <a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Get in touch</a> and we'll help you pick the right fit.</p>
+						<?php endif; ?>
+					</div>
+
+					<div class="ptab-pane" role="tabpanel" data-ptab-pane="shipping" hidden>
+						<?php espire_shipping_content(); ?>
 					</div>
 				</div>
 				<?php if ( $espire_emblem ) : ?>
@@ -208,8 +211,7 @@ while ( have_posts() ) :
 
 	<?php
 	// Slide-in panels, hidden until their buttons are clicked.
-	echo $espire_fit_guide_html; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped as it was built
-	espire_shipping_panel();
+	espire_category_overview_panel( $espire_cat_term ); // opened by the emblem
 	foreach ( $espire_symbols as $espire_symbol ) {
 		espire_symbol_panel( $espire_symbol );
 	}

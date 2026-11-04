@@ -145,20 +145,19 @@ function espire_fits_with_guide( $fits ) {
 }
 
 /** Prints the Fit Guide slide-in panel (id "fit-guide"); false if nothing to show. */
-function espire_render_fit_guide( $fits, $term ) {
+/**
+ * The Size Guide itself: one tab per fit (icon + name), then each fit's
+ * photo, text, diagrams and size chart. Printed inside the "Sizing" tab on
+ * product pages. Returns false (printing nothing) when no fit has content.
+ */
+function espire_size_guide_content( $fits, $term ) {
 	$fits = espire_fits_with_guide( $fits );
 	if ( ! $fits ) {
 		return false;
 	}
 	$multi = count( $fits ) > 1;
 	?>
-	<div class="panel-overlay" data-panel-close="fit-guide"></div>
-	<aside class="info-panel fit-guide-panel size-guide-panel" id="fit-guide-panel" aria-label="Size Guide">
-		<button type="button" class="panel-close" aria-label="Close" data-panel-close="fit-guide">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-		</button>
-		<h3>Size Guide &mdash; <?php echo esc_html( $term->name ); ?></h3>
-
+	<div class="fit-guide-panel size-guide">
 		<?php if ( $multi ) : ?>
 			<?php // One tab per fit: its icon and name (Products → Categories → Available Fits). ?>
 			<div class="fit-tabs" role="tablist">
@@ -242,6 +241,24 @@ function espire_render_fit_guide( $fits, $term ) {
 			</section>
 		<?php endforeach; ?>
 
+	</div>
+	<?php
+	return true;
+}
+
+/** The Size Guide as a slide-in panel (kept for any page that wants one). */
+function espire_render_fit_guide( $fits, $term ) {
+	if ( ! espire_fits_with_guide( $fits ) ) {
+		return false;
+	}
+	?>
+	<div class="panel-overlay" data-panel-close="fit-guide"></div>
+	<aside class="info-panel size-guide-panel" id="fit-guide-panel" aria-label="Size Guide">
+		<button type="button" class="panel-close" aria-label="Close" data-panel-close="fit-guide">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+		</button>
+		<h3>Size Guide &mdash; <?php echo esc_html( $term->name ); ?></h3>
+		<?php espire_size_guide_content( $fits, $term ); ?>
 		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
 	</aside>
 	<?php
@@ -256,7 +273,8 @@ function espire_render_fit_guide( $fits, $term ) {
  * "Quick Answers" box). Until that's filled in, the returns answer copied
  * from the live /faq/ page is shown.
  */
-function espire_shipping_panel() {
+/** The shipping & returns answers (FAQ page → Quick Answers), for the product page tab. */
+function espire_shipping_content() {
 	$faqs     = array();
 	$faq_page = get_page_by_path( 'faq' );
 	if ( $faq_page && function_exists( 'get_field' ) ) {
@@ -273,6 +291,20 @@ function espire_shipping_panel() {
 		);
 	}
 	?>
+	<div class="shipping-content">
+		<?php foreach ( $faqs as $i => $faq ) : ?>
+			<details class="faq-item"<?php echo 0 === $i ? ' open' : ''; ?>>
+				<summary><?php echo esc_html( $faq[0] ); ?></summary>
+				<?php echo wp_kses_post( wpautop( $faq[1] ) ); ?>
+			</details>
+		<?php endforeach; ?>
+		<a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>" class="panel-textlink">See the full Shipping &amp; Orders FAQ</a>
+	</div>
+	<?php
+}
+
+function espire_shipping_panel() {
+	?>
 	<div class="panel-overlay" data-panel-close="shipping"></div>
 	<aside class="info-panel" id="shipping-panel" aria-label="Shipping and Returns">
 		<button type="button" class="panel-close" aria-label="Close" data-panel-close="shipping">
@@ -280,14 +312,8 @@ function espire_shipping_panel() {
 		</button>
 		<h3>Shipping &amp; Returns</h3>
 		<p class="panel-intro">The most common questions, answered &mdash; see the full FAQ for everything else.</p>
-		<?php foreach ( $faqs as $i => $faq ) : ?>
-			<details class="faq-item"<?php echo 0 === $i ? ' open' : ''; ?>>
-				<summary><?php echo esc_html( $faq[0] ); ?></summary>
-				<?php echo wp_kses_post( wpautop( $faq[1] ) ); ?>
-			</details>
-		<?php endforeach; ?>
+		<?php espire_shipping_content(); ?>
 		<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="btn olive btn-block">Need Help? Contact Us Here &rarr;</a>
-		<a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>" class="panel-textlink">See the full Shipping &amp; Orders FAQ &rarr;</a>
 	</aside>
 	<?php
 }
