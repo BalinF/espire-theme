@@ -324,6 +324,6 @@ copy). DIY builder pages have no breadcrumbs.
 **Category → Available Fits** extras: **Fit Name Image** (a ready-made fit graphic shown
 instead of icon + name on Size Guide tabs and in the About panel); **Guide Sections**
 (up to 3: title, sketch image, rows of icon + label + text; sketches alternate sides);
-**Size Notes** rows take a **Size Icon**. Tag popups have one button to the tag's page
+the measurement table is **Measurement Table: Sizes** (icon per column) + **Measurement Table: Rows** (what's measured, then a figure per size). Size Notes were removed. Tag popups have one button to the tag's page
 (`ESPIRE_SYMBOL_BUTTON_TEXT` in inc/symbols.php). The About panel's Seed To Store steps
 are joined by the faint half-arrow mark (`assets/step-connector.svg`).
