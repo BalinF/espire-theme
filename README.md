@@ -327,3 +327,12 @@ instead of icon + name on Size Guide tabs and in the About panel); **Guide Secti
 the measurement table is **Measurement Table: Sizes** (icon per column) + **Measurement Table: Rows** (what's measured, then a figure per size). Size Notes were removed. Tag popups have one button to the tag's page
 (`ESPIRE_SYMBOL_BUTTON_TEXT` in inc/symbols.php). The About panel's Seed To Store steps
 are joined by the faint half-arrow mark (`assets/step-connector.svg`).
+
+**Gift cards (inc/gift-cards.php)**: a Simple, Virtual product with **Sell as a gift card**
+ticked (Gift Card box on the product). Shoppers pick an amount (or Other, between the
+min and max), optionally a recipient + message. When the order is paid, each card gets
+a code like `ESP-7KQ2-M9XD`: a WooCommerce coupon (Marketing → Coupons) worth that
+amount, valid 3 years, emailed to the recipient or buyer and shown on the order. Online
+it goes in the coupon box; the unused balance stays on the coupon. In store: look the
+code up, take it off in Square, then lower the coupon's amount. Coupons must be enabled
+(WooCommerce → Settings → General).
