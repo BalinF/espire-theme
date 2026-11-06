@@ -115,7 +115,7 @@ while ( have_posts() ) :
 				<div class="product-price"><?php echo wp_kses_post( $product->get_price_html() ); ?></div>
 
 				<div class="avail-bar">
-					<span><?php echo $product->is_in_stock() ? 'Have it made for you' : 'Currently out of stock'; ?></span>
+					<span><?php echo espire_is_gift_card( $product ) ? 'Emailed as soon as you order' : ( $product->is_in_stock() ? 'Have it made for you' : 'Currently out of stock' ); ?></span>
 				</div>
 
 				<?php
