@@ -30,6 +30,7 @@ require_once get_template_directory() . '/inc/pages.php';
 require_once get_template_directory() . '/inc/home.php';
 require_once get_template_directory() . '/inc/shop-the-set.php';
 require_once get_template_directory() . '/inc/gift-cards.php';
+require_once get_template_directory() . '/inc/gift-cards-admin.php';
 require_once get_template_directory() . '/inc/shop-filters.php';
 require_once get_template_directory() . '/inc/product-cards.php';
 require_once get_template_directory() . '/inc/journey.php';
