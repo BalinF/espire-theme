@@ -333,6 +333,6 @@ ticked (Gift Card box on the product). Shoppers pick an amount (or Other, betwee
 min and max), optionally a recipient + message. When the order is paid, each card gets
 a code like `ESP-7KQ2-M9XD`: a WooCommerce coupon (Marketing → Coupons) worth that
 amount, valid 3 years, emailed to the recipient or buyer and shown on the order. Online
-it goes in the coupon box; the unused balance stays on the coupon. In store: look the
+it goes in the coupon box and comes off the whole order, shipping included; the unused balance stays on the coupon. In store: look the
 code up, take it off in Square, then lower the coupon's amount. Coupons must be enabled
 (WooCommerce → Settings → General).
