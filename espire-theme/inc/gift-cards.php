@@ -264,6 +264,50 @@ function espire_gift_card_new_code() {
 	return $code;
 }
 
+/**
+ * Make one gift card: a coupon worth $amount, valid for ESPIRE_GIFT_CARD_YEARS.
+ * $args: order_id, to_name, to_email, note. Returns the code.
+ */
+function espire_gift_card_create( $amount, $args = array() ) {
+	$args   = wp_parse_args( $args, array( 'order_id' => 0, 'to_name' => '', 'to_email' => '', 'note' => '' ) );
+	$code   = espire_gift_card_new_code();
+	$coupon = new WC_Coupon();
+	$coupon->set_code( $code );
+	$coupon->set_discount_type( 'fixed_cart' );
+	$coupon->set_amount( $amount );
+	$coupon->set_individual_use( false );
+	$coupon->set_usage_limit( 0 );
+	$coupon->set_date_expires( strtotime( '+' . ESPIRE_GIFT_CARD_YEARS . ' years' ) );
+	$coupon->set_description( 'Espire gift card ($' . espire_money( $amount ) . '). Manage it under WooCommerce → Gift Cards.' );
+	$coupon->update_meta_data( '_espire_gift_card', 'yes' );
+	$coupon->update_meta_data( '_espire_gc_order', (int) $args['order_id'] );
+	$coupon->update_meta_data( '_espire_gc_initial', $amount );
+	$coupon->update_meta_data( '_espire_gc_to', trim( $args['to_name'] . ( $args['to_email'] ? ' <' . $args['to_email'] . '>' : '' ) ) );
+	$coupon->save();
+	espire_gift_card_log( $coupon, $amount, $args['note'] ?: 'Created' );
+	return $code;
+}
+
+/** Add a line to a card's history: + for loaded, − for spent. */
+function espire_gift_card_log( $coupon, $change, $note ) {
+	$log   = (array) $coupon->get_meta( '_espire_gc_log' );
+	$log[] = array( 'time' => time(), 'change' => (float) $change, 'balance' => (float) $coupon->get_amount(), 'note' => (string) $note );
+	$coupon->update_meta_data( '_espire_gc_log', array_values( array_filter( $log ) ) );
+	$coupon->save();
+}
+
+/** Take $spent off a card's balance (online order or in store) and log it. */
+function espire_gift_card_spend( $coupon, $spent, $note ) {
+	$left = max( 0, round( (float) $coupon->get_amount() - (float) $spent, 2 ) );
+	$coupon->set_amount( $left );
+	if ( $left <= 0 ) {
+		$coupon->set_usage_limit( max( 1, $coupon->get_usage_count() ) ); // fully spent
+	}
+	$coupon->save();
+	espire_gift_card_log( $coupon, -1 * (float) $spent, $note );
+	return $left;
+}
+
 function espire_gift_card_issue( $order_id ) {
 	$order = wc_get_order( $order_id );
 	if ( ! $order ) {
@@ -276,19 +320,12 @@ function espire_gift_card_issue( $order_id ) {
 		}
 		$codes = array();
 		for ( $n = 0; $n < max( 1, (int) $line->get_quantity() ); $n++ ) {
-			$code   = espire_gift_card_new_code();
-			$coupon = new WC_Coupon();
-			$coupon->set_code( $code );
-			$coupon->set_discount_type( 'fixed_cart' );
-			$coupon->set_amount( $amount );
-			$coupon->set_individual_use( false );
-			$coupon->set_usage_limit( 0 );
-			$coupon->set_date_expires( strtotime( '+' . ESPIRE_GIFT_CARD_YEARS . ' years' ) );
-			$coupon->set_description( sprintf( 'Espire gift card from order #%s — $%s. In store: take it off in Square, then lower the Coupon amount here by what was spent.', $order->get_order_number(), espire_money( $amount ) ) );
-			$coupon->update_meta_data( '_espire_gift_card', 'yes' );
-			$coupon->update_meta_data( '_espire_gc_order', $order->get_id() );
-			$coupon->update_meta_data( '_espire_gc_initial', $amount );
-			$coupon->save();
+			$code = espire_gift_card_create( $amount, array(
+				'order_id' => $order->get_id(),
+				'to_name'  => $line->get_meta( 'Recipient' ),
+				'to_email' => $line->get_meta( 'Recipient email' ) ?: $order->get_billing_email(),
+				'note'     => sprintf( 'Bought online, order #%s', $order->get_order_number() ),
+			) );
 			$codes[] = $code;
 		}
 		$line->add_meta_data( '_espire_gc_codes', $codes, true );
@@ -296,7 +333,7 @@ function espire_gift_card_issue( $order_id ) {
 		$line->save();
 
 		$to = $line->get_meta( 'Recipient email' ) ?: $order->get_billing_email();
-		espire_gift_card_email( $to, $codes, $amount, $line->get_meta( 'Recipient' ), $line->get_meta( 'Message' ), $order );
+		espire_gift_card_email( $to, $codes, $amount, $line->get_meta( 'Recipient' ), $line->get_meta( 'Message' ), trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ) );
 		$order->add_order_note( sprintf( 'Gift card %s ($%s) issued and emailed to %s.', implode( ', ', $codes ), espire_money( $amount ), $to ) );
 	}
 }
@@ -304,11 +341,10 @@ add_action( 'woocommerce_order_status_processing', 'espire_gift_card_issue' );
 add_action( 'woocommerce_order_status_completed', 'espire_gift_card_issue' );
 
 /** The gift card email, in WooCommerce's email style. */
-function espire_gift_card_email( $to, $codes, $amount, $to_name, $message, $order ) {
+function espire_gift_card_email( $to, $codes, $amount, $to_name, $message, $from = '' ) {
 	if ( ! $to || ! function_exists( 'WC' ) ) {
 		return;
 	}
-	$from    = trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() );
 	$expires = date_i18n( 'j F Y', strtotime( '+' . ESPIRE_GIFT_CARD_YEARS . ' years' ) );
 	ob_start();
 	?>
@@ -406,12 +442,7 @@ function espire_gift_card_redeem( $order_id ) {
 			continue;
 		}
 		$used = abs( (float) $fee->get_total() );
-		$left = max( 0, round( (float) $coupon->get_amount() - $used, 2 ) );
-		$coupon->set_amount( $left );
-		if ( $left <= 0 ) {
-			$coupon->set_usage_limit( max( 1, $coupon->get_usage_count() ) ); // fully spent
-		}
-		$coupon->save();
+		$left = espire_gift_card_spend( $coupon, $used, sprintf( 'Spent online, order #%s', $order->get_order_number() ) );
 		$order->add_order_note( sprintf( 'Gift card %s: $%s used, $%s left.', $code, espire_money( $used ), espire_money( $left ) ) );
 	}
 	$order->update_meta_data( '_espire_gc_redeemed', 1 );

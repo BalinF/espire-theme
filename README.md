@@ -336,3 +336,8 @@ amount, valid 3 years, emailed to the recipient or buyer and shown on the order.
 it goes in the coupon box and comes off the whole order, shipping included; the unused balance stays on the coupon. In store: look the
 code up, take it off in Square, then lower the coupon's amount. Coupons must be enabled
 (WooCommerce → Settings → General).
+
+**WooCommerce → Gift Cards**: every card with status (Unused / Part used / Spent /
+Expired), balance, original value, who it's for, where it came from and its history;
+search and filter. **Spent in store** takes an amount off a card's balance; **Make a gift
+card** creates cards by hand (optionally emailed).
