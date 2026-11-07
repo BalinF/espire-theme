@@ -11,8 +11,9 @@
  * code (ESP-XXXX-XXXX) as a WooCommerce coupon worth the amount, valid for
  * 3 years, emailed to the recipient (or the buyer) and shown on the order.
  *
- * Spending it: online, the code goes in the coupon box at cart/checkout;
- * whatever isn't used stays on the card (its coupon amount goes down). In
+ * Spending it: online, the code goes in the coupon box at cart/checkout and
+ * comes off the whole order, shipping included; whatever isn't used stays
+ * on the card (its coupon amount goes down). In
  * store: look the code up in Marketing → Coupons, take it off in Square, then
  * lower that coupon's amount by what was spent.
  */
@@ -326,26 +327,92 @@ function espire_gift_card_email( $to, $codes, $amount, $to_name, $message, $orde
 	$mailer->send( $to, 'Your Espire Clothing gift card', $mailer->wrap_message( 'You\'ve got a gift card', ob_get_clean() ), array( 'Content-Type: text/html; charset=UTF-8' ) );
 }
 
-/* ---------- Spending: the unused part stays on the card ---------- */
+/* ---------- Spending: off the whole order, shipping included ---------- */
 
+/** True if a coupon (object or code) is an Espire gift card. */
+function espire_coupon_is_gift_card( $coupon ) {
+	$coupon = $coupon instanceof WC_Coupon ? $coupon : new WC_Coupon( $coupon );
+	return $coupon->get_id() && 'yes' === $coupon->get_meta( '_espire_gift_card' );
+}
+
+/**
+ * A gift card is entered in the normal coupon box, but it isn't a product
+ * discount (WooCommerce coupons can't touch shipping). Its coupon gives $0;
+ * instead its balance comes off the order total as a "Gift card" line, up to
+ * whatever is owed (products + shipping), and the rest stays on the card.
+ */
+add_filter( 'woocommerce_coupon_get_discount_amount', function ( $discount, $discounting, $cart_item, $single, $coupon ) {
+	return espire_coupon_is_gift_card( $coupon ) ? 0 : $discount;
+}, 99, 5 );
+
+add_action( 'woocommerce_cart_calculate_fees', function ( $cart ) {
+	$owed = (float) $cart->get_subtotal() + (float) $cart->get_subtotal_tax()
+		- (float) $cart->get_discount_total() - (float) $cart->get_discount_tax()
+		+ (float) $cart->get_shipping_total() + (float) $cart->get_shipping_tax();
+	foreach ( $cart->get_fees() as $fee ) { // e.g. the Shop The Set saving
+		$owed += (float) $fee->amount;
+	}
+	foreach ( $cart->get_applied_coupons() as $code ) {
+		$coupon = new WC_Coupon( $code );
+		if ( ! espire_coupon_is_gift_card( $coupon ) || $owed <= 0 ) {
+			continue;
+		}
+		$use = round( min( (float) $coupon->get_amount(), $owed ), 2 );
+		if ( $use <= 0 ) {
+			continue;
+		}
+		$cart->fees_api()->add_fee( array(
+			'id'      => 'espire-gc-' . sanitize_title( $code ),
+			'name'    => 'Gift card ' . strtoupper( $code ),
+			'amount'  => -1 * $use,
+			'taxable' => false, // paying with a gift card isn't a discount: GST on the goods is unchanged
+		) );
+		$owed -= $use;
+	}
+}, 99 );
+
+/** In the totals, the coupon row just shows the card's balance + Remove. */
+add_filter( 'woocommerce_cart_totals_coupon_label', function ( $label, $coupon ) {
+	return espire_coupon_is_gift_card( $coupon ) ? 'Gift card ' . strtoupper( $coupon->get_code() ) : $label;
+}, 10, 2 );
+add_filter( 'woocommerce_cart_totals_coupon_html', function ( $html, $coupon ) {
+	if ( ! espire_coupon_is_gift_card( $coupon ) ) {
+		return $html;
+	}
+	$remove = add_query_arg( 'remove_coupon', rawurlencode( $coupon->get_code() ), defined( 'WOOCOMMERCE_CHECKOUT' ) ? wc_get_checkout_url() : wc_get_cart_url() );
+	return 'Balance $' . esc_html( espire_money( (float) $coupon->get_amount() ) ) . ' <a href="' . esc_url( $remove ) . '" class="woocommerce-remove-coupon" data-coupon="' . esc_attr( $coupon->get_code() ) . '">[Remove]</a>';
+}, 10, 2 );
+
+/** Mark the order's gift card line with its code, for taking it off the balance. */
+add_action( 'woocommerce_checkout_create_order_fee_item', function ( $item, $fee_key, $fee ) {
+	if ( isset( $fee->id ) && 0 === strpos( $fee->id, 'espire-gc-' ) ) {
+		$item->add_meta_data( '_espire_gc_code', strtoupper( substr( $item->get_name(), strlen( 'Gift card ' ) ) ), true );
+	}
+}, 10, 3 );
+
+/** Once the order is placed and paid, lower each card's balance by what it paid. */
 function espire_gift_card_redeem( $order_id ) {
 	$order = wc_get_order( $order_id );
 	if ( ! $order || $order->get_meta( '_espire_gc_redeemed' ) ) {
 		return;
 	}
-	foreach ( $order->get_items( 'coupon' ) as $item ) {
-		$coupon = new WC_Coupon( $item->get_code() );
-		if ( ! $coupon->get_id() || 'yes' !== $coupon->get_meta( '_espire_gift_card' ) ) {
+	foreach ( $order->get_fees() as $fee ) {
+		$code = $fee->get_meta( '_espire_gc_code' );
+		if ( ! $code ) {
 			continue;
 		}
-		$used = (float) $item->get_discount() + (float) $item->get_discount_tax();
+		$coupon = new WC_Coupon( $code );
+		if ( ! espire_coupon_is_gift_card( $coupon ) ) {
+			continue;
+		}
+		$used = abs( (float) $fee->get_total() );
 		$left = max( 0, round( (float) $coupon->get_amount() - $used, 2 ) );
 		$coupon->set_amount( $left );
 		if ( $left <= 0 ) {
 			$coupon->set_usage_limit( max( 1, $coupon->get_usage_count() ) ); // fully spent
 		}
 		$coupon->save();
-		$order->add_order_note( sprintf( 'Gift card %s: $%s used, $%s left.', strtoupper( $item->get_code() ), espire_money( $used ), espire_money( $left ) ) );
+		$order->add_order_note( sprintf( 'Gift card %s: $%s used, $%s left.', $code, espire_money( $used ), espire_money( $left ) ) );
 	}
 	$order->update_meta_data( '_espire_gc_redeemed', 1 );
 	$order->save();
